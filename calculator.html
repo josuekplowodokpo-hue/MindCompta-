@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCompta - Outils de Calcul</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Base styles */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Roboto+Mono:wght@400;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .bg-brand-dark { background-color: #0d47a1; /* Bleu profond, moins sombre */ }
+        .text-brand-dark { color: #0d47a1; }
+        .bg-accent { background-color: #42a5f5; /* Bleu Clair Vif */ }
+        .hover-accent:hover { background-color: #1e88e5; }
+        .active-link { color: #42a5f5; font-weight: 600; }
+        
+        /* Navigation & Inputs */
+        .input-group input {
+            @apply w-full p-3 border border-gray-300 rounded-lg text-lg text-right font-mono transition duration-300focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm;
+        }
+        .nav-link { @apply text-sm font-medium hover:text-gray-200 transition duration-200; }
+        .mobile-link { @apply block py-2 px-3 text-base font-medium rounded-lg hover:bg-[#345b85] transition duration-200; }
+
+        /* CALCULATOR V3 LIGHT STYLES */
+        #calc-display-v2 {
+            font-family: 'Roboto Mono', monospace;
+            @apply w-full p-6 mb-4 text-5xl text-right bg-gray-100 text-gray-900 rounded-xl border-2 border-gray-200 shadow-xl;
+            min-height: 80px;
+        }
+        .calc-btn-v2 {
+            @apply p-4 rounded-xl text-2xl font-semibold transition duration-150 shadow-md transform active:scale-95 hover:shadow-lg;
+        }
+        .btn-operator {
+            @apply bg-blue-500 hover:bg-blue-600 text-white;
+        }
+        .btn-number {
+            @apply bg-white hover:bg-gray-100 text-gray-800 border border-gray-200;
+        }
+        .btn-clear {
+            @apply bg-red-100 hover:bg-red-200 text-red-700;
+        }
+        .btn-equal {
+            @apply bg-green-500 hover:bg-green-600 text-white;
+        }
+
+        /* TMS/TMST Styles */
+        .economic-card {
+            @apply bg-white p-6 rounded-xl shadow-xl border border-gray-100;
+        }
+        .mode-button {
+            @apply py-2 px-4 rounded-lg font-medium transition duration-150;
+        }
+        .mode-active {
+            @apply bg-blue-500 text-white shadow-md;
+        }
+        .mode-inactive {
+            @apply bg-gray-200 text-gray-700 hover:bg-gray-300;
+        }
+    </style>
+    <!-- Chargement de MathJax pour les formules LaTeX -->
+    <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <!-- EN-TÊTE ET NAVIGATION -->
+    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <!-- LOGO MIS À JOUR -->
+                    <img src="logo.jpg" 
+                         alt="MindCompta Logo" 
+                         class="h-10 w-auto rounded-full mr-3 border-2 border-white">
+                    <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
+                </div>
+                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-6">
+                    <a href="index.html" class="nav-link">Accueil</a>
+                    <a href="services.html" class="nav-link">Services</a>
+                    <a href="calculator.html" class="nav-link active-link">Calculatrice</a>
+                    <a href="contact.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300">
+                        Contact
+                    </a>
+                </nav>
+                <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </div>
+            <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
+                <a href="index.html" class="mobile-link">Accueil</a>
+                <a href="services.html" class="mobile-link">Services</a>
+                <a href="calculator.html" class="mobile-link active-link">Calculatrice</a>
+                <a href="contact.html" class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CONTENU PRINCIPAL CALCULATRICE -->
+    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-8">
+        <h1 class="text-3xl font-bold text-center text-brand-dark mb-8">Outils de Calculs Financiers & Économiques</h1>
+
+        <!-- Onglets de navigation des outils -->
+        <div class="flex justify-center mb-6">
+            <button id="tab-standard" onclick="showTab('standard')" 
+                    class="tab-button bg-brand-dark text-white font-semibold py-3 px-6 rounded-l-xl shadow-lg transition duration-150">
+                Calculatrice Standard
+            </button>
+            <button id="tab-tools" onclick="showTab('tools')" 
+                    class="tab-button bg-white text-brand-dark font-semibold py-3 px-6 rounded-r-xl shadow-lg hover:bg-gray-100 transition duration-150">
+                Outils Comptables & Économiques
+            </button>
+        </div>
+
+        <!-- Conteneur des Onglets -->
+        <div class="bg-white p-6 md:p-10 rounded-xl shadow-2xl border border-gray-100">
+            
+            <!-- 1. CALCULATRICE STANDARD (Affichage par défaut) -->
+            <section id="content-standard" class="tab-content">
+                <h2 class="text-2xl font-bold text-brand-dark mb-6 text-center">Calculatrice Habituelle</h2>
+                <div class="max-w-sm mx-auto p-6 bg-gray-50 rounded-3xl shadow-2xl border border-gray-200">
+                    <input type="text" id="calc-display-v2" value="0" disabled aria-label="Résultat de la calculatrice">
+                    
+                    <div class="grid grid-cols-4 gap-3">
+                        <!-- Ligne 1 -->
+                        <button onclick="clearDisplayV2()" class="calc-btn-v2 btn-clear">AC</button>
+                        <button onclick="deleteLast()" class="calc-btn-v2 btn-clear">DEL</button>
+                        <button onclick="appendOperatorV2('/')" class="calc-btn-v2 btn-operator">÷</button>
+                        <button onclick="appendOperatorV2('*')" class="calc-btn-v2 btn-operator">×</button>
+                        
+                        <!-- Ligne 2 -->
+                        <button onclick="appendValueV2('7')" class="calc-btn-v2 btn-number">7</button>
+                        <button onclick="appendValueV2('8')" class="calc-btn-v2 btn-number">8</button>
+                        <button onclick="appendValueV2('9')" class="calc-btn-v2 btn-number">9</button>
+                        <button onclick="appendOperatorV2('-')" class="calc-btn-v2 btn-operator">-</button>
+                        
+                        <!-- Ligne 3 -->
+                        <button onclick="appendValueV2('4')" class="calc-btn-v2 btn-number">4</button>
+                        <button onclick="appendValueV2('5')" class="calc-btn-v2 btn-number">5</button>
+                        <button onclick="appendValueV2('6')" class="calc-btn-v2 btn-number">6</button>
+                        <button onclick="appendOperatorV2('+')" class="calc-btn-v2 btn-operator">+</button>
+                        
+                        <!-- Ligne 4 -->
+                        <button onclick="appendValueV2('1')" class="calc-btn-v2 btn-number">1</button>
+                        <button onclick="appendValueV2('2')" class="calc-btn-v2 btn-number">2</button>
+                        <button onclick="appendValueV2('3')" class="calc-btn-v2 btn-number">3</button>
+                        <button onclick="calculateResultV2()" class="calc-btn-v2 btn-equal row-span-2">=</button>
+                        
+                        <!-- Ligne 5 -->
+                        <button onclick="appendValueV2('0')" class="calc-btn-v2 btn-number col-span-2">0</button>
+                        <button onclick="appendValueV2('.')" class="calc-btn-v2 btn-number">.</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. OUTILS COMPTABLES ET ÉCONOMIQUES (Initialement caché) -->
+            <section id="content-tools" class="tab-content hidden">
+                <h2 class="text-2xl font-bold text-brand-dark mb-6 border-b pb-2">Outils Spécialisés Finance & Économie</h2>
+                
+                <!-- Sous-Onglets pour les outils comptables -->
+                <div class="flex justify-start mb-6 border-b pb-4 overflow-x-auto">
+                    <button id="subtab-bilan" onclick="showSubTab('bilan')" 
+                            class="subtab-button mode-active font-semibold py-2 px-4 rounded-l-lg whitespace-nowrap">
+                        Générateur de Bilan
+                    </button>
+                    <button id="subtab-marge" onclick="showSubTab('marge')" 
+                            class="subtab-button mode-inactive font-semibold py-2 px-4 whitespace-nowrap">
+                        Calcul de Marge
+                    </button>
+                    <button id="subtab-tms" onclick="showSubTab('tms')" 
+                            class="subtab-button mode-inactive font-semibold py-2 px-4 whitespace-nowrap">
+                        Taux Marginal de Substitution (TMS)
+                    </button>
+                    <button id="subtab-tmst" onclick="showSubTab('tmst')" 
+                            class="subtab-button mode-inactive font-semibold py-2 px-4 rounded-r-lg whitespace-nowrap">
+                        Taux Marginal de Substitution Technique (TMST)
+                    </button>
+                </div>
+
+                <!-- 2a. Générateur de Bilan (Existant) -->
+                <div id="subcontent-bilan" class="subtab-content grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- ... Bilan content (kept as is) ... -->
+                    <div class="economic-card bg-green-50/50">
+                        <h3 class="text-2xl font-bold text-green-700 mb-4 border-b border-green-300 pb-2">ACTIF</h3>
+                        <div class="space-y-4">
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">Actifs Immobolisés (C. 2)</label>
+                                <input type="number" step="0.01" value="50000" min="0" id="actif_immo" oninput="calculateBilan()">
+                            </div>
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">Actifs Circulants (C. 3)</label>
+                                <input type="number" step="0.01" value="30000" min="0" id="actif_circ" oninput="calculateBilan()">
+                            </div>
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">Trésorerie Actif (C. 4)</label>
+                                <input type="number" step="0.01" value="5000" min="0" id="treso_actif" oninput="calculateBilan()">
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t-2 border-green-700">
+                            <h4 class="text-xl font-bold flex justify-between">
+                                <span>TOTAL ACTIF :</span>
+                                <span id="total_actif" class="text-2xl">0</span>
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="economic-card bg-red-50/50">
+                        <h3 class="text-2xl font-bold text-red-700 mb-4 border-b border-red-300 pb-2">PASSIF</h3>
+                        <div class="space-y-4">
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">Capitaux Propres (C. 1)</label>
+                                <input type="number" step="0.01" value="40000" min="0" id="capitaux_propres" oninput="calculateBilan()">
+                            </div>
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">Dettes à Long Terme (C. 5)</label>
+                                <input type="number" step="0.01" value="25000" min="0" id="dettes_long" oninput="calculateBilan()">
+                            </div>
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">Dettes à Court Terme (C. 6)</label>
+                                <input type="number" step="0.01" value="15000" min="0" id="dettes_court" oninput="calculateBilan()">
+                            </div>
+                            <div class="input-group">
+                                <label class="block text-sm font-medium text-gray-700">Trésorerie Passif (C. 7)</label>
+                                <input type="number" step="0.01" value="5000" min="0" id="treso_passif" oninput="calculateBilan()">
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t-2 border-red-700">
+                            <h4 class="text-xl font-bold flex justify-between">
+                                <span>TOTAL PASSIF :</span>
+                                <span id="total_passif" class="text-2xl">0</span>
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 mt-6 p-4 rounded-lg text-center bg-blue-100/50 shadow-xl border-2 border-blue-200">
+                        <h3 class="text-2xl font-bold mb-2 text-brand-dark">VÉRIFICATION DU BILAN</h3>
+                        <p id="bilan_result" class="text-xl font-bold text-gray-600">Entrez les montants ci-dessus pour vérifier.</p>
+                    </div>
+                </div>
+
+                <!-- 2b. Calcul de Marge (Existant) -->
+                <div id="subcontent-marge" class="subtab-content hidden economic-card max-w-lg mx-auto">
+                    <h3 class="text-2xl font-bold text-brand-dark mb-4 border-b pb-2">Calcul du Taux de Marge</h3>
+                    <div class="space-y-4">
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Prix de Vente Hors Taxe (PVHT)</label>
+                            <input type="number" step="0.01" value="100" min="0" id="pvht_marge" oninput="calculateMarge()">
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Coût d'Achat (CA)</label>
+                            <input type="number" step="0.01" value="70" min="0" id="ca_marge" oninput="calculateMarge()">
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t-2 border-accent text-center bg-gray-50 p-4 rounded-lg">
+                        <h4 class="text-xl font-bold text-brand-dark">Résultat</h4>
+                        <p class="text-lg text-gray-700">Marge Commerciale : <span id="marge_commerciale" class="font-bold text-green-600">30.00</span></p>
+                        <p class="text-lg text-gray-700">Taux de Marge : <span id="taux_marge" class="font-bold text-green-600">42.86%</span></p>
+                    </div>
+                </div>
+                
+                <!-- 2c. Taux Marginal de Substitution (TMS) (MIS À JOUR) -->
+                <div id="subcontent-tms" class="subtab-content hidden economic-card max-w-lg mx-auto">
+                    <h3 class="text-2xl font-bold text-brand-dark mb-4 border-b pb-2">Taux Marginal de Substitution (TMS)</h3>
+                    <p class="text-sm text-gray-500 mb-4">Mesure le compromis entre deux biens. Choisissez le mode de calcul :</p>
+                    
+                    <!-- Sélection du Mode de Calcul -->
+                    <div class="flex justify-center space-x-2 mb-6">
+                        <button class="mode-button mode-active" data-mode="quantite" onclick="setTMSMode('quantite')">Par Quantités ($\Delta X, \Delta Y$)</button>
+                        <button class="mode-button mode-inactive" data-mode="prix" onclick="setTMSMode('prix')">Par Prix ($\frac{P_X}{P_Y}$)</button>
+                    </div>
+
+                    <!-- Mode 1: Par Quantités -->
+                    <div id="tms-quantite-inputs" class="space-y-4">
+                        <p class="text-sm font-medium text-blue-700">$$TMS = - \frac{\Delta Y}{\Delta X}$$</p>
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Quantité Initiale de Bien X ($X_1$)</label>
+                            <input type="number" step="0.01" value="10" min="0" id="tms_x1" oninput="calculateTMS()">
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Quantité Finale de Bien X ($X_2$)</label>
+                            <input type="number" step="0.01" value="11" min="0" id="tms_x2" oninput="calculateTMS()">
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Quantité Initiale de Bien Y ($Y_1$)</label>
+                            <input type="number" step="0.01" value="50" min="0" id="tms_y1" oninput="calculateTMS()">
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Quantité Finale de Bien Y ($Y_2$)</label>
+                            <input type="number" step="0.01" value="45" min="0" id="tms_y2" oninput="calculateTMS()">
+                        </div>
+                    </div>
+
+                    <!-- Mode 2: Par Prix (Initialement caché) -->
+                    <div id="tms-prix-inputs" class="space-y-4 hidden">
+                        <p class="text-sm font-medium text-blue-700">$$TMS = \frac{P_X}{P_Y} \text{ (à l'équilibre)}$$</p>
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Prix du Bien X ($P_X$)</label>
+                            <input type="number" step="0.01" value="5" min="0" id="tms_px" oninput="calculateTMS()">
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Prix du Bien Y ($P_Y$)</label>
+                            <input type="number" step="0.01" value="1" min="0" id="tms_py" oninput="calculateTMS()">
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t-2 border-accent text-center bg-gray-50 p-4 rounded-lg">
+                        <h4 class="text-xl font-bold text-brand-dark">Résultat TMS</h4>
+                        <p class="text-lg text-gray-700">TMS (Valeur Absolue) : <span id="tms_result" class="font-bold text-green-600">5.00</span></p>
+                        <p id="tms_interpretation" class="text-sm text-gray-500 mt-2">Le TMS de 5.00 signifie que le consommateur doit renoncer à 5.00 unités de Y pour une unité supplémentaire de X.</p>
+                    </div>
+                </div>
+
+                <!-- 2d. Taux Marginal de Substitution Technique (TMST) (Existant) -->
+                <div id="subcontent-tmst" class="subtab-content hidden economic-card max-w-lg mx-auto">
+                    <h3 class="text-2xl font-bold text-brand-dark mb-4 border-b pb-2">Taux Marginal de Substitution Technique (TMST)</h3>
+                    <p class="text-sm text-gray-500 mb-4">Mesure le compromis entre les facteurs de production (Capital K et Travail L). ($$TMST = - \frac{\Delta K}{\Delta L}$$)</p>
+                    <div class="space-y-4">
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Quantité Initiale de Travail ($L_1$)</label>
+                            <input type="number" step="0.01" value="5" min="0" id="tmst_l1" oninput="calculateTMST()">
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Quantité Finale de Travail ($L_2$)</label>
+                            <input type="number" step="0.01" value="6" min="0" id="tmst_l2" oninput="calculateTMST()">
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Quantité Initiale de Capital ($K_1$)</label>
+                            <input type="number" step="0.01" value="100" min="0" id="tmst_k1" oninput="calculateTMST()">
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700">Quantité Finale de Capital ($K_2$)</label>
+                            <input type="number" step="0.01" value="80" min="0" id="tmst_k2" oninput="calculateTMST()">
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t-2 border-accent text-center bg-gray-50 p-4 rounded-lg">
+                        <h4 class="text-xl font-bold text-brand-dark">Résultat TMST</h4>
+                        <p class="text-lg text-gray-700">TMST (Valeur Absolue) : <span id="tmst_result" class="font-bold text-green-600">20.00</span></p>
+                        <p class="text-sm text-gray-500 mt-2">Un TMST de 20.00 signifie que l'entreprise doit renoncer à 20.00 unités de Capital pour 1 unité supplémentaire de Travail.</p>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+     <!-- PIED DE PAGE -->
+    <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
+        <p class="text-center text-sm text-gray-400">&copy; 2024 MindCompta. Outils Financiers & Économiques.</p>
+    </footer>
+
+    <!-- LOGIQUE JAVASCRIPT -->
+    <script>
+        let expression = '0';
+        let currentTMSMode = 'quantite'; // Default mode
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Logique du Menu Mobile ---
+            const menuButton = document.getElementById('menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Initialiser les calculs par défaut
+            calculateBilan();
+            calculateMarge();
+            calculateTMS();
+            calculateTMST();
+
+            // Set default display value on load
+            document.getElementById('calc-display-v2').value = expression;
+        });
+
+        // --- Logique de Navigation par Onglets (Tabs) ---
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('bg-brand-dark', 'text-white', 'bg-white', 'text-brand-dark');
+                if (button.id === `tab-${tabId}`) {
+                    button.classList.add('bg-brand-dark', 'text-white');
+                } else {
+                    button.classList.add('bg-white', 'text-brand-dark', 'hover:bg-gray-100');
+                }
+            });
+            
+            if (tabId === 'tools') {
+                // Ensure the last active subtab (or bilan) is shown
+                const activeSubTab = document.querySelector('.subtab-content:not(.hidden)');
+                showSubTab(activeSubTab ? activeSubTab.id.replace('subcontent-', '') : 'bilan');
+            }
+        }
+
+        function showSubTab(subTabId) {
+            document.querySelectorAll('.subtab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`subcontent-${subTabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.subtab-button').forEach(button => {
+                button.classList.remove('mode-active', 'mode-inactive');
+                if (button.id === `subtab-${subTabId}`) {
+                    button.classList.add('mode-active');
+                } else {
+                    button.classList.add('mode-inactive');
+                }
+            });
+
+             // For TMS, ensure the correct inputs are visible on tab change
+            if (subTabId === 'tms') {
+                const activeModeButton = document.querySelector('#subcontent-tms .mode-button.mode-active');
+                if(activeModeButton) {
+                    currentTMSMode = activeModeButton.dataset.mode;
+                    setTMSMode(currentTMSMode); // Re-apply the mode logic
+                } else {
+                    setTMSMode('quantite'); // Default
+                }
+            }
+        }
+
+
+        // --- Logique Calculatrice Standard V3 ---
+        const displayV2 = document.getElementById('calc-display-v2');
+
+        function updateDisplayV2(value) {
+            displayV2.value = value;
+        }
+
+        function appendValueV2(value) {
+            if (expression === 'Error') {
+                expression = '';
+            }
+            if (expression === '0' && value !== '.') {
+                expression = value;
+            } else if (value === '.' && expression.split(/[+\-*/]/).pop().includes('.')) {
+                return;
+            } else {
+                expression += value;
+            }
+            updateDisplayV2(expression);
+        }
+
+        function appendOperatorV2(operator) {
+            if (expression === 'Error') {
+                expression = '0';
+            }
+            if (expression === '0' && operator === '-') {
+                expression = operator;
+            } else if (expression === '0' && operator !== '-') {
+                 return;
+            } else {
+                const lastChar = expression.slice(-1);
+                if (['+', '-', '*', '/'].includes(lastChar)) {
+                    expression = expression.slice(0, -1);
+                }
+                expression += operator;
+            }
+            updateDisplayV2(expression);
+        }
+
+        function deleteLast() {
+            if (expression === 'Error') {
+                 expression = '0';
+            } else {
+                expression = expression.slice(0, -1);
+                if (expression === '' || expression === '-') {
+                    expression = '0';
+                }
+            }
+            updateDisplayV2(expression);
+        }
+
+        function clearDisplayV2() {
+            expression = '0';
+            updateDisplayV2(expression);
+        }
+
+        function calculateResultV2() {
+            if (expression === 'Error') {
+                return;
+            }
+            try {
+                const result = new Function('return ' + expression)(); 
+                const finalResult = String(parseFloat(result.toFixed(10)));
+                expression = finalResult;
+                updateDisplayV2(expression);
+            } catch (e) {
+                expression = 'Error';
+                updateDisplayV2(expression);
+            }
+        }
+
+
+        // --- Logique Outils Comptables (Bilan & Marge) ---
+
+        function formatCurrency(number) {
+            return new Intl.NumberFormat('fr-FR', {
+                style: 'currency',
+                currency: 'EUR', // Utilisé EUR par défaut pour un contexte financier européen
+                minimumFractionDigits: 2
+            }).format(number);
+        }
+
+        function getVal(id) {
+            return parseFloat(document.getElementById(id).value) || 0;
+        }
+
+        function calculateBilan() {
+            // Actif
+            const actifImmo = getVal('actif_immo');
+            const actifCirc = getVal('actif_circ');
+            const tresoActif = getVal('treso_actif');
+            
+            const totalActif = actifImmo + actifCirc + tresoActif;
+            document.getElementById('total_actif').textContent = formatCurrency(totalActif);
+
+            // Passif
+            const capitauxProp = getVal('capitaux_propres');
+            const dettesLong = getVal('dettes_long');
+            const dettesCourt = getVal('dettes_court');
+            const tresoPassif = getVal('treso_passif');
+
+            const totalPassif = capitauxProp + dettesLong + dettesCourt + tresoPassif;
+            document.getElementById('total_passif').textContent = formatCurrency(totalPassif);
+
+            // Vérification du Bilan
+            const bilanResultElement = document.getElementById('bilan_result');
+            const difference = totalActif - totalPassif;
+
+            if (Math.abs(difference) < 0.01) { 
+                bilanResultElement.textContent = `Bilan Équilibré : ${formatCurrency(totalActif)}`;
+                bilanResultElement.classList.remove('text-red-600', 'text-gray-600');
+                bilanResultElement.classList.add('text-green-600');
+            } else {
+                bilanResultElement.textContent = `Déséquilibre de ${formatCurrency(difference.toFixed(2))} | Actif ≠ Passif`;
+                bilanResultElement.classList.remove('text-green-600', 'text-gray-600');
+                bilanResultElement.classList.add('text-red-600');
+            }
+        }
+        
+        function calculateMarge() {
+            const pvht = getVal('pvht_marge');
+            const ca = getVal('ca_marge');
+
+            const margeCommerciale = pvht - ca;
+            let tauxMarge = 0;
+
+            if (ca > 0) {
+                tauxMarge = (margeCommerciale / ca) * 100;
+            }
+
+            document.getElementById('marge_commerciale').textContent = margeCommerciale.toFixed(2);
+            document.getElementById('taux_marge').textContent = `${tauxMarge.toFixed(2)}%`;
+        }
+
+        // --- Logique Taux Marginal de Substitution (TMS) (Mis à jour) ---
+
+        function setTMSMode(mode) {
+            currentTMSMode = mode;
+            document.querySelectorAll('#subcontent-tms .mode-button').forEach(button => {
+                button.classList.remove('mode-active', 'mode-inactive');
+                if (button.dataset.mode === mode) {
+                    button.classList.add('mode-active');
+                    document.getElementById(`tms-${mode}-inputs`).classList.remove('hidden');
+                } else {
+                    button.classList.add('mode-inactive');
+                    document.getElementById(`tms-${button.dataset.mode}-inputs`).classList.add('hidden');
+                }
+            });
+            calculateTMS(); // Recalcule après changement de mode
+        }
+
+        function calculateTMS() {
+            const tmsResultElement = document.getElementById('tms_result');
+            const tmsInterpretationElement = document.getElementById('tms_interpretation');
+            let tms = 0;
+            let interpretation = "";
+
+            if (currentTMSMode === 'quantite') {
+                const X1 = getVal('tms_x1');
+                const X2 = getVal('tms_x2');
+                const Y1 = getVal('tms_y1');
+                const Y2 = getVal('tms_y2');
+                
+                const deltaX = X2 - X1;
+                const deltaY = Y1 - Y2; // On utilise Y1 - Y2 pour obtenir la valeur positive du renoncement
+
+                if (deltaX > 0 && deltaY >= 0) {
+                    tms = deltaY / deltaX;
+                    interpretation = `Le TMS de ${tms.toFixed(2)} signifie que le consommateur doit renoncer à ${tms.toFixed(2)} unités de Y pour une unité supplémentaire de X.`;
+                } else if (deltaX !== 0) {
+                    // Calcul TMS général (changement négatif autorisé)
+                    tms = Math.abs(deltaY / deltaX);
+                    interpretation = `Calculé par la variation des quantités, le TMS est de ${tms.toFixed(2)}.`;
+                } else {
+                    tmsResultElement.textContent = "Indéfini (ΔX = 0)";
+                    tmsInterpretationElement.textContent = "La variation de la quantité X ne peut être nulle pour ce calcul.";
+                    tmsResultElement.classList.remove('text-green-600');
+                    tmsResultElement.classList.add('text-red-600');
+                    return;
+                }
+
+            } else if (currentTMSMode === 'prix') {
+                const Px = getVal('tms_px');
+                const Py = getVal('tms_py');
+
+                if (Py > 0) {
+                    tms = Px / Py;
+                    interpretation = `À l'équilibre, le TMS est égal au rapport des prix (${Px.toFixed(2)} / ${Py.toFixed(2)}), soit ${tms.toFixed(2)}.`;
+                } else {
+                    tmsResultElement.textContent = "Indéfini (P_Y = 0)";
+                    tmsInterpretationElement.textContent = "Le prix du bien Y doit être supérieur à zéro.";
+                    tmsResultElement.classList.remove('text-green-600');
+                    tmsResultElement.classList.add('text-red-600');
+                    return;
+                }
+            }
+            tmsResultElement.textContent = tms.toFixed(2);
+            tmsInterpretationElement.textContent = interpretation;
+            tmsResultElement.classList.remove('text-red-600');
+            tmsResultElement.classList.add('text-green-600');
+        }
+        
+        // --- Logique Taux Marginal de Substitution Technique (TMST) ---
+        function calculateTMST() {
+            const L1 = getVal('tmst_l1');
+            const L2 = getVal('tmst_l2');
+            const K1 = getVal('tmst_k1');
+            const K2 = getVal('tmst_k2');
+
+            const deltaL = L2 - L1;
+            const deltaK = K1 - K2; // On utilise K1 - K2 pour obtenir la valeur positive de la réduction du capital
+            
+            const tmstResultElement = document.getElementById('tmst_result');
+            const tmstInterpretationElement = document.getElementById('tmst_interpretation');
+
+            if (deltaL > 0 && deltaK >= 0) {
+                const tmst = (deltaK / deltaL);
+                tmstResultElement.textContent = tmst.toFixed(2);
+                tmstInterpretationElement.textContent = `Un TMST de ${tmst.toFixed(2)} signifie que l'entreprise doit renoncer à ${tmst.toFixed(2)} unités de Capital pour 1 unité supplémentaire de Travail.`;
+                tmstResultElement.classList.remove('text-red-600');
+                tmstResultElement.classList.add('text-green-600');
+            } else if (deltaL !== 0) {
+                const tmst = (Math.abs(K2 - K1) / Math.abs(L2 - L1));
+                tmstResultElement.textContent = tmst.toFixed(2);
+                 tmstInterpretationElement.textContent = `Calculé par la variation des facteurs, le TMST est de ${tmst.toFixed(2)}.`;
+                tmstResultElement.classList.remove('text-red-600');
+                tmstResultElement.classList.add('text-green-600');
+            } else {
+                tmstResultElement.textContent = "Indéfini (ΔL = 0)";
+                tmstInterpretationElement.textContent = "La variation de la quantité de Travail (L) ne peut être nulle pour ce calcul.";
+                tmstResultElement.classList.remove('text-green-600');
+                tmstResultElement.classList.add('text-red-600');
+            }
+        }
+        
+        // Ensure the correct tab is active on initial load (optional, but good practice)
+        showTab('standard'); 
+    </script>
+</body>
+</html>

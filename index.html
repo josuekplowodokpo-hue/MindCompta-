@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCompta - Accueil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .bg-brand-dark { background-color: #0d47a1; /* Bleu Profond */ }
+        .text-brand-dark { color: #0d47a1; }
+        .bg-accent { background-color: #42a5f5; /* Bleu Clair Vif */ }
+        .hover-accent:hover { background-color: #1e88e5; }
+        .nav-link { @apply text-sm font-medium hover:text-gray-200 transition duration-200; }
+        .mobile-link { @apply block py-2 px-3 text-base font-medium rounded-lg hover:bg-[#345b85] transition duration-200; }
+        .active-link { color: #42a5f5; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <!-- EN-TÊTE ET NAVIGATION -->
+    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <!-- LOGO MIS À JOUR -->
+                    <img src="logo.jpg" 
+                         alt="MindCompta Logo" 
+                         class="h-10 w-auto rounded-full mr-3 border-2 border-white">
+                    <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
+                </div>
+                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-6">
+                    <a href="index.html" class="nav-link active-link">Accueil</a>
+                    <a href="services.html" class="nav-link">Services</a>
+                    <a href="calculator.html" class="nav-link">Calculatrice</a>
+                    <a href="contact.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300">
+                        Contact
+                    </a>
+                </nav>
+                <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </div>
+            <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
+                <a href="index.html" class="mobile-link active-link">Accueil</a>
+                <a href="services.html" class="mobile-link">Services</a>
+                <a href="calculator.html" class="mobile-link">Calculatrice</a>
+                <a href="contact.html" class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CONTENU PRINCIPAL - HERO SECTION -->
+    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-16 md:py-24">
+        <div class="text-center">
+            <h1 class="text-5xl md:text-6xl font-extrabold text-gray-900 mb-4 leading-tight">
+                La Précision Financière à Portée de Main
+            </h1>
+            <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                MindCompta Finance vous offre des outils de calcul puissants et élégants pour gérer vos finances et vos analyses économiques avec une clarté inégalée.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                <a href="calculator.html" class="bg-brand-dark text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-blue-800 transition duration-300 transform hover:scale-105">
+                    Accéder à la Calculatrice
+                </a>
+                <a href="services.html" class="bg-white text-brand-dark font-bold py-3 px-8 rounded-full border border-gray-300 shadow-md hover:bg-gray-50 transition duration-300 transform hover:scale-105">
+                    Découvrir nos Services
+                </a>
+            </div>
+        </div>
+
+        <!-- Section des Avantages -->
+        <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                <div class="text-accent text-4xl mb-4">💡</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Calculs Lumineux</h3>
+                <p class="text-gray-500 text-sm">Une interface claire et non-sombres, optimisée pour la lisibilité et le confort visuel.</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                <div class="text-accent text-4xl mb-4">📈</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Outils Économiques</h3>
+                <p class="text-gray-500 text-sm">Calcul du TMS, TMST, Bilan et Marge intégrés pour les professionnels de la finance.</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                <div class="text-accent text-4xl mb-4">📱</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Mobile-Friendly</h3>
+                <p class="text-gray-500 text-sm">Une conception entièrement responsive, parfaite sur mobile et tablette.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- PIED DE PAGE -->
+    <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
+        <p class="text-center text-sm text-gray-400">&copy; 2024 MindCompta. Tous droits réservés.</p>
+    </footer>
+
+    <!-- LOGIQUE JAVASCRIPT SIMPLE -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuButton = document.getElementById('menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
+
