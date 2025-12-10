@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Services</title>
     <script src="https://cdn.tailwindcss.com"></script>
-<meta name="google-adsense-account" content="ca-pub-7972578599056246">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -16,100 +15,111 @@
         .nav-link { @apply text-sm font-medium hover:text-gray-200 transition duration-200; }
         .mobile-link { @apply block py-2 px-3 text-base font-medium rounded-lg hover:bg-[#345b85] transition duration-200; }
         .active-link { color: #42a5f5; font-weight: 600; }
+        /* Style spécifique pour le cadre PDF */
+        .pdf-frame {
+            min-height: 80vh; /* Assure que le PDF est grand et visible sur mobile */
+            width: 100%;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
     <!-- EN-TÊTE ET NAVIGATION -->
-    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                    <img src="logo.jpg" 
-                         alt="MindCompta Logo" 
-                         class="h-10 w-auto rounded-full mr-3 border-2 border-white">
-                    <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
-                </div>
-                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-6">
-                    <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="services.html" class="nav-link active-link">Services</a>
-                    <a href="calculator.html" class="nav-link">Calculatrice</a>
-                    <a href="contact.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300">
-                        Contact
-                    </a>
-                </nav>
-                <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                </button>
-            </div>
-            <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
-                <a href="index.html" class="mobile-link">Accueil</a>
-                <a href="services.html" class="mobile-link active-link">Services</a>
-                <a href="calculator.html" class="mobile-link">Calculatrice</a>
-                <a href="contact.html" class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3">Contact</a>
+    <header class="w-full bg-brand-dark text-white shadow-xl fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-4">
+            <a href="index.html" class="text-2xl font-extrabold tracking-tight hover:text-accent transition duration-300">MindCompta</a>
+            
+            <!-- Menu Desktop -->
+            <nav class="hidden md:flex space-x-6">
+                <a href="index.html" class="nav-link">Accueil</a>
+                <a href="services.html" class="nav-link active-link">Services</a>
+                <a href="about.html" class="nav-link">À Propos</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+                <a href="calculator.html" class="nav-link">Calculatrice</a>
             </nav>
+
+            <!-- Bouton Menu Mobile (Hamburger) -->
+            <button id="menu-button" class="md:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
         </div>
+
+        <!-- Menu Mobile Déroulant -->
+        <nav id="mobile-menu" class="hidden md:hidden px-4 pb-4 space-y-1 bg-[#093574]">
+            <a href="index.html" class="mobile-link">Accueil</a>
+            <a href="services.html" class="mobile-link active-link bg-[#1855a8]">Services</a>
+            <a href="about.html" class="mobile-link">À Propos</a>
+            <a href="contact.html" class="mobile-link">Contact</a>
+            <a href="calculator.html" class="mobile-link">Calculatrice</a>
+        </nav>
     </header>
 
-    <!-- CONTENU PRINCIPAL - SERVICES -->
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-12">
-        <h1 class="text-4xl font-bold text-center text-brand-dark mb-10">Nos Solutions d'Analyse Financière</h1>
-        <p class="text-center text-lg text-gray-600 mb-12 max-w-4xl mx-auto">
-            Nous proposons une gamme de services et d'outils pour optimiser votre gestion comptable, financière et votre compréhension des marchés.
-        </p>
+    <!-- CONTENU PRINCIPAL DES SERVICES (avec la nouvelle section PDF) -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow pt-[72px]">
+        
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Nos Services d'Aide à la Conformité</h1>
+            <p class="text-xl text-gray-500">Des outils de calcul à l'expertise réglementaire.</p>
+        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Service 1: Conseil en Gestion -->
-            <div class="bg-white p-8 rounded-xl shadow-2xl border border-gray-200 transition duration-300 hover:shadow-3xl">
-                <div class="text-5xl text-accent mb-4">📊</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Audit et Conseil en Gestion</h3>
-                <p class="text-gray-600 mb-4">
-                    Optimisez la structure de votre bilan et vos ratios de rentabilité. Notre service d'audit vous aide à prendre des décisions éclairées basées sur des données financières solides.
-                </p>
-                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
-                    <li>Analyse de la structure de Capital.</li>
-                    <li>Optimisation des flux de trésorerie.</li>
-                    <li>Prévisions budgétaires détaillées.</li>
-                </ul>
-                <a href="contact.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">En savoir plus →</a>
-            </div>
-
-            <!-- Service 2: Outils Économiques Avancés -->
-            <div class="bg-white p-8 rounded-xl shadow-2xl border border-gray-200 transition duration-300 hover:shadow-3xl">
-                <div class="text-5xl text-accent mb-4">🧪</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Modélisation Économique</h3>
-                <p class="text-gray-600 mb-4">
-                    Utilisez nos modèles et calculatrices avancées pour maîtriser les concepts d'économie fondamentale, comme le Taux Marginal de Substitution (TMS).
-                </p>
-                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
-                    <li>Calculs du TMS par prix et quantités.</li>
-                    <li>Analyse de la fonction de production (TMST).</li>
-                    <li>Ressources éducatives en microéconomie.</li>
-                </ul>
-                <a href="calculator.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Accéder aux Outils →</a>
-            </div>
-
-            <!-- Service 3: Formation et Tutoriels -->
-            <div class="bg-white p-8 rounded-xl shadow-2xl border border-gray-200 transition duration-300 hover:shadow-3xl">
-                <div class="text-5xl text-accent mb-4">📚</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Formations Personnalisées</h3>
-                <p class="text-gray-600 mb-4">
-                    Que vous soyez étudiant ou entrepreneur, nos formations vous donneront les clés pour comprendre et appliquer les principes de la comptabilité et de la finance.
-                </p>
-                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
-                    <li>Cours sur le Bilan et le Compte de Résultat.</li>
-                    <li>Ateliers sur le calcul des marges.</li>
-                    <li>Sessions de questions-réponses en direct.</li>
-                </ul>
-                <a href="contact.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Réserver une Session →</a>
-            </div>
+        <!-- SECTION D'INTÉGRATION DU PDF -->
+        <section class="mt-16 bg-white p-6 sm:p-10 rounded-3xl shadow-2xl">
+            <h2 class="text-3xl font-extrabold text-brand-dark mb-6 text-center">Documentation OHADA Clé (Intégrée)</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-4xl mx-auto">
+                Consultez notre guide simplifié des obligations fiscales et comptables OHADA directement dans cette fenêtre.
+            </p>
             
-             <!-- Service 4: Support Technique -->
-            <div class="bg-white p-8 rounded-xl shadow-2xl border border-gray-200 transition duration-300 hover:shadow-3xl">
-                <div class="text-5xl text-accent mb-4">🛠️</div>
+            <!-- Cadre iFrame pour afficher le PDF -->
+            <div class="flex justify-center">
+                <iframe 
+                    src="documents/rapport_ohada.pdf" 
+                    title="Rapport de Conformité OHADA" 
+                    class="pdf-frame"
+                    loading="lazy"
+                >
+                    <!-- Message de secours si l'iframe n'est pas supporté (rare) -->
+                    Ce navigateur ne supporte pas l'intégration de PDF. Vous pouvez le télécharger ici : 
+                    <a href="documents/rapport_ohada.pdf" class="text-accent hover:underline font-semibold">Télécharger le Rapport OHADA.</a>
+                </iframe>
+            </div>
+
+            <!-- Bouton de Téléchargement simple pour tous -->
+             <div class="text-center mt-8">
+                <a href="documents/rapport_ohada.pdf" download 
+                   class="inline-flex items-center py-3 px-6 bg-accent text-white font-bold rounded-full shadow-lg hover-accent transition duration-300">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Télécharger le document (PDF)
+                </a>
+            </div>
+        </section>
+
+
+        <!-- Ancienne section des services -->
+        <section class="mt-16 grid md:grid-cols-2 gap-8">
+            <!-- Service 1 : Calculs OHADA -->
+            <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
+                <div class="text-brand-dark text-5xl mb-4">🧮</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">Calculs Réglementaires OHADA</h3>
+                <p class="text-gray-600 mb-4">
+                    Accédez à des outils précis pour le calcul du TMS, du TMST, des ratios de gestion et des tableaux financiers conformes à l'OHADA.
+                </p>
+                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
+                    <li>Analyse de Bilan.</li>
+                    <li>Marge et Seuil de Rentabilité.</li>
+                    <li>Taux de Marge sur Coûts Variables (TMCV).</li>
+                </ul>
+                <a href="calculator.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Voir les Outils →</a>
+            </div>
+
+            <!-- Service 2 : Support Technique -->
+            <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
+                <div class="text-brand-dark text-5xl mb-4">🛠️</div>
                 <h3 class="text-2xl font-bold text-gray-800 mb-3">Support Technique Dédié</h3>
                 <p class="text-gray-600 mb-4">
-                    Un problème avec un calcul ? Une question sur l'utilisation d'un outil ? Notre équipe est là pour vous assister rapidement et efficacement.
+                    Un problème avec un calcul ? Notre équipe est là pour vous assister rapidement et efficacement.
                 </p>
                 <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
                     <li>Assistance par chat et e-mail.</li>
@@ -118,12 +128,13 @@
                 </ul>
                 <a href="contact.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Contacter le Support →</a>
             </div>
-        </div>
+        </section>
+        
     </main>
 
     <!-- PIED DE PAGE -->
     <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
-        <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
+        <p class="text-center text-sm text-gray-400">&copy; 2024 MindCompta. Tous droits réservés.</p>
     </footer>
 
     <!-- LOGIQUE JAVASCRIPT SIMPLE -->
