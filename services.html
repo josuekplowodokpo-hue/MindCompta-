@@ -65,33 +65,39 @@
             <p class="text-xl text-gray-500">Des outils de calcul à l'expertise réglementaire.</p>
         </div>
 
-        <!-- SECTION D'INTÉGRATION DU PDF -->
+        <!-- SECTION D'INTÉGRATION DU PDF PROFESSIONNELLE -->
         <section class="mt-16 bg-white p-6 sm:p-10 rounded-3xl shadow-2xl">
-            <h2 class="text-3xl font-extrabold text-brand-dark mb-6 text-center">Documentation OHADA Clé (Intégrée)</h2>
+            <h2 class="text-3xl font-extrabold text-brand-dark mb-6 text-center">Acte Uniforme OHADA : Droit Comptable</h2>
             <p class="text-center text-gray-600 mb-8 max-w-4xl mx-auto">
-                Consultez notre guide simplifié des obligations fiscales et comptables OHADA directement dans cette fenêtre.
+                Consultez ici l'intégralité du **Nouvel Acte Uniforme relatif au Droit Comptable** et à l'information financière.
             </p>
             
-            <!-- Cadre iFrame pour afficher le PDF - CHEMIN CORRIGÉ ICI -->
-            <div class="flex justify-center">
-                <iframe 
-                    src="rapport_ohada.pdf" 
-                    title="Rapport de Conformité OHADA" 
-                    class="pdf-frame"
-                    loading="lazy"
-                >
-                    <!-- Message de secours si l'iframe n'est pas supporté (rare) -->
-                    Ce navigateur ne supporte pas l'intégration de PDF. Vous pouvez le télécharger ici : 
-                    <a href="rapport_ohada.pdf" class="text-accent hover:underline font-semibold">Télécharger le Rapport OHADA.</a>
-                </iframe>
-            </div>
+            <!-- Définition du nom de fichier pour l'URL -->
+            <script>
+                // Utiliser une variable JavaScript pour encoder l'URL correctement, car les espaces posent problème dans les attributs HTML
+                const pdfFileName = 'Nouvel%20acte%20uniforme%20OHADA%20Droit%20comptable.pdf';
+                document.write(`
+                    <div class="flex justify-center">
+                        <iframe 
+                            src="${pdfFileName}" 
+                            title="Acte Uniforme OHADA Droit Comptable" 
+                            class="pdf-frame"
+                            loading="lazy"
+                        >
+                            <!-- Message de secours si l'iframe n'est pas supporté -->
+                            Ce navigateur ne supporte pas l'intégration de PDF. Vous pouvez le télécharger ici : 
+                            <a href="${pdfFileName}" class="text-accent hover:underline font-semibold">Télécharger l'Acte Uniforme.</a>
+                        </iframe>
+                    </div>
+                `);
+            </script>
 
-            <!-- Bouton de Téléchargement simple pour tous - CHEMIN CORRIGÉ ICI -->
+            <!-- Bouton de Téléchargement simple pour tous -->
              <div class="text-center mt-8">
-                <a href="rapport_ohada.pdf" download="Rapport_MindCompta_OHADA.pdf" 
+                <a href="Nouvel%20acte%20uniforme%20OHADA%20Droit%20comptable.pdf" download="Nouvel_Acte_Uniforme_OHADA.pdf" 
                    class="inline-flex items-center py-3 px-6 bg-accent text-white font-bold rounded-full shadow-lg hover-accent transition duration-300">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Télécharger le document (PDF)
+                    Télécharger l'Acte Uniforme (PDF)
                 </a>
             </div>
         </section>
@@ -119,7 +125,7 @@
                 <div class="text-brand-dark text-5xl mb-4">🛠️</div>
                 <h3 class="text-2xl font-bold text-gray-800 mb-3">Support Technique Dédié</h3>
                 <p class="text-gray-600 mb-4">
-                    Un problème avec un calcul ? Une question sur l'utilisation d'un outil ? Notre équipe est là pour vous assister rapidement et efficacement.
+                    Un problème avec un calcul ? Notre équipe est là pour vous assister rapidement et efficacement.
                 </p>
                 <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
                     <li>Assistance par chat et e-mail.</li>
@@ -134,7 +140,7 @@
 
     <!-- PIED DE PAGE -->
     <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
-        <p class="text-center text-sm text-gray-400">&copy; 2024 MindCompta. Tous droits réservés.</p>
+        <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
     <!-- LOGIQUE JAVASCRIPT SIMPLE -->
