@@ -17,9 +17,9 @@
         .active-link { color: #42a5f5; font-weight: 600; }
         /* Style spécifique pour le cadre PDF */
         .pdf-frame {
-            min-height: 80vh; /* Assure que le PDF est grand et visible sur mobile */
+            min-height: 80vh; 
             width: 100%;
-            border: 2px solid #e0e0e0;
+            border: none;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
@@ -57,7 +57,7 @@
         </nav>
     </header>
 
-    <!-- CONTENU PRINCIPAL DES SERVICES (avec la nouvelle section PDF) -->
+    <!-- CONTENU PRINCIPAL DES SERVICES -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow pt-[72px]">
         
         <div class="text-center mb-12">
@@ -72,11 +72,11 @@
                 Consultez notre guide simplifié des obligations fiscales et comptables OHADA directement dans cette fenêtre.
             </p>
             
-            <!-- Cadre iFrame pour afficher le PDF -->
+            <!-- Cadre iFrame pour afficher le PDF - CHEMIN CORRIGÉ ICI -->
             <div class="flex justify-center">
                 <iframe 
                     src="rapport_ohada.pdf" 
-                    title="Acte uniforme OHADA" 
+                    title="Rapport de Conformité OHADA" 
                     class="pdf-frame"
                     loading="lazy"
                 >
@@ -86,9 +86,9 @@
                 </iframe>
             </div>
 
-            <!-- Bouton de Téléchargement simple pour tous -->
+            <!-- Bouton de Téléchargement simple pour tous - CHEMIN CORRIGÉ ICI -->
              <div class="text-center mt-8">
-                <a href="rapport_ohada.pdf" download 
+                <a href="rapport_ohada.pdf" download="Rapport_MindCompta_OHADA.pdf" 
                    class="inline-flex items-center py-3 px-6 bg-accent text-white font-bold rounded-full shadow-lg hover-accent transition duration-300">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     Télécharger le document (PDF)
@@ -97,7 +97,7 @@
         </section>
 
 
-        <!-- Ancienne section des services -->
+        <!-- Ancienne section des services (inchangée) -->
         <section class="mt-16 grid md:grid-cols-2 gap-8">
             <!-- Service 1 : Calculs OHADA -->
             <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
@@ -119,7 +119,7 @@
                 <div class="text-brand-dark text-5xl mb-4">🛠️</div>
                 <h3 class="text-2xl font-bold text-gray-800 mb-3">Support Technique Dédié</h3>
                 <p class="text-gray-600 mb-4">
-                    Un problème avec un calcul ? Notre équipe est là pour vous assister rapidement et efficacement.
+                    Un problème avec un calcul ? Une question sur l'utilisation d'un outil ? Notre équipe est là pour vous assister rapidement et efficacement.
                 </p>
                 <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
                     <li>Assistance par chat et e-mail.</li>
