@@ -15,10 +15,9 @@
         .nav-link { @apply text-sm font-medium hover:text-gray-200 transition duration-200; }
         .mobile-link { @apply block py-2 px-3 text-base font-medium rounded-lg hover:bg-[#345b85] transition duration-200; }
         .active-link { color: #42a5f5; font-weight: 600; }
-        /* Style spécifique pour le cadre PDF */
+        
+        /* Style spécifique pour le cadre PDF ajusté (plus carré/compact) */
         .pdf-frame {
-            min-height: 80vh; 
-            width: 100%;
             border: none;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -72,29 +71,23 @@
                 Consultez ici l'intégralité du **Nouvel Acte Uniforme relatif au Droit Comptable** et à l'information financière.
             </p>
             
-            <!-- Définition du nom de fichier pour l'URL -->
-            <script>
-                // Utiliser une variable JavaScript pour encoder l'URL correctement, car les espaces posent problème dans les attributs HTML
-                const pdfFileName = 'Nouvel%20acte%20uniforme%20OHADA%20Droit%20comptable.pdf';
-                document.write(`
-                    <div class="flex justify-center">
-                        <iframe 
-                            src="${pdfFileName}" 
-                            title="Acte Uniforme OHADA Droit Comptable" 
-                            class="pdf-frame"
-                            loading="lazy"
-                        >
-                            <!-- Message de secours si l'iframe n'est pas supporté -->
-                            Ce navigateur ne supporte pas l'intégration de PDF. Vous pouvez le télécharger ici : 
-                            <a href="${pdfFileName}" class="text-accent hover:underline font-semibold">Télécharger l'Acte Uniforme.</a>
-                        </iframe>
-                    </div>
-                `);
-            </script>
+            <!-- Intégration du PDF avec taille ajustée -->
+            <div class="flex justify-center">
+                <iframe 
+                    src="Nouvel_acte_uniforme_OHADA_Droit_comptable.pdf" 
+                    title="Acte Uniforme OHADA Droit Comptable" 
+                    class="pdf-frame w-full max-w-3xl h-[600px]"
+                    loading="lazy"
+                >
+                    <!-- Message de secours si l'iframe n'est pas supporté -->
+                    Ce navigateur ne supporte pas l'intégration de PDF. Vous pouvez le télécharger ici : 
+                    <a href="Nouvel_acte_uniforme_OHADA_Droit_comptable.pdf" class="text-accent hover:underline font-semibold" download>Télécharger l'Acte Uniforme.</a>
+                </iframe>
+            </div>
 
             <!-- Bouton de Téléchargement simple pour tous -->
              <div class="text-center mt-8">
-                <a href="Nouvel%20acte%20uniforme%20OHADA%20Droit%20comptable.pdf" download="Nouvel_Acte_Uniforme_OHADA.pdf" 
+                <a href="Nouvel_acte_uniforme_OHADA_Droit_comptable.pdf" download="Nouvel_Acte_Uniforme_OHADA.pdf" 
                    class="inline-flex items-center py-3 px-6 bg-accent text-white font-bold rounded-full shadow-lg hover-accent transition duration-300">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     Télécharger l'Acte Uniforme (PDF)
