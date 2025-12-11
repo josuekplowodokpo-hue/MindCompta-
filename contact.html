@@ -4,19 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Contact</title>
-<meta name="google-adsense-account" content="ca-pub-7972578599056246">
+    <meta name="google-adsense-account" content="ca-pub-7972578599056246">
+    <!-- Chargement de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .bg-brand-dark { background-color: #0d47a1; }
-        .text-brand-dark { color: #0d47a1; }
-        .bg-accent { background-color: #42a5f5; }
-        .hover-accent:hover { background-color: #1e88e5; }
-        .nav-link { @apply text-sm font-medium hover:text-gray-200 transition duration-200; }
-        .mobile-link { @apply block py-2 px-3 text-base font-medium rounded-lg hover:bg-[#345b85] transition duration-200; }
-        .active-link { color: #42a5f5; font-weight: 600; }
-    </style>
+    <!-- LIAISON VERS LE FICHIER CSS EXTERNE PARTAGÉ -->
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
@@ -25,27 +17,32 @@
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center">
-                    <!-- MISE À JOUR : Source de l'image remplacée par logo.jpg -->
+                    <!-- LOGO -->
                     <img src="logo.jpg" 
                          alt="MindCompta Logo" 
                          class="h-10 w-auto rounded-full mr-3 border-2 border-white">
                     <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
                 </div>
+                <!-- Menu Desktop -->
                 <nav id="desktop-nav" class="hidden sm:flex items-center space-x-6">
                     <a href="index.html" class="nav-link">Accueil</a>
                     <a href="services.html" class="nav-link">Services</a>
+                    <a href="about.html" class="nav-link">À Propos</a>
                     <a href="calculator.html" class="nav-link">Calculatrice</a>
-                    <a href="contact.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 active-link">
+                    <a href="contact.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white active-link">
                         Contact
                     </a>
                 </nav>
+                <!-- Bouton Menu Mobile (Hamburger) -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
             </div>
+            <!-- Menu Mobile Déroulant -->
             <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
                 <a href="index.html" class="mobile-link">Accueil</a>
                 <a href="services.html" class="mobile-link">Services</a>
+                <a href="about.html" class="mobile-link">À Propos</a>
                 <a href="calculator.html" class="mobile-link">Calculatrice</a>
                 <a href="contact.html" class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3 active-link">Contact</a>
             </nav>
@@ -60,23 +57,23 @@
         </p>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <!-- Colonne 1: Formulaire (Action Formspree inchangée) -->
+
+            <!-- Colonne 1: Formulaire (Action Formspree) -->
             <div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-2xl border border-gray-200">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-6">Envoyez-nous un Message</h2>
-                
+
                 <form action="https://formspree.io/f/mgvgleko" method="POST" class="space-y-4">
-                    <!-- Champ Nom (pour information) -->
+                    <!-- Champ Nom -->
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700">Nom Complet</label>
                         <input type="text" id="name" name="name" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent" required>
                     </div>
-                    <!-- Champ Email (obligatoire par Formspree) -->
+                    <!-- Champ Email -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700">Adresse E-mail</label>
                         <input type="email" id="email" name="email" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent" required>
                     </div>
-                    <!-- Champ Sujet (pour information) -->
+                    <!-- Champ Sujet -->
                     <div>
                         <label for="subject" class="block text-sm font-medium text-gray-700">Sujet</label>
                         <select id="subject" name="subject" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
@@ -86,8 +83,8 @@
                             <option>Autre</option>
                         </select>
                     </div>
-                    <!-- Champ Message (obligatoire par Formspree) -->
-                    <div
+                    <!-- Champ Message (Syntaxe corrigée) -->
+                    <div>
                         <label for="message" class="block text-sm font-medium text-gray-700">Votre Message</label>
                         <textarea id="message" name="message" rows="4" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent" required></textarea>
                     </div>
@@ -97,23 +94,20 @@
                 </form>
             </div>
 
-            <!-- Colonne 2: Coordonnées (Mises à jour) -->
+            <!-- Colonne 2: Coordonnées -->
             <div class="bg-brand-dark text-white p-8 rounded-xl shadow-2xl flex flex-col justify-center">
                 <h2 class="text-2xl font-semibold mb-6 border-b border-blue-400 pb-2">Informations Clés</h2>
                 <div class="space-y-6">
                     <div>
                         <p class="text-lg font-bold mb-1">E-mail de Support</p>
-                        <!-- MISE À JOUR : Email remplacé -->
                         <a href="mailto:mindcompta@gmail.com" class="text-accent hover:text-white transition duration-200">mindcompta@gmail.com</a>
                     </div>
                     <div>
                         <p class="text-lg font-bold mb-1">Téléphone</p>
-                        <!-- MISE À JOUR : Numéro de téléphone remplacé -->
                         <p class="text-gray-300">+228 79 59 27 17</p>
                     </div>
                     <div>
                         <p class="text-lg font-bold mb-1">Adresse</p>
-                        <!-- MISE À JOUR : Adresse remplacée -->
                         <p class="text-gray-300">Lomé - Togo</p>
                     </div>
                 </div>
@@ -129,18 +123,8 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT SIMPLE -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuButton = document.getElementById('menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            menuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-            
-            // Le formulaire soumet directement à Formspree.
-        });
-    </script>
+    <!-- LIAISON VERS LE JAVASCRIPT PARTAGÉ (Menu Mobile) -->
+    <script src="script.js"></script>
 </body>
 </html>
 
