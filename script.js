@@ -1,6 +1,7 @@
 // ******************************************************
 // Logique JavaScript partagée pour toutes les pages
-// Gère l'ouverture/fermeture du menu mobile et la soumission du formulaire de contact
+// Gère l'ouverture/fermeture du menu mobile, la soumission du formulaire de contact,
+// et la largeur dynamique du carrousel d'images.
 // ******************************************************
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -40,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const endpoint = "https://formspree.io/f/mgvgleko";
             const formData = new FormData(form);
 
-            // CORRECTION: Convertir FormData en objet JSON pour une soumission AJAX fiable
+            // Convertir FormData en objet JSON pour une soumission AJAX fiable
             const data = {};
             formData.forEach((value, key) => data[key] = value);
 
@@ -79,5 +80,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitButton.textContent = 'Envoyer le Message';
             }
         });
+    }
+
+    // ------------------------------------------
+    // 3. FIX DU CAROUSEL D'IMAGES (Définition de la largeur dynamique)
+    // ------------------------------------------
+    const scrollContent = document.querySelector('.image-scroll-content');
+    
+    // Cette fonction est appelée au chargement et au redimensionnement
+    function setScrollContentWidth() {
+        if (!scrollContent) return;
+
+        // Récupérer tous les enfants (images) de la première moitié du contenu
+        // Puisque nous avons deux groupes d'images dupliquées dans le HTML, 
+        // nous ne mesurons que le premier groupe (les 5 premières images).
+        const images = scrollContent.querySelectorAll('img');
+        
+        let totalWidth = 0;
+        
+        // Mesurer la largeur des 5 premières images (le set original)
+        for (let i = 0; i < 5 && i < images.length; i++) {
+            // Utiliser offsetWidth pour inclure la bordure/padding si nécessaire, mais surtout la marge droite.
+            // La marge droite est de 1.5rem (24px)
+            const imageWidth = images[i].offsetWidth;
+            const marginRight = 24; // 1.5rem Tailwind margin
+            totalWidth += imageWidth + marginRight;
+        }
+
+        // Il faut s'assurer que l'élément .image-scroll-content soit deux fois
+        // plus large que le contenu visible (totalWidth * 2) pour l'effet de boucle.
+        // On définit la largeur du conteneur en pixels pour que l'animation CSS fonctionne correctement.
+        scrollContent.style.width = `${totalWidth * 2}px`;
+    }
+
+    if (scrollContent) {
+        setScrollContentWidth();
+        window.addEventListener('resize', setScrollContentWidth);
     }
 });
