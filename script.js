@@ -40,12 +40,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const endpoint = "https://formspree.io/f/mgvgleko";
             const formData = new FormData(form);
 
+            // CORRECTION: Convertir FormData en objet JSON pour une soumission AJAX fiable
+            const data = {};
+            formData.forEach((value, key) => data[key] = value);
+
             try {
                 const response = await fetch(endpoint, {
                     method: 'POST',
-                    body: formData,
+                    // Envoyer les données au format JSON
+                    body: JSON.stringify(data), 
                     headers: {
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        // Définir le Content-Type pour que Formspree traite le JSON
+                        'Content-Type': 'application/json' 
                     }
                 });
 
@@ -55,8 +62,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     form.reset(); // Effacer le formulaire après succès
                 } else {
                     // Tente de récupérer l'erreur de la réponse Formspree
-                    const data = await response.json();
-                    let errorMessage = data.error || "Oups! Il y a eu un problème lors de l'envoi de votre message.";
+                    const responseData = await response.json();
+                    let errorMessage = responseData.error || "Oups! Il y a eu un problème lors de l'envoi de votre message. Vérifiez l'adresse email.";
                     
                     formMessages.textContent = errorMessage;
                     formMessages.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-300');
