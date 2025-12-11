@@ -4,125 +4,139 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - À Propos de Nous</title>
+    <!-- Chargement de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-<meta name="google-adsense-account" content="ca-pub-7972578599056246">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .bg-brand-dark { background-color: #1F3A4C; }
-        .text-brand-dark { color: #1F3A4C; }
-        .bg-accent { background-color: #007bff; }
-        .hover-accent:hover { background-color: #0056b3; }
-        .active-link { color: #5eead4; font-weight: 600; }
-        .nav-link { 
-            @apply text-sm font-medium hover:text-gray-300 transition duration-200;
-        }
-        .mobile-link {
-            @apply block py-2 px-3 text-base font-medium rounded-lg hover:bg-[#384a5c] transition duration-200;
-        }
-    </style>
+    <!-- LIAISON VERS LE FICHIER CSS EXTERNE PARTAGÉ -->
+    <link rel="stylesheet" href="style.css"> 
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- EN-TÊTE ET NAVIGATION (Menu Hamburger/Responsive) -->
+    <!-- EN-TÊTE ET NAVIGATION (Utilise style.css pour le style) -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
-            <!-- Conteneur Logo et Bouton Menu -->
             <div class="flex justify-between items-center">
-                
-                <!-- Logo et Nom de Marque -->
                 <div class="flex items-center">
+                    <!-- LOGO -->
                     <img src="logo.jpg" 
                          alt="MindCompta Logo" 
                          class="h-10 w-auto rounded-full mr-3 border-2 border-white">
-                    <span class="text-xl font-bold tracking-wider">MindCompta</span>
+                    <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
                 </div>
-
-                <!-- Navigation Desktop -->
+                <!-- Menu Desktop -->
                 <nav id="desktop-nav" class="hidden sm:flex items-center space-x-6">
                     <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="services.html" class="nav-link">Nos Services</a>
-                    <a href="about.html" class="nav-link hidden md:inline-block active-link">À Propos</a>
-                    <!-- Bouton Contact -->
-                    <a href="contact.html" 
-                       class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300">
-                        Contactez-nous
+                    <a href="services.html" class="nav-link">Services</a>
+                    <a href="about.html" class="nav-link active-link">À Propos</a>
+                    <a href="calculator.html" class="nav-link">Calculatrice</a>
+                    <a href="contact.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+                        Contact
                     </a>
                 </nav>
-                
                 <!-- Bouton Menu Mobile (Hamburger) -->
-                <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#384a5c] transition duration-300" aria-label="Menu">
+                <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
             </div>
-
-            <!-- Menu Mobile Déroulant (Initialement caché) -->
+            <!-- Menu Mobile Déroulant -->
             <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
                 <a href="index.html" class="mobile-link">Accueil</a>
-                <a href="services.html" class="mobile-link">Nos Services</a>
-                <a href="about.html" class="mobile-link active-link">À Propos</a>
-                <!-- Bouton Contact Mobile -->
-                <a href="contact.html" 
-                   class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3">
-                    Contactez-nous
-                </a>
+                <a href="services.html" class="mobile-link">Services</a>
+                <a href="about.html" class="mobile-link active-link bg-[#1855a8]">À Propos</a>
+                <a href="calculator.html" class="mobile-link">Calculatrice</a>
+                <a href="contact.html" class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3">Contact</a>
             </nav>
         </div>
     </header>
 
-    <!-- CONTENU PRINCIPAL À PROPOS -->
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-16">
-        <div class="bg-white p-10 rounded-xl shadow-2xl border border-gray-100">
-            <h1 class="text-3xl font-bold text-brand-dark mb-4 border-b pb-2">Notre Mission et Nos Valeurs</h1>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-8">
-                <div>
-                    <h2 class="text-2xl font-semibold text-accent mb-3">L'Histoire de MindCompta</h2>
-                    <p class="text-gray-700 mb-4">
-                        Fondée par une équipe d'experts comptables et de juristes passionnés par le développement économique africain, MindCompta a été créée avec une vision claire : fournir une expertise de niveau mondial, parfaitement alignée sur les exigences du système OHADA. Nous avons bâti notre réputation sur la confiance, la rigueur et l'engagement envers la réussite de nos clients.
-                    </p>
-                    <p class="text-gray-700">
-                        Notre connaissance approfondie des réglementations locales nous permet de transformer les défis de la conformité en avantages stratégiques, permettant aux entreprises de se concentrer sur leur cœur de métier.
-                    </p>
-                </div>
+    <!-- CONTENU PRINCIPAL -->
+    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-16 md:py-24">
 
-                <div>
-                    <h2 class="text-2xl font-semibold text-accent mb-3">Nos Valeurs Fondamentales</h2>
-                    <ul class="text-gray-700 space-y-3 list-disc list-inside">
-                        <li>**Intégrité :** Une transparence totale dans toutes nos opérations.</li>
-                        <li>**Expertise OHADA :** Une maîtrise des textes légaux pour une conformité sans faille.</li>
-                        <li>**Proactivité :** Anticiper les besoins de nos clients et les évolutions réglementaires.</li>
-                        <li>**Partenariat :** Travailler main dans la main avec nos clients pour atteindre leurs objectifs.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="text-center mt-12 p-6 bg-gray-100 rounded-lg">
-                <h3 class="text-xl font-bold text-brand-dark mb-4">Notre Équipe vous Attend</h3>
-                <a href="contact.html" class="inline-block py-3 px-8 text-lg font-semibold text-white rounded-lg bg-accent hover-accent transition duration-300 shadow-lg">
-                    Rencontrer Nos Experts
-                </a>
-            </div>
-
+        <div class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">Notre Mission : Simplifier l'OHADA</h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                MindCompta a été créé pour transformer l'accès à la finance et au droit comptable en Afrique.
+            </p>
         </div>
+
+        <!-- Section 1 : Histoire du Fondateur -->
+        <section class="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-gray-200 mb-16">
+            
+            <div class="md:flex md:items-start md:space-x-10">
+                
+                <!-- Bloc Photo (Place réservée) -->
+                <div class="md:w-1/3 flex justify-center mb-8 md:mb-0">
+                    <div class="w-56 h-56 rounded-full overflow-hidden shadow-2xl border-4 border-accent p-1 bg-white">
+                        <!-- Source de l'image : Placehold.co est une alternative si vous n'avez pas d'image -->
+                        <img 
+                            src="photo.jpg" 
+                            onerror="this.onerror=null; this.src='https://placehold.co/216x216/0d47a1/ffffff?text=Josu%C3%A9+KPLOWODOKPO';"
+                            alt="Portrait du fondateur Josué KPLOWODOKPO" 
+                            class="w-full h-full object-cover rounded-full"
+                            loading="lazy"
+                        >
+                    </div>
+                </div>
+
+                <!-- Bloc Texte du Fondateur -->
+                <div class="md:w-2/3">
+                    <h2 class="text-3xl font-bold text-brand-dark mb-4">Message du Fondateur</h2>
+                    <p class="text-lg text-gray-700 mb-4 font-semibold">
+                        Je suis Josué KPLOWODOKPO, et j'ai fondé MindCompta.
+                    </p>
+                    <p class="text-gray-600 mb-4">
+                        L'idée derrière ce site est née d'une frustration commune : la complexité et le manque d'accessibilité des outils de conformité financière en zone OHADA. J'ai constaté que beaucoup de professionnels et d'entrepreneurs perdaient un temps précieux à chercher des textes réglementaires ou à effectuer des calculs manuels risqués.
+                    </p>
+                    <p class="text-gray-600">
+                        Notre objectif est clair : **démocratiser l'accès au Droit Comptable OHADA et fournir des outils digitaux fiables** pour garantir une gestion financière précise et sans erreur. MindCompta est votre allié quotidien pour la conformité et l'analyse économique.
+                    </p>
+                    <p class="mt-6 text-right italic text-brand-dark font-medium">
+                        — Josué KPLOWODOKPO
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2 : Nos Valeurs et Engagement -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-10">Nos Valeurs</h2>
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                
+                <div class="p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+                    <div class="text-accent text-4xl mb-3">🎯</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Précision</h3>
+                    <p class="text-gray-500 text-sm">Des outils de calcul et des sources réglementaires d'une exactitude irréprochable.</p>
+                </div>
+                
+                <div class="p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+                    <div class="text-accent text-4xl mb-3">🌐</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Accessibilité</h3>
+                    <p class="text-gray-500 text-sm">Rendre l'information financière complexe simple et disponible pour tous, partout.</p>
+                </div>
+
+                <div class="p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+                    <div class="text-accent text-4xl mb-3">💡</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Innovation</h3>
+                    <p class="text-gray-500 text-sm">Utiliser les meilleures technologies pour automatiser les tâches complexes.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="text-center mt-12 p-8 bg-brand-dark rounded-xl shadow-2xl">
+            <h3 class="text-3xl font-bold text-white mb-4">Prêt à simplifier votre conformité ?</h3>
+            <a href="contact.html" class="inline-block py-3 px-8 text-lg font-semibold text-brand-dark rounded-full bg-accent hover-accent transition duration-300 shadow-xl transform hover:scale-105 text-white">
+                Nous Contacter
+            </a>
+        </div>
+
     </main>
 
     <!-- PIED DE PAGE -->
     <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
-        <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés. | Système OHADA.</p>
+        <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT POUR LE MENU MOBILE -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuButton = document.getElementById('menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            menuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-        });
-    </script>
+    <!-- LIAISON VERS LE FICHIER JAVASCRIPT EXTERNE PARTAGÉ -->
+    <script src="script.js"></script>
 </body>
 </html>
 
