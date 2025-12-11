@@ -1,7 +1,7 @@
 // ******************************************************
 // Logique JavaScript partagée pour toutes les pages
 // Gère l'ouverture/fermeture du menu mobile, la soumission du formulaire de contact,
-// et la largeur dynamique du carrousel d'images.
+// et l'animation du carrousel d'images.
 // ******************************************************
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (menuButton && mobileMenu) {
         menuButton.addEventListener('click', () => {
-            // Bascule la classe 'hidden' pour afficher/cacher le menu mobile
+            // Toggles the 'hidden' class to show/hide the mobile menu
             mobileMenu.classList.toggle('hidden');
         });
     }
@@ -29,30 +29,30 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Masquer les messages précédents et réinitialiser les styles
+            // Hide previous messages and reset styles
             formMessages.classList.add('hidden');
             formMessages.classList.remove('bg-green-100', 'text-green-800', 'border-green-300', 'bg-red-100', 'text-red-800', 'border-red-300');
             
-            // Désactiver le bouton d'envoi pendant le processus
+            // Disable submit button during the process
             submitButton.disabled = true;
             submitButton.textContent = 'Envoi en cours...';
 
-            // Endpoint Formspree (Identifiant de votre formulaire)
+            // Formspree Endpoint (Your form ID)
             const endpoint = "https://formspree.io/f/mgvgleko";
             const formData = new FormData(form);
 
-            // Convertir FormData en objet JSON pour une soumission AJAX fiable
+            // Convert FormData to JSON object for reliable AJAX submission
             const data = {};
             formData.forEach((value, key) => data[key] = value);
 
             try {
                 const response = await fetch(endpoint, {
                     method: 'POST',
-                    // Envoyer les données au format JSON
+                    // Send data in JSON format
                     body: JSON.stringify(data), 
                     headers: {
                         'Accept': 'application/json',
-                        // Définir le Content-Type pour que Formspree traite le JSON
+                        // Set Content-Type for Formspree to process JSON
                         'Content-Type': 'application/json' 
                     }
                 });
@@ -60,9 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (response.ok) {
                     formMessages.textContent = "Merci ! Votre message a été envoyé avec succès.";
                     formMessages.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-300');
-                    form.reset(); // Effacer le formulaire après succès
+                    form.reset(); // Clear the form after success
                 } else {
-                    // Tente de récupérer l'erreur de la réponse Formspree
+                    // Try to retrieve the error from the Formspree response
                     const responseData = await response.json();
                     let errorMessage = responseData.error || "Oups! Il y a eu un problème lors de l'envoi de votre message. Vérifiez l'adresse email.";
                     
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 formMessages.textContent = "Erreur de connexion. Veuillez réessayer plus tard.";
                 formMessages.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-300');
             } finally {
-                // Rendre le message visible et réactiver le bouton
+                // Make the message visible and re-enable the button
                 formMessages.classList.remove('hidden');
                 submitButton.disabled = false;
                 submitButton.textContent = 'Envoyer le Message';
@@ -83,38 +83,62 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ------------------------------------------
-    // 3. FIX DU CAROUSEL D'IMAGES (Définition de la largeur dynamique)
+    // 3. CAROUSEL D'IMAGES À DÉFILEMENT INFINI (FIX AVEC JS)
     // ------------------------------------------
     const scrollContent = document.querySelector('.image-scroll-content');
     
-    // Cette fonction est appelée au chargement et au redimensionnement
-    function setScrollContentWidth() {
-        if (!scrollContent) return;
+    if (scrollContent) {
+        const imageWidth = 300; // Fixed image width (from CSS)
+        const imageMargin = 24; // Fixed margin (1.5rem = 24px)
+        const numOriginalImages = 7; // Number of images in the original set
 
-        // Récupérer tous les enfants (images) de la première moitié du contenu
-        // Puisque nous avons deux groupes d'images dupliquées dans le HTML, 
-        // nous ne mesurons que le premier groupe (les 5 premières images).
-        const images = scrollContent.querySelectorAll('img');
-        
-        let totalWidth = 0;
-        
-        // Mesurer la largeur des 5 premières images (le set original)
-        for (let i = 0; i < 5 && i < images.length; i++) {
-            // Utiliser offsetWidth pour inclure la bordure/padding si nécessaire, mais surtout la marge droite.
-            // La marge droite est de 1.5rem (24px)
-            const imageWidth = images[i].offsetWidth;
-            const marginRight = 24; // 1.5rem Tailwind margin
-            totalWidth += imageWidth + marginRight;
+        // Calculate the total width of the original set (W_original)
+        const originalContentWidth = (imageWidth * numOriginalImages) + (imageMargin * (numOriginalImages - 1));
+
+        // The scroll content container must be twice the width of the original set
+        const totalScrollWidth = originalContentWidth * 2;
+        scrollContent.style.width = `${totalScrollWidth}px`;
+
+        let currentPosition = 0;
+        const scrollSpeed = 0.5; // Pixels per frame (slower/faster scroll)
+        let isPaused = false;
+
+        // Function to animate the scroll
+        function animateScroll() {
+            if (!isPaused) {
+                // Move current position to the left
+                currentPosition -= scrollSpeed; 
+
+                // Check for infinite loop condition:
+                // If we scroll past the end of the first set (W_original),
+                // reset the position back to 0 to simulate seamless loop.
+                if (Math.abs(currentPosition) >= originalContentWidth) {
+                    currentPosition = 0;
+                }
+                
+                // Apply the new position
+                scrollContent.style.transform = `translateX(${currentPosition}px)`;
+            }
+
+            // Request the next frame for smooth animation
+            requestAnimationFrame(animateScroll);
         }
 
-        // Il faut s'assurer que l'élément .image-scroll-content soit deux fois
-        // plus large que le contenu visible (totalWidth * 2) pour l'effet de boucle.
-        // On définit la largeur du conteneur en pixels pour que l'animation CSS fonctionne correctement.
-        scrollContent.style.width = `${totalWidth * 2}px`;
-    }
+        // Start the animation loop
+        animateScroll();
 
-    if (scrollContent) {
-        setScrollContentWidth();
-        window.addEventListener('resize', setScrollContentWidth);
+        // Pause/Play on hover for desktop and touch for mobile
+        const scrollContainer = document.querySelector('.image-scroll-container');
+        if (scrollContainer) {
+            scrollContainer.addEventListener('mouseenter', () => { isPaused = true; });
+            scrollContainer.addEventListener('mouseleave', () => { isPaused = false; });
+            
+            // Handle touch events (less reliable but better than nothing)
+            scrollContainer.addEventListener('touchstart', () => { isPaused = true; });
+            scrollContainer.addEventListener('touchend', () => { 
+                // Delay play slightly to allow user to view image
+                setTimeout(() => { isPaused = false; }, 500); 
+            });
+        }
     }
 });
