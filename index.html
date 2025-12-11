@@ -4,105 +4,107 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Accueil</title>
+    <!-- Chargement de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-<meta name="google-adsense-account" content="ca-pub-7972578599056246">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .bg-brand-dark { background-color: #0d47a1; /* Bleu Profond */ }
-        .text-brand-dark { color: #0d47a1; }
-        .bg-accent { background-color: #42a5f5; /* Bleu Clair Vif */ }
-        .hover-accent:hover { background-color: #1e88e5; }
-        .nav-link { @apply text-sm font-medium hover:text-gray-200 transition duration-200; }
-        .mobile-link { @apply block py-2 px-3 text-base font-medium rounded-lg hover:bg-[#345b85] transition duration-200; }
-        .active-link { color: #42a5f5; font-weight: 600; }
-    </style>
-<script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/75b13009b7c6c4e0aa7a571f3/66de64ba832ef55799c90dfd5.js");</script>
-    <!-- DÉBUT DES BALISES PWA (Progressive Web App) POUR L'ICÔNE D'ÉCRAN D'ACCUEIL -->
-    <!-- 1. Lien vers le Web App Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- 2. Couleur de la barre d'adresse du navigateur mobile (Chrome/Android) -->
-    <meta name="theme-color" content="#0d47a1"> 
-    
-    <!-- 3. Configuration iOS (Apple Touch Icon) -->
-    <link rel="apple-touch-icon" href="logo.jpg">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <!-- FIN DES BALISES PWA -->
-
+    <!-- LIAISON VERS LE FICHIER CSS EXTERNE -->
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- EN-TÊTE ET NAVIGATION -->
+    <!-- EN-TÊTE ET NAVIGATION (Utilise style.css pour le style) -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center">
-                    <!-- LOGO MIS À JOUR -->
+                    <!-- LOGO -->
                     <img src="logo.jpg" 
                          alt="MindCompta Logo" 
                          class="h-10 w-auto rounded-full mr-3 border-2 border-white">
                     <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
                 </div>
+                <!-- Menu Desktop -->
                 <nav id="desktop-nav" class="hidden sm:flex items-center space-x-6">
                     <a href="index.html" class="nav-link active-link">Accueil</a>
                     <a href="services.html" class="nav-link">Services</a>
+                    <a href="about.html" class="nav-link">À Propos</a>
                     <a href="calculator.html" class="nav-link">Calculatrice</a>
-                    <a href="contact.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300">
+                    <a href="contact.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
                         Contact
                     </a>
                 </nav>
+                <!-- Bouton Menu Mobile (Hamburger) -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
             </div>
+            <!-- Menu Mobile Déroulant -->
             <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
-                <a href="index.html" class="mobile-link active-link">Accueil</a>
+                <a href="index.html" class="mobile-link active-link bg-[#1855a8]">Accueil</a>
                 <a href="services.html" class="mobile-link">Services</a>
+                <a href="about.html" class="mobile-link">À Propos</a>
                 <a href="calculator.html" class="mobile-link">Calculatrice</a>
                 <a href="contact.html" class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3">Contact</a>
             </nav>
         </div>
     </header>
 
-    <!-- CONTENU PRINCIPAL - HERO SECTION -->
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-16 md:py-24">
-        <div class="text-center">
-            <h1 class="text-5xl md:text-6xl font-extrabold text-gray-900 mb-4 leading-tight">
-                La Précision Financière à Portée de Main
+    <!-- CONTENU PRINCIPAL -->
+    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-16">
+
+        <!-- Section Héro -->
+        <section class="text-center py-16 md:py-24 bg-white rounded-3xl shadow-2xl mb-16">
+            <h1 class="text-5xl md:text-6xl font-extrabold text-gray-900 mb-4 tracking-tight">
+                L'Expertise Comptable <span class="text-brand-dark">au Cœur de l'OHADA</span>
             </h1>
-            <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                MindCompta Finance vous offre des outils de calcul puissants et élégants pour gérer vos finances et vos analyses économiques avec une clarté inégalée.
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                MindCompta est votre plateforme dédiée pour naviguer dans l'Acte Uniforme OHADA, avec des outils de calcul précis et conformes aux normes.
             </p>
-            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <a href="calculator.html" class="bg-brand-dark text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-blue-800 transition duration-300 transform hover:scale-105">
-                    Accéder à la Calculatrice
-                </a>
-                <a href="services.html" class="bg-white text-brand-dark font-bold py-3 px-8 rounded-full border border-gray-300 shadow-md hover:bg-gray-50 transition duration-300 transform hover:scale-105">
+            <div class="space-x-4">
+                <a href="services.html" class="inline-block py-3 px-8 text-lg font-semibold text-white rounded-full bg-accent hover-accent transition duration-300 shadow-lg transform hover:scale-105">
                     Découvrir nos Services
                 </a>
+                <a href="calculator.html" class="inline-block py-3 px-8 text-lg font-semibold text-brand-dark rounded-full bg-gray-200 hover:bg-gray-300 transition duration-300">
+                    Accéder aux Outils
+                </a>
             </div>
-        </div>
+        </section>
 
-        <!-- Section des Avantages -->
-        <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-                <div class="text-accent text-4xl mb-4">💡</div>
-                <h3 class="text-xl font-semibold text-gray-800 mb-2">Calculs Lumineux</h3>
-                <p class="text-gray-500 text-sm">Une interface claire et non-sombres, optimisée pour la lisibilité et le confort visuel.</p>
+        <!-- Section Fonctionnalités -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-10">Nos Avantages Clés</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                    <div class="text-accent text-4xl mb-4">📚</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Conformité OHADA</h3>
+                    <p class="text-gray-500 text-sm">Accès direct et vérifié aux textes de loi (Acte Uniforme) pour une fiabilité totale.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                    <div class="text-accent text-4xl mb-4">📐</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Calculatrice Financière</h3>
+                    <p class="text-gray-500 text-sm">Outils intégrés (TMS, TMST, Bilan) pour des analyses économiques rapides.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                    <div class="text-accent text-4xl mb-4">🤝</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Support Expert</h3>
+                    <p class="text-gray-500 text-sm">Une équipe de spécialistes prête à vous aider sur toutes vos questions réglementaires.</p>
+                </div>
             </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-                <div class="text-accent text-4xl mb-4">📈</div>
-                <h3 class="text-xl font-semibold text-gray-800 mb-2">Outils Économiques</h3>
-                <p class="text-gray-500 text-sm">Calcul du TMS, TMST, Bilan et Marge intégrés pour les professionnels de la finance.</p>
+        </section>
+
+        <!-- Section Témoignages (Mock) -->
+        <section class="py-12">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-10">Ce que disent nos utilisateurs</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <blockquote class="bg-white p-8 rounded-xl shadow-xl border-t-4 border-accent">
+                    <p class="text-lg text-gray-700 italic mb-4">"MindCompta m'a fait gagner un temps précieux. L'accès direct à l'Acte Uniforme et la calculatrice en ligne sont indispensables pour ma pratique quotidienne."</p>
+                    <footer class="font-semibold text-brand-dark">— Marie K., Expert-Comptable</footer>
+                </blockquote>
+                <blockquote class="bg-white p-8 rounded-xl shadow-xl border-t-4 border-accent">
+                    <p class="text-lg text-gray-700 italic mb-4">"La meilleure ressource en ligne pour la finance OHADA. Simple, précis, et toujours à jour. J'utilise la calculatrice TMST chaque semaine."</p>
+                    <footer class="font-semibold text-brand-dark">— Jean P., Consultant Financier</footer>
+                </blockquote>
             </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-                <div class="text-accent text-4xl mb-4">📱</div>
-                <h3 class="text-xl font-semibold text-gray-800 mb-2">Mobile-Friendly</h3>
-                <p class="text-gray-500 text-sm">Une conception entièrement responsive, parfaite sur mobile et tablette.</p>
-            </div>
-        </div>
+        </section>
 
     </main>
 
@@ -111,16 +113,8 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT SIMPLE -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuButton = document.getElementById('menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            menuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-        });
-    </script>
+    <!-- LIAISON VERS LE FICHIER JAVASCRIPT EXTERNE -->
+    <script src="script.js"></script>
 </body>
 </html>
 
