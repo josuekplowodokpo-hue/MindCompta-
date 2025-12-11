@@ -54,33 +54,28 @@ body {
 }
 
 /* ======================================================= */
-/* NOUVEAUX STYLES POUR LE CAROUSEL D'IMAGES DÉFILANT (FIX) */
+/* STYLES POUR LE CAROUSEL D'IMAGES DÉFILANT (GÉRÉ PAR JS) */
 /* ======================================================= */
 .image-scroll-container {
     overflow: hidden; /* Cache les images qui débordent */
-    /* Utiliser 'flex' sur le conteneur interne pour s'assurer que les images sont côte à côte */
-    display: flex;
+    /* Assure que l'élément est prêt pour le positionnement relatif si besoin */
+    position: relative; 
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
 
 .image-scroll-content {
-    /* Le contenu DOIT être très large pour dépasser le conteneur principal */
+    /* Utiliser flex pour aligner les images. JS va définir la largeur et la translation */
     display: flex;
-    flex-shrink: 0; /* Empêche le contenu d'être compressé */
-    /* Nous allons utiliser JavaScript pour calculer la largeur, mais le CSS gère l'animation */
-    animation: scroll-left 40s linear infinite; /* 40s est la durée du défilement */
-}
-
-/* Pause l'animation au survol */
-.image-scroll-container:hover .image-scroll-content {
-    animation-play-state: paused;
+    flex-shrink: 0; 
+    /* Initialisation pour la translation par JS */
+    transform: translateX(0);
 }
 
 .image-scroll-content img {
-    /* Assure que les images sont côte à côte et maintiennent la hauteur */
+    /* Assure que les images sont des blocs en ligne et maintiennent la hauteur */
     height: 150px; /* Hauteur fixe pour les images */
     width: 300px; /* Largeur fixe pour l'image placeholder */
-    margin-right: 1.5rem; /* Espacement entre les images */
+    margin-right: 1.5rem; /* Espacement entre les images (24px) */
     object-fit: cover;
     border-radius: 0.5rem;
     transition: transform 0.3s ease;
@@ -90,14 +85,3 @@ body {
     transform: scale(1.05);
 }
 
-/* Définition de l'animation de défilement de droite à gauche */
-/* Nous allons utiliser JS pour définir la largeur totale et ajuster cette animation */
-@keyframes scroll-left {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        /* Déplace par 50% de la largeur totale du contenu (pour boucler) */
-        transform: translateX(-50%); 
-    }
-}
