@@ -4,49 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Services</title>
+    <!-- Chargement de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .bg-brand-dark { background-color: #0d47a1; /* Bleu Profond */ }
-        .text-brand-dark { color: #0d47a1; }
-        .bg-accent { background-color: #42a5f5; /* Bleu Clair Vif */ }
-        .hover-accent:hover { background-color: #1e88e5; }
-        .nav-link { @apply text-sm font-medium hover:text-gray-200 transition duration-200; }
-        .mobile-link { @apply block py-2 px-3 text-base font-medium rounded-lg hover:bg-[#345b85] transition duration-200; }
-        .active-link { color: #42a5f5; font-weight: 600; }
-
-        /* --- NOUVEAUX STYLES POUR L'APERCU PDF PROFESSIONNEL --- */
-        .pdf-preview-container {
-            position: relative;
-            background-color: #f8f8f8; /* Arrière-plan légèrement gris pour le contraste */
-            padding: 1rem;
-            border: 1px solid #e0e0e0;
-            border-radius: 16px;
-            /* Ombre plus douce et plus large */
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
-        }
-
-        .pdf-frame-stylized {
-            border: 4px solid #fff; /* Bordure blanche pour simuler une feuille de papier */
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Ombre légère sur le document lui-même */
-            width: 100%;
-            height: 600px; /* Grande hauteur pour le bureau */
-        }
-
-        /* Responsive height for better mobile viewing */
-        @media (max-width: 768px) {
-            .pdf-frame-stylized {
-                height: 400px; /* Plus compact sur mobile */
-            }
-        }
-        /* --- FIN DES STYLES PDF --- */
-    </style>
+    <!-- LIAISON VERS LE FICHIER CSS EXTERNE PARTAGÉ -->
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- EN-TÊTE ET NAVIGATION (Aligné sur index.html) -->
+    <!-- EN-TÊTE ET NAVIGATION (Utilise style.css pour le style) -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
@@ -63,7 +28,7 @@
                     <a href="services.html" class="nav-link active-link">Services</a>
                     <a href="about.html" class="nav-link">À Propos</a>
                     <a href="calculator.html" class="nav-link">Calculatrice</a>
-                    <a href="contact.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300">
+                    <a href="contact.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
                         Contact
                     </a>
                 </nav>
@@ -93,14 +58,14 @@
             </p>
         </div>
 
-        <!-- SECTION D'INTÉGRATION DU PDF PROFESSIONNELLE (Améliorée) -->
+        <!-- SECTION D'INTÉGRATION DU PDF PROFESSIONNELLE (Utilise les classes de style.css) -->
         <section class="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-gray-200 mb-16">
             <h2 class="text-3xl font-extrabold text-brand-dark mb-4 text-center">Consultation : Acte Uniforme OHADA (Droit Comptable)</h2>
             <p class="text-center text-gray-500 mb-8 max-w-4xl mx-auto">
                 Accédez à la source réglementaire officielle pour une conformité totale. Le document est présenté dans un aperçu professionnel et est téléchargeable.
             </p>
 
-            <!-- Conteneur d'aperçu stylisé -->
+            <!-- Conteneur d'aperçu stylisé utilisant les classes du style.css -->
             <div class="flex justify-center w-full">
                 <div class="pdf-preview-container w-full max-w-3xl">
                     <iframe 
@@ -162,21 +127,13 @@
 
     </main>
 
-    <!-- PIED DE PAGE (Aligné sur index.html) -->
+    <!-- PIED DE PAGE (Utilise style.css pour le style) -->
     <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT SIMPLE -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuButton = document.getElementById('menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            menuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-        });
-    </script>
+    <!-- LIAISON VERS LE FICHIER JAVASCRIPT EXTERNE PARTAGÉ -->
+    <script src="script.js"></script>
 </body>
 </html>
 
