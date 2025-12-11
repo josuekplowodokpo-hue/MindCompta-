@@ -8,7 +8,7 @@
 body { 
     font-family: 'Inter', sans-serif; 
     /* Définit une couleur d'arrière-plan par défaut pour la plupart des pages */
-    background-color: #f3f4f6; 
+    background-color: #f3f4f6;
 }
 
 /* Brand Colors */
