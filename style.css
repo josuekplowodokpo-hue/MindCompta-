@@ -54,17 +54,20 @@ body {
 }
 
 /* ======================================================= */
-/* NOUVEAUX STYLES POUR LE CAROUSEL D'IMAGES DÉFILANT */
+/* NOUVEAUX STYLES POUR LE CAROUSEL D'IMAGES DÉFILANT (FIX) */
 /* ======================================================= */
 .image-scroll-container {
     overflow: hidden; /* Cache les images qui débordent */
-    white-space: nowrap; /* Force tous les éléments enfants à rester sur une seule ligne */
+    /* Utiliser 'flex' sur le conteneur interne pour s'assurer que les images sont côte à côte */
+    display: flex;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
 
 .image-scroll-content {
-    display: inline-block;
-    /* Le défilement est créé en dupliquant le contenu et en animant les deux blocs */
+    /* Le contenu DOIT être très large pour dépasser le conteneur principal */
+    display: flex;
+    flex-shrink: 0; /* Empêche le contenu d'être compressé */
+    /* Nous allons utiliser JavaScript pour calculer la largeur, mais le CSS gère l'animation */
     animation: scroll-left 40s linear infinite; /* 40s est la durée du défilement */
 }
 
@@ -74,10 +77,9 @@ body {
 }
 
 .image-scroll-content img {
-    /* Assure que les images sont des blocs en ligne et maintiennent la hauteur */
-    display: inline-block;
+    /* Assure que les images sont côte à côte et maintiennent la hauteur */
     height: 150px; /* Hauteur fixe pour les images */
-    width: auto;
+    width: 300px; /* Largeur fixe pour l'image placeholder */
     margin-right: 1.5rem; /* Espacement entre les images */
     object-fit: cover;
     border-radius: 0.5rem;
@@ -89,12 +91,13 @@ body {
 }
 
 /* Définition de l'animation de défilement de droite à gauche */
+/* Nous allons utiliser JS pour définir la largeur totale et ajuster cette animation */
 @keyframes scroll-left {
-    0% {
+    from {
         transform: translateX(0);
     }
-    100% {
-        /* Déplace le contenu de 50% (la taille d'un jeu d'images) */
+    to {
+        /* Déplace par 50% de la largeur totale du contenu (pour boucler) */
         transform: translateX(-50%); 
     }
 }
