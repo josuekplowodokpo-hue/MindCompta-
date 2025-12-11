@@ -1,67 +1,100 @@
-/* * Fichier CSS global pour MindCompta Finance 
- * Contient les styles de base, les couleurs de la marque et les utilitaires partagés.
+/*
+ * Styles CSS globaux pour toutes les pages MindCompta
+ * Utilise la police Inter et définit les couleurs principales
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
-/* Base Styles */
 body { 
     font-family: 'Inter', sans-serif; 
-    /* Définit une couleur d'arrière-plan par défaut pour la plupart des pages */
-    background-color: #f3f4f6;
+    /* Assure que la scrollbar est gérée correctement */
+    overflow-x: hidden; 
 }
 
-/* Brand Colors */
-.bg-brand-dark { background-color: #0d47a1; /* Bleu Profond */ }
+/* Couleurs de la Marque */
+.bg-brand-dark { background-color: #0d47a1; } /* Bleu Profond */
 .text-brand-dark { color: #0d47a1; }
-.bg-accent { background-color: #42a5f5; /* Bleu Clair Vif */ }
+.bg-accent { background-color: #42a5f5; } /* Bleu Clair Vif */
 .hover-accent:hover { background-color: #1e88e5; }
 
-/* Navigation Links - Tailwind utilities defined here for consistency */
+/* Styles de Navigation (utilisés dans le header) */
 .nav-link { 
-    font-size: 0.875rem; /* text-sm */
-    font-weight: 500; /* font-medium */
-    color: #ffffff;
-    transition-duration: 200ms;
-    transition-property: color;
+    /* Correspond à la définition Tailwind: text-sm font-medium hover:text-gray-200 transition duration-200 */
+    color: white; 
+    font-size: 0.875rem; 
+    font-weight: 500;
+    transition: color 200ms;
 }
-.nav-link:hover { color: #d1d5db; /* gray-300 */ }
-
-.mobile-link { 
-    display: block; 
-    padding: 0.5rem 0.75rem; 
-    font-size: 1rem; /* text-base */
-    font-weight: 500; /* font-medium */
-    border-radius: 0.5rem; /* rounded-lg */
-    transition: background-color 200ms;
+.nav-link:hover {
+    color: #e5e7eb; /* gray-200 */
 }
-.mobile-link:hover { background-color: #345b85; }
-
 .active-link { 
-    color: #42a5f5; 
+    color: #42a5f5; /* La couleur accent sur le texte */
     font-weight: 600; 
 }
 
-/* PDF Preview Styles (imported from services.html for global use) */
-.pdf-preview-container {
-    position: relative;
-    background-color: #f8f8f8;
-    padding: 1rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+/* Styles de Navigation Mobile */
+.mobile-link { 
+    /* Correspond à la définition Tailwind: block py-2 px-3 text-base font-medium rounded-lg hover:bg-[#345b85] transition duration-200 */
+    display: block;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    transition: background-color 200ms;
+}
+.mobile-link:hover {
+    background-color: #345b85; 
 }
 
-.pdf-frame-stylized {
-    border: 4px solid #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    height: 600px;
+/* Styles spécifiques aux composants (e.g., input group pour la calculatrice) */
+.input-group input {
+    /* Style pour tous les champs d'entrée pour la cohérence */
+    @apply w-full p-3 border border-gray-300 rounded-lg text-lg text-right font-mono transition duration-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm;
 }
 
-@media (max-width: 768px) {
-    .pdf-frame-stylized {
-        height: 400px;
+/* ======================================================= */
+/* NOUVEAUX STYLES POUR LE CAROUSEL D'IMAGES DÉFILANT */
+/* ======================================================= */
+.image-scroll-container {
+    overflow: hidden; /* Cache les images qui débordent */
+    white-space: nowrap; /* Force tous les éléments enfants à rester sur une seule ligne */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.image-scroll-content {
+    display: inline-block;
+    /* Le défilement est créé en dupliquant le contenu et en animant les deux blocs */
+    animation: scroll-left 40s linear infinite; /* 40s est la durée du défilement */
+}
+
+/* Pause l'animation au survol */
+.image-scroll-container:hover .image-scroll-content {
+    animation-play-state: paused;
+}
+
+.image-scroll-content img {
+    /* Assure que les images sont des blocs en ligne et maintiennent la hauteur */
+    display: inline-block;
+    height: 150px; /* Hauteur fixe pour les images */
+    width: auto;
+    margin-right: 1.5rem; /* Espacement entre les images */
+    object-fit: cover;
+    border-radius: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.image-scroll-content img:hover {
+    transform: scale(1.05);
+}
+
+/* Définition de l'animation de défilement de droite à gauche */
+@keyframes scroll-left {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        /* Déplace le contenu de 50% (la taille d'un jeu d'images) */
+        transform: translateX(-50%); 
     }
 }
