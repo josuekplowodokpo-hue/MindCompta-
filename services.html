@@ -15,13 +15,33 @@
         .nav-link { @apply text-sm font-medium hover:text-gray-200 transition duration-200; }
         .mobile-link { @apply block py-2 px-3 text-base font-medium rounded-lg hover:bg-[#345b85] transition duration-200; }
         .active-link { color: #42a5f5; font-weight: 600; }
-        
-        /* Style spécifique pour le cadre PDF ajusté (plus carré/compact) */
-        .pdf-frame {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* Ombre plus prononcée */
+
+        /* --- NOUVEAUX STYLES POUR L'APERCU PDF PROFESSIONNEL --- */
+        .pdf-preview-container {
+            position: relative;
+            background-color: #f8f8f8; /* Arrière-plan légèrement gris pour le contraste */
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            /* Ombre plus douce et plus large */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
         }
+
+        .pdf-frame-stylized {
+            border: 4px solid #fff; /* Bordure blanche pour simuler une feuille de papier */
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Ombre légère sur le document lui-même */
+            width: 100%;
+            height: 600px; /* Grande hauteur pour le bureau */
+        }
+
+        /* Responsive height for better mobile viewing */
+        @media (max-width: 768px) {
+            .pdf-frame-stylized {
+                height: 400px; /* Plus compact sur mobile */
+            }
+        }
+        /* --- FIN DES STYLES PDF --- */
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -65,7 +85,7 @@
 
     <!-- CONTENU PRINCIPAL DES SERVICES -->
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-16 md:py-24 pt-[100px] sm:pt-[120px]">
-        
+
         <div class="text-center mb-16">
             <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">Nos Services d'Aide à la Conformité</h1>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -73,30 +93,32 @@
             </p>
         </div>
 
-        <!-- SECTION D'INTÉGRATION DU PDF PROFESSIONNELLE (Conformité Réglementaire) -->
+        <!-- SECTION D'INTÉGRATION DU PDF PROFESSIONNELLE (Améliorée) -->
         <section class="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-gray-200 mb-16">
-            <h2 class="text-3xl font-extrabold text-brand-dark mb-4 text-center">Acte Uniforme OHADA : Droit Comptable</h2>
+            <h2 class="text-3xl font-extrabold text-brand-dark mb-4 text-center">Consultation : Acte Uniforme OHADA (Droit Comptable)</h2>
             <p class="text-center text-gray-500 mb-8 max-w-4xl mx-auto">
-                L'outil incontournable pour les professionnels. Consultez l'intégralité du **Nouvel Acte Uniforme** directement sur la plateforme.
+                Accédez à la source réglementaire officielle pour une conformité totale. Le document est présenté dans un aperçu professionnel et est téléchargeable.
             </p>
-            
-            <!-- Intégration du PDF avec taille ajustée et chemin direct -->
+
+            <!-- Conteneur d'aperçu stylisé -->
             <div class="flex justify-center w-full">
-                <iframe 
-                    src="comptable.pdf" 
-                    title="Acte Uniforme OHADA Droit Comptable" 
-                    class="pdf-frame w-full max-w-3xl h-[600px] shadow-2xl"
-                    loading="lazy"
-                >
-                    <!-- Message de secours si l'iframe n'est pas supporté -->
-                    Ce navigateur ne supporte pas l'intégration de PDF. Vous pouvez le télécharger ici : 
-                    <a href="comptable.pdf" class="text-accent hover:underline font-semibold" download>Télécharger l'Acte Uniforme.</a>
-                </iframe>
+                <div class="pdf-preview-container w-full max-w-3xl">
+                    <iframe 
+                        src="comptable.pdf" 
+                        title="Acte Uniforme OHADA Droit Comptable" 
+                        class="pdf-frame-stylized"
+                        loading="lazy"
+                    >
+                        <!-- Message de secours si l'iframe n'est pas supporté -->
+                        Ce navigateur ne supporte pas l'intégration de PDF. Vous pouvez le télécharger ici : 
+                        <a href="comptable.pdf" class="text-accent hover:underline font-semibold" download>Télécharger l'Acte Uniforme.</a>
+                    </iframe>
+                </div>
             </div>
 
             <!-- Bouton de Téléchargement -->
              <div class="text-center mt-8">
-                <a href="comptable.pdf" download="Nouvel_Acte_Uniforme_OHADA.pdf" 
+                <a href="comptable.pdf" download="Acte_Uniforme_OHADA_Comptable.pdf" 
                    class="inline-flex items-center py-3 px-8 bg-accent text-white font-bold rounded-full shadow-lg hover-accent transition duration-300 transform hover:scale-105">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     Télécharger l'Acte Uniforme (PDF)
@@ -137,7 +159,7 @@
                 <a href="contact.html" class="mt-6 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Contacter l'Équipe →</a>
             </div>
         </section>
-        
+
     </main>
 
     <!-- PIED DE PAGE (Aligné sur index.html) -->
