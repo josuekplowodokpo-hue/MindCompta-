@@ -58,11 +58,12 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            <!-- Colonne 1: Formulaire (Action Formspree) -->
+            <!-- Colonne 1: Formulaire -->
             <div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-2xl border border-gray-200">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-6">Envoyez-nous un Message</h2>
 
-                <form action="https://formspree.io/f/mgvgleko" method="POST" class="space-y-4">
+                <!-- ATTENTION : Retrait de l'action et de la méthode pour gérer la soumission en JavaScript (sans redirection) -->
+                <form id="contactForm" class="space-y-4">
                     <!-- Champ Nom -->
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700">Nom Complet</label>
@@ -77,18 +78,22 @@
                     <div>
                         <label for="subject" class="block text-sm font-medium text-gray-700">Sujet</label>
                         <select id="subject" name="subject" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
-                            <option>Demande d'assistance calculatrice</option>
-                            <option>Information sur les services</option>
-                            <option>Partenariat / Presse</option>
-                            <option>Autre</option>
+                            <option value="Demande d'assistance calculatrice">Demande d'assistance calculatrice</option>
+                            <option value="Information sur les services">Information sur les services</option>
+                            <option value="Partenariat / Presse">Partenariat / Presse</option>
+                            <option value="Autre">Autre</option>
                         </select>
                     </div>
-                    <!-- Champ Message (Syntaxe corrigée) -->
+                    <!-- Champ Message -->
                     <div>
                         <label for="message" class="block text-sm font-medium text-gray-700">Votre Message</label>
                         <textarea id="message" name="message" rows="4" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent" required></textarea>
                     </div>
-                    <button type="submit" class="w-full bg-brand-dark text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-blue-800 transition duration-300 transform hover:scale-[1.01]">
+
+                    <!-- Zone d'affichage des messages de statut gérée par script.js -->
+                    <div id="form-messages" class="mt-4 p-3 rounded-lg text-center font-semibold hidden transition duration-300"></div>
+                    
+                    <button type="submit" id="submitButton" class="w-full bg-brand-dark text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-blue-800 transition duration-300 transform hover:scale-[1.01]">
                         Envoyer le Message
                     </button>
                 </form>
@@ -123,7 +128,7 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LIAISON VERS LE JAVASCRIPT PARTAGÉ (Menu Mobile) -->
+    <!-- LIAISON VERS LE JAVASCRIPT PARTAGÉ (Menu Mobile et Formulaire) -->
     <script src="script.js"></script>
 </body>
 </html>
