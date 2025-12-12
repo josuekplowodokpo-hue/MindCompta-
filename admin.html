@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCompta - Tableau de Bord Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <!-- EN-TÊTE ET NAVIGATION -->
+    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <img src="logo.jpg" 
+                         alt="MindCompta Logo" 
+                         class="h-10 w-auto rounded-full mr-3 border-2 border-white">
+                    <span class="text-xl font-bold tracking-wider">MindCompta Admin</span>
+                </div>
+                <nav class="hidden sm:flex items-center space-x-6">
+                    <a href="index.html" class="nav-link">Accueil</a>
+                    <a href="admin.html" class="nav-link active-link bg-red-400 py-2 px-4 rounded-lg">Admin</a> 
+                    <button onclick="handleSignOut()" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
+                        Déconnexion
+                    </button>
+                </nav>
+                <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </div>
+            <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
+                <a href="index.html" class="mobile-link">Accueil</a>
+                <a href="admin.html" class="mobile-link bg-red-400 text-center font-semibold text-white py-3">Admin</a>
+                <button onclick="handleSignOut()" class="mobile-link bg-red-500 text-center font-semibold hover:bg-red-600 text-white py-3 w-full">Déconnexion</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
+        <h1 class="text-3xl font-extrabold text-brand-dark mb-6 mt-4">
+            Tableau de Bord Administrateur
+        </h1>
+        <p class="text-gray-600 mb-8">Liste des utilisateurs enregistrés et leur dernière activité. Les données sont mises à jour en temps réel.</p>
+        
+        <!-- Conteneur d'état de chargement/erreur -->
+        <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-lg shadow-md hidden">
+            Chargement des données...
+        </div>
+
+        <!-- TABLEAU DES UTILISATEURS -->
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">UID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dernière Connexion</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Date Création</th>
+                    </tr>
+                </thead>
+                <tbody id="user-list" class="bg-white divide-y divide-gray-200">
+                    <!-- Les lignes d'utilisateurs seront insérées ici par JavaScript -->
+                    <tr>
+                        <td colspan="4" class="py-12 text-center text-gray-400" id="no-data-row">
+                            Aucun utilisateur enregistré trouvé (hors connexion anonyme).
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- PIED DE PAGE -->
+    <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
+        <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
+    </footer>
+
+    <!-- LOGIQUE JAVASCRIPT POUR LA PAGE ADMIN -->
+    <script type="module">
+        // Import des modules Firebase nécessaires
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            query, 
+            onSnapshot, 
+            setLogLevel 
+        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+        // Configuration Firebase (Doit correspondre à script.js)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
+            authDomain: "mindcompta-cbb69.firebaseapp.com",
+            projectId: "mindcompta-cbb69",
+            storageBucket: "mindcompta-cbb69.firebasestorage.app",
+            messagingSenderId: "470368630296",
+            appId: "1:470368630296:web:510de914f335b27b3d356d",
+            measurementId: "G-SKSVSV0H70"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        setLogLevel('debug');
+
+        const userListElement = document.getElementById('user-list');
+        const statusMessage = document.getElementById('status-message');
+        const noDataRow = document.getElementById('no-data-row');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        /**
+         * Formate une date ISO string en format lisible.
+         * @param {string} isoString Date au format ISO.
+         * @returns {string} Date formatée.
+         */
+        function formatISODate(isoString) {
+            try {
+                const date = new Date(isoString);
+                if (isNaN(date)) return 'N/A';
+                return date.toLocaleString('fr-FR', {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return 'Date invalide';
+            }
+        }
+
+        /**
+         * Écoute en temps réel les changements dans la collection d'utilisateurs.
+         */
+        function startUserListener() {
+            // Chemin de la collection publique: /artifacts/{appId}/public/data/users
+            const usersCollectionRef = collection(db, `artifacts/${appId}/public/data/users`);
+            const usersQuery = query(usersCollectionRef);
+
+            statusMessage.textContent = "Connexion à la base de données...";
+            statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-800');
+            statusMessage.classList.add('bg-yellow-100', 'text-yellow-800');
+            userListElement.innerHTML = '';
+            noDataRow.classList.remove('hidden');
+
+
+            const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
+                const users = [];
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    users.push(data);
+                });
+
+                // Triez les utilisateurs par dernière connexion (plus récent en premier)
+                users.sort((a, b) => new Date(b.lastLogin) - new Date(a.lastLogin));
+
+                // Mise à jour de la table
+                userListElement.innerHTML = ''; // Vide la liste existante
+
+                if (users.length === 0) {
+                    userListElement.appendChild(noDataRow);
+                    noDataRow.classList.remove('hidden');
+                } else {
+                    noDataRow.classList.add('hidden');
+                    users.forEach(user => {
+                        const row = document.createElement('tr');
+                        row.classList.add('hover:bg-gray-50', 'transition', 'duration-150');
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.email || 'N/A'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">${user.uid}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">${formatISODate(user.lastLogin)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">${formatISODate(user.creationTime)}</td>
+                        `;
+                        userListElement.appendChild(row);
+                    });
+                }
+                
+                statusMessage.textContent = `Liste mise à jour: ${users.length} utilisateurs trouvés.`;
+                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800');
+                statusMessage.classList.add('bg-green-100', 'text-green-800');
+                setTimeout(() => { statusMessage.classList.add('hidden'); }, 3000);
+
+
+            }, (error) => {
+                console.error("Erreur de connexion Firestore:", error);
+                statusMessage.textContent = "Erreur: Impossible de charger les données utilisateurs. (Vérifiez la console pour les détails)";
+                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800');
+                statusMessage.classList.add('bg-red-100', 'text-red-800', 'hidden');
+            });
+            
+            // Retourne la fonction de désabonnement au cas où nous aurions besoin de l'arrêter
+            return unsubscribe;
+        }
+
+        // --- Vérification de l'authentification et lancement du listener ---
+        onAuthStateChanged(auth, (user) => {
+            if (user && !user.isAnonymous) {
+                // Utilisateur connecté. Lancer le chargement des données.
+                console.log("Utilisateur connecté. Chargement du tableau de bord admin.");
+                startUserListener();
+            } else {
+                // Utilisateur non connecté ou anonyme. Redirection vers la page de connexion.
+                console.log("Accès refusé. Redirection vers la connexion.");
+                const message = "Accès restreint. Veuillez vous connecter avec un compte non-anonyme.";
+                // Utilisation d'un modal simple pour prévenir l'utilisateur (remplace l'alerte)
+                if (confirm(message + "\nOK pour aller à la page de connexion.")) {
+                    window.location.href = 'login.html';
+                }
+            }
+        });
+        
+    </script>
+    <!-- Le script.js global est chargé par le module ci-dessus si nécessaire -->
+</body>
+</html>
+
