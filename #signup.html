@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCompta - Connexion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- LIAISON VERS LE FICHIER CSS EXTERNE PARTAGÉ -->
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans">
+
+    <!-- EN-TÊTE ET NAVIGATION -->
+    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <img src="logo.jpg" 
+                         alt="MindCompta Logo" 
+                         class="h-10 w-auto rounded-full mr-3 border-2 border-white">
+                    <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
+                </div>
+                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-6">
+                    <a href="index.html" class="nav-link">Accueil</a>
+                    <a href="services.html" class="nav-link">Services (Livre)</a>
+                    <a href="about.html" class="nav-link">À Propos</a>
+                    <a href="calculator.html" class="nav-link">Calculatrice</a>
+                    <!-- Lien Admin (visible si connecté) -->
+                    <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-lg hidden">Admin</a> 
+
+                    <!-- Par défaut, afficher Se Connecter, cacher Déconnexion -->
+                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white active-link">
+                        Se Connecter
+                    </a>
+                    <button onclick="handleSignOut()" id="nav-logout-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white hidden">
+                        Déconnexion
+                    </button>
+                </nav>
+                <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </div>
+            <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
+                <a href="index.html" class="mobile-link">Accueil</a>
+                <a href="services.html" class="mobile-link">Services (Livre)</a>
+                <a href="about.html" class="mobile-link">À Propos</a>
+                <a href="calculator.html" class="mobile-link">Calculatrice</a>
+                <!-- Lien Admin Mobile (visible si connecté) -->
+                <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-400 text-center font-semibold text-white py-3 hidden">Admin</a>
+
+                <!-- Par défaut, afficher Se Connecter, cacher Déconnexion -->
+                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3 active-link">Se Connecter</a>
+                <button onclick="handleSignOut()" id="mobile-logout-btn" class="mobile-link bg-red-500 text-center font-semibold hover:bg-red-600 text-white py-3 hidden w-full">Déconnexion</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden md:max-w-xl">
+            <div class="md:flex">
+                <!-- Section Connexion -->
+                <div id="login-section" class="w-full md:w-1/2 p-8 transition-all duration-500">
+                    <h2 class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
+                    
+                    <form id="login-form" class="space-y-4">
+                        <div>
+                            <label for="login-email" class="block text-sm font-medium text-gray-700">Adresse Email</label>
+                            <input type="email" id="login-email" name="email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
+                        </div>
+                        <div>
+                            <label for="login-password" class="block text-sm font-medium text-gray-700">Mot de Passe</label>
+                            <input type="password" id="login-password" name="password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
+                        </div>
+                        
+                        <!-- Message d'erreur/succès -->
+                        <div id="login-message" class="text-center p-2 rounded-lg text-sm hidden"></div>
+
+                        <button type="submit" class="w-full bg-accent text-white font-semibold py-2 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01]">
+                            Se Connecter
+                        </button>
+                    </form>
+                    
+                    <div class="mt-6 text-center">
+                        <p class="text-sm text-gray-600">
+                            Pas encore de compte ? 
+                            <button id="show-signup-btn-desktop" class="text-accent font-semibold hover:underline transition duration-300">
+                                Créez-en un.
+                            </button>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Section Inscription -->
+                <div id="signup-section" class="w-full md:w-1/2 p-8 bg-brand-light transition-all duration-500 md:block hidden">
+                    <h2 class="text-3xl font-bold text-white mb-6 text-center">Inscription</h2>
+                    
+                    <form id="signup-form" class="space-y-4">
+                        <div>
+                            <label for="signup-name" class="block text-sm font-medium text-gray-100">Nom et Prénom</label>
+                            <input type="text" id="signup-name" name="name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
+                        </div>
+                        <div>
+                            <label for="signup-email" class="block text-sm font-medium text-gray-100">Adresse Email</label>
+                            <input type="email" id="signup-email" name="email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
+                        </div>
+                        <div>
+                            <label for="signup-password" class="block text-sm font-medium text-gray-100">Mot de Passe (min. 6 caractères)</label>
+                            <input type="password" id="signup-password" name="password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
+                        </div>
+                        
+                        <!-- Message d'erreur/succès -->
+                        <div id="signup-message" class="text-center p-2 rounded-lg text-sm hidden"></div>
+                        
+                        <!-- NOTE IMPORTANTE POUR LE RÔLE ADMIN -->
+                        <div class="p-3 text-xs bg-brand-dark/20 rounded-lg text-gray-200">
+                            <span class="font-bold">NOTE:</span> Pour créer votre compte administrateur, utilisez l'email: <code class="font-mono text-yellow-300">admin@mindcompta.com</code>
+                        </div>
+
+                        <button type="submit" class="w-full bg-accent text-white font-semibold py-2 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01]">
+                            Créer un Compte
+                        </button>
+                    </form>
+
+                    <div class="mt-6 text-center md:hidden">
+                        <p class="text-sm text-gray-100">
+                            Déjà membre ? 
+                            <button id="show-login-btn-mobile" class="text-accent font-semibold hover:underline transition duration-300">
+                                Connectez-vous.
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- PIED DE PAGE -->
+    <footer class="w-full bg-brand-dark border-t border-gray-700 py-6">
+        <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
+    </footer>
+
+    <!-- LOGIQUE JAVASCRIPT (Chargez le script comme un module) -->
+    <script type="module" src="script.js"></script>
+    <script type="module">
+        // Logique pour afficher/cacher les boutons de connexion/déconnexion et le lien Admin
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+
+        // Configuration Firebase (dupliquée pour la robustesse des écouteurs d'état)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
+            authDomain: "mindcompta-cbb69.firebaseapp.com",
+            projectId: "mindcompta-cbb69",
+            storageBucket: "mindcompta-cbb69.firebasestorage.app",
+            messagingSenderId: "470368630296",
+            appId: "1:470368630296:web:510de914f335b27b3d356d",
+            measurementId: "G-SKSVSV0H70"
+        };
+        
+        if (firebaseConfig.apiKey) {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+
+            // Gère l'affichage mobile du formulaire (bascule entre Login et Signup)
+            document.getElementById('show-signup-btn-desktop')?.addEventListener('click', () => {
+                document.getElementById('signup-section').classList.remove('hidden');
+                document.getElementById('login-section').classList.add('md:w-1/2', 'hidden');
+                document.getElementById('login-section').classList.remove('w-full');
+            });
+
+            document.getElementById('show-login-btn-mobile')?.addEventListener('click', () => {
+                document.getElementById('signup-section').classList.add('hidden');
+                document.getElementById('login-section').classList.add('w-full');
+                document.getElementById('login-section').classList.remove('md:w-1/2', 'hidden');
+            });
+
+
+            onAuthStateChanged(auth, (user) => {
+                const loginBtnDesktop = document.getElementById('nav-login-btn');
+                const logoutBtnDesktop = document.getElementById('nav-logout-btn');
+                const loginBtnMobile = document.getElementById('mobile-login-btn');
+                const logoutBtnMobile = document.getElementById('mobile-logout-btn');
+
+                const adminBtnDesktop = document.getElementById('nav-admin-btn');
+                const adminBtnMobile = document.getElementById('mobile-admin-btn');
+                
+                // Si l'utilisateur est connecté ET n'est PAS anonyme (connexion réelle)
+                if (user && !user.isAnonymous) {
+                    // Cacher Connexion, Afficher Déconnexion
+                    if (loginBtnDesktop) loginBtnDesktop.classList.add('hidden');
+                    if (logoutBtnDesktop) logoutBtnDesktop.classList.remove('hidden');
+                    if (loginBtnMobile) loginBtnMobile.classList.add('hidden');
+                    if (logoutBtnMobile) logoutBtnMobile.classList.remove('hidden');
+                    
+                    // Afficher Admin (le rôle sera vérifié sur la page admin.html)
+                    if (adminBtnDesktop) adminBtnDesktop.classList.remove('hidden');
+                    if (adminBtnMobile) adminBtnMobile.classList.remove('hidden');
+
+                } else {
+                    // Utilisateur déconnecté ou anonyme
+                    // Afficher Connexion, Cacher Déconnexion
+                    if (loginBtnDesktop) loginBtnDesktop.classList.remove('hidden');
+                    if (logoutBtnDesktop) logoutBtnDesktop.classList.add('hidden');
+                    if (loginBtnMobile) loginBtnMobile.classList.remove('hidden');
+                    if (logoutBtnMobile) logoutBtnMobile.classList.add('hidden');
+                    
+                    // Cacher Admin
+                    if (adminBtnDesktop) adminBtnDesktop.classList.add('hidden');
+                    if (adminBtnMobile) adminBtnMobile.classList.add('hidden');
+                }
+            });
+
+            // Fonction de Déconnexion globale (utilisée sur tous les boutons de déconnexion)
+            window.handleSignOut = async () => {
+                try {
+                    await signOut(auth);
+                    // Rediriger vers la page d'accueil ou de connexion
+                    window.location.href = 'index.html'; 
+                } catch (error) {
+                    console.error("Erreur de déconnexion:", error);
+                }
+            };
+        }
+    </script>
+</body>
+</html>
+
