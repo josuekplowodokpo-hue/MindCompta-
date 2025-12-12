@@ -1,87 +1,88 @@
-/*
- * Styles CSS globaux pour toutes les pages MindCompta
- * Utilise la police Inter et définit les couleurs principales
- */
+/* Styles Globaux pour MindCompta 
+Utilise principalement des classes Tailwind CSS, mais définit 
+les couleurs personnalisées et les styles spécifiques de navigation/animation.
+*/
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+/* 1. Définition des Couleurs Personnalisées */
 
-body { 
-    font-family: 'Inter', sans-serif; 
-    /* Assure que la scrollbar est gérée correctement */
-    overflow-x: hidden; 
+/* Couleurs principales du thème (utilisées dans l'HTML via classes Tailwind ex: bg-brand-dark) */
+.bg-brand-dark {
+    background-color: #1e3a8a; /* Deep Navy Blue for Header/Footer */
+}
+.text-brand-dark {
+    color: #1e3a8a; 
+}
+.border-brand-dark {
+    border-color: #1e3a8a;
 }
 
-/* Couleurs de la Marque */
-.bg-brand-dark { background-color: #0d47a1; } /* Bleu Profond */
-.text-brand-dark { color: #0d47a1; }
-.bg-accent { background-color: #42a5f5; } /* Bleu Clair Vif */
-.hover-accent:hover { background-color: #1e88e5; }
-
-/* Styles de Navigation (utilisés dans le header) */
-.nav-link { 
-    /* Correspond à la définition Tailwind: text-sm font-medium hover:text-gray-200 transition duration-200 */
-    color: white; 
-    font-size: 0.875rem; 
-    font-weight: 500;
-    transition: color 200ms;
+/* Couleur d'accentuation (pour les boutons principaux et les liens actifs) */
+.bg-accent {
+    background-color: #f59e0b; /* Amber/Gold */
 }
-.nav-link:hover {
-    color: #e5e7eb; /* gray-200 */
+.text-accent {
+    color: #f59e0b;
 }
-.active-link { 
-    color: #42a5f5; /* La couleur accent sur le texte */
-    font-weight: 600; 
+.hover-accent:hover {
+    background-color: #d97706; /* Darker Amber on hover */
 }
 
-/* Styles de Navigation Mobile */
-.mobile-link { 
-    /* Correspond à la définition Tailwind: block py-2 px-3 text-base font-medium rounded-lg hover:bg-[#345b85] transition duration-200 */
-    display: block;
-    padding: 0.5rem 0.75rem;
-    font-size: 1rem;
-    font-weight: 500;
-    border-radius: 0.5rem;
-    transition: background-color 200ms;
-}
-.mobile-link:hover {
-    background-color: #345b85; 
+/* Couleur de fond secondaire (utilisée pour la section d'inscription) */
+.bg-brand-light {
+    background-color: #3b82f6; /* Medium Blue */
 }
 
-/* Styles spécifiques aux composants (e.g., input group pour la calculatrice) */
-.input-group input {
-    /* Style pour tous les champs d'entrée pour la cohérence */
-    @apply w-full p-3 border border-gray-300 rounded-lg text-lg text-right font-mono transition duration-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm;
+
+/* 2. Styles de Navigation */
+
+/* Styles communs aux liens de navigation (Desktop) */
+.nav-link {
+    /* Utilise une couleur intermédiaire pour le hover qui contraste bien avec brand-dark */
+    @apply text-white px-3 py-2 rounded-lg font-medium transition duration-200 hover:bg-[#345b85];
 }
 
-/* ======================================================= */
-/* STYLES POUR LE CAROUSEL D'IMAGES DÉFILANT (GÉRÉ PAR JS) */
-/* ======================================================= */
+/* Style du lien de navigation actif (Desktop) */
+.active-link {
+    @apply bg-accent text-white; /* Utilise la couleur d'accentuation pour l'onglet actif */
+}
+
+/* Styles pour les liens de navigation mobile */
+.mobile-link {
+    @apply block px-4 py-3 rounded-lg text-white font-medium hover:bg-[#345b85] transition duration-200;
+}
+
+
+/* 3. Styles du Carrousel d'Images Défilant (Index.html) */
+
 .image-scroll-container {
-    overflow: hidden; /* Cache les images qui débordent */
-    /* Assure que l'élément est prêt pour le positionnement relatif si besoin */
-    position: relative; 
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    overflow: hidden; 
+    white-space: nowrap; 
 }
 
 .image-scroll-content {
-    /* Utiliser flex pour aligner les images. JS va définir la largeur et la translation */
-    display: flex;
-    flex-shrink: 0; 
-    /* Initialisation pour la translation par JS */
-    transform: translateX(0);
+    display: inline-block;
+    animation: scrollImages 40s linear infinite; 
+    will-change: transform; 
 }
 
 .image-scroll-content img {
-    /* Assure que les images sont des blocs en ligne et maintiennent la hauteur */
-    height: 150px; /* Hauteur fixe pour les images */
-    width: 300px; /* Largeur fixe pour l'image placeholder */
-    margin-right: 1.5rem; /* Espacement entre les images (24px) */
-    object-fit: cover;
+    display: inline-block;
+    width: 300px; 
+    height: 150px;
+    object-fit: cover; 
+    margin-right: 1rem; 
     border-radius: 0.5rem;
-    transition: transform 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.image-scroll-content img:hover {
-    transform: scale(1.05);
+/* Définition de l'animation de défilement pour un défilement continu */
+@keyframes scrollImages {
+    0% {
+        transform: translateX(0); 
+    }
+    100% {
+        /* Défile de 50% pour que le duplicata remplace l'original de manière fluide */
+        transform: translateX(-50%); 
+    }
 }
-
