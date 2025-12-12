@@ -1,317 +1,250 @@
-// ******************************************************
-// Logique JavaScript partagée pour toutes les pages
-// Gère l'ouverture/fermeture du menu mobile, l'authentification Firebase
-// et la gestion des données utilisateur dans Firestore.
-// ******************************************************
-
-// =======================================================
-// 1. INITIALISATION FIREBASE ET AUTHENTIFICATION CANVAS
-// =======================================================
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
 import { 
     getAuth, 
-    signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword, 
-    signOut, 
+    signInAnonymously, 
     signInWithCustomToken, 
-    signInAnonymously,
-    onAuthStateChanged
+    onAuthStateChanged,
+    createUserWithEmailAndPassword, // Ajouté pour l'inscription
+    signInWithEmailAndPassword,     // Ajouté pour la connexion
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { 
     getFirestore, 
     doc, 
     setDoc, 
-    getDoc,
-    setLogLevel // Ajout du log level
+    getDoc, 
+    onSnapshot, 
+    collection, 
+    query, 
+    where, 
+    getDocs 
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 
-// Configuration Firebase fournie par l'utilisateur
-const firebaseConfig = {
+// --- 1. CONFIGURATION ET INITIALISATION GLOBALE ---
+
+// Récupération des variables globales de l'environnement Canvas
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+    // Clés de configuration de votre projet MindCompta (issues des captures d'écran)
     apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
     authDomain: "mindcompta-cbb69.firebaseapp.com",
-    databaseURL: "https://mindcompta-cbb69-default-rtdb.firebaseio.com",
     projectId: "mindcompta-cbb69",
     storageBucket: "mindcompta-cbb69.firebasestorage.app",
     messagingSenderId: "470368630296",
     appId: "1:470368630296:web:510de914f335b27b3d356d",
     measurementId: "G-SKSVSV0H70"
 };
+const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-// Variables globales pour les services Firebase
-let app;
-let auth;
-let db;
-let analytics;
-let userId = null;
+// Initialisation des services
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-if (firebaseConfig.apiKey) {
-    app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-    setLogLevel('debug'); // Active les logs Firestore pour le débogage
-    analytics = getAnalytics(app); 
+let currentUserId = null;
+let isAdmin = false;
 
-    // Variable d'application ID pour les chemins Firestore
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-    // Utilise le jeton personnalisé fourni par Canvas s'il est disponible, sinon connexion anonyme.
-    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-    // Fonction pour sauvegarder ou mettre à jour les données de l'utilisateur dans Firestore
-    async function saveUserData(user) {
-        if (!db || !user || user.isAnonymous) {
-            console.warn("Firestore non initialisé ou utilisateur anonyme. Données non sauvegardées.");
-            return;
-        }
-
-        // Chemin: /artifacts/{appId}/public/data/users/{userId}
-        const userRef = doc(db, `artifacts/${appId}/public/data/users`, user.uid);
-        const now = new Date().toISOString();
-
-        const userDataUpdate = {
-            uid: user.uid,
-            email: user.email || 'N/A',
-            lastLogin: now,
-            // Utilisez 'merge: true' pour mettre à jour sans écraser les champs existants
-        };
-
-        try {
-            const docSnap = await getDoc(userRef);
-            
-            // Si le document n'existe pas (nouvelle inscription), ajoutez la date de création
-            if (!docSnap.exists()) {
-                userDataUpdate.creationTime = now;
-            }
-
-            await setDoc(userRef, userDataUpdate, { merge: true });
-            console.log(`Données utilisateur (${user.uid}) sauvegardées/mises à jour dans Firestore.`);
-
-        } catch (e) {
-            console.error("Erreur lors de la sauvegarde des données utilisateur dans Firestore:", e);
-        }
-    }
-
-
-    async function initializeAuth() {
-        try {
-            if (initialAuthToken) {
-                await signInWithCustomToken(auth, initialAuthToken);
-            } else {
-                await signInAnonymously(auth);
-            }
-        } catch (error) {
-            console.error("Échec de l'authentification initiale Firebase:", error);
-        }
-    }
-    
-    // Écouteur de l'état d'authentification pour mettre à jour l'ID utilisateur
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            userId = user.uid;
-            console.log(`Utilisateur connecté. UID: ${userId}`);
-            // Mise à jour de la dernière connexion lors du changement d'état (utile après une reconnexion)
-            if (!user.isAnonymous && user.email) {
-                saveUserData(user); 
-            }
+// Authentification initiale
+const initializeAuth = async () => {
+    try {
+        if (initialAuthToken) {
+            await signInWithCustomToken(auth, initialAuthToken);
+            console.log("Authenticated with custom token.");
         } else {
-            userId = null;
-            console.log("Utilisateur déconnecté ou anonyme non reconnu.");
+            // Tentative de connexion anonyme pour l'accès public
+            await signInAnonymously(auth);
+            console.log("Signed in anonymously.");
         }
-    });
-
-    initializeAuth();
-
-} else {
-    console.error("La configuration Firebase est manquante. Les fonctions d'authentification seront indisponibles.");
-}
-
-
-// =======================================================
-// 2. FONCTIONS D'AUTHENTIFICATION PUBLIQUES (Exposées à window)
-// =======================================================
-
-/**
- * Gère la connexion d'un utilisateur existant par e-mail et mot de passe.
- * Fonction appelée depuis login.html.
- */
-window.handleLogin = async function() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const message = document.getElementById('auth-message');
-
-    message.textContent = '';
-    message.classList.add('hidden');
-
-    if (!auth) {
-        message.textContent = "Erreur: Service d'authentification indisponible.";
-        message.classList.remove('hidden');
-        return;
-    }
-
-    try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        
-        // --- MISE À JOUR FIREBASE: Enregistrement de la dernière connexion ---
-        await saveUserData(userCredential.user);
-
-        // Succès
-        message.textContent = `Connexion réussie! Bienvenue, ${userCredential.user.email}. Redirection...`;
-        message.classList.remove('text-red-500', 'border-red-300');
-        message.classList.add('text-green-500', 'border-green-300');
-
-        setTimeout(() => { window.location.href = 'index.html'; }, 1500);
-
     } catch (error) {
-        console.error("Erreur de connexion:", error.code, error.message);
-        let userMessage = "Échec de la connexion. Vérifiez votre e-mail et mot de passe.";
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-             userMessage = "E-mail ou mot de passe incorrect.";
-        }
-        
-        message.textContent = userMessage;
-    } finally {
-         message.classList.remove('hidden');
+        console.error("Firebase Auth initialization error:", error);
     }
 };
 
-/**
- * Gère la création de compte utilisateur par e-mail et mot de passe.
- * Fonction appelée depuis register.html.
- */
-window.handleRegister = async function() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const passwordConfirm = document.getElementById('password-confirm').value;
-    const message = document.getElementById('auth-message');
-
-    message.textContent = '';
-    message.classList.add('hidden');
-
-    if (!auth) {
-        message.textContent = "Erreur: Service d'authentification indisponible.";
-        message.classList.remove('hidden');
-        return;
-    }
-
-    if (password !== passwordConfirm) {
-        message.textContent = "Les mots de passe ne correspondent pas.";
-        message.classList.remove('hidden');
-        return;
-    }
-
-    if (password.length < 6) {
-        message.textContent = "Le mot de passe doit comporter au moins 6 caractères.";
-        message.classList.remove('hidden');
-        return;
-    }
-
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-        // --- MISE À JOUR FIREBASE: Enregistrement du nouvel utilisateur ---
-        await saveUserData(userCredential.user);
-
-        // Succès
-        message.textContent = `Compte créé avec succès! Bienvenue, ${userCredential.user.email}. Redirection...`;
-        message.classList.remove('text-red-500', 'border-red-300');
-        message.classList.add('text-green-500', 'border-green-300');
-
-        setTimeout(() => { window.location.href = 'index.html'; }, 1500);
-
-    } catch (error) {
-        console.error("Erreur d'inscription:", error.code, error.message);
-        let userMessage = "Échec de la création du compte. Veuillez réessayer.";
+// Écouteur d'état d'authentification
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUserId = user.uid;
+        console.log("User UID:", currentUserId);
         
-        if (error.code === 'auth/email-already-in-use') {
-             userMessage = "Cet e-mail est déjà utilisé.";
-        } else if (error.code === 'auth/invalid-email') {
-             userMessage = "Format d'e-mail invalide.";
-        } else if (error.code === 'auth/weak-password') {
-             userMessage = "Le mot de passe est trop faible (min. 6 caractères).";
-        }
-
-        message.textContent = userMessage;
-    } finally {
-        message.classList.remove('hidden');
+        // 1. Récupérer les informations de l'utilisateur (y compris le rôle)
+        await fetchUserRole(currentUserId);
+    } else {
+        currentUserId = null;
+        isAdmin = false;
+        console.log("User is signed out.");
     }
-};
-
-/**
- * Déconnecte l'utilisateur et redirige vers la page de connexion.
- */
-window.handleSignOut = async function() {
-    if (!auth) return;
-    try {
-        await signOut(auth);
-        console.log("Déconnexion réussie.");
-        window.location.href = 'login.html'; 
-    } catch (error) {
-        console.error("Erreur de déconnexion:", error.message);
-    }
-};
-
-
-// =======================================================
-// 3. LOGIQUE DOM (Menu Mobile et Animation du Carrousel)
-// =======================================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    // --- GESTION DU MENU MOBILE ---
-    const menuButton = document.getElementById('menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-
-    if (menuButton && mobileMenu) {
-        menuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-    }
-
-    // --- CARROUSEL D'IMAGES À DÉFILEMENT INFINI ---
-    const scrollContent = document.querySelector('.image-scroll-content');
-    
-    if (scrollContent) {
-        const imageWidth = 300; 
-        const imageMargin = 24; 
-        const numOriginalImages = 7; 
-
-        const originalContentWidth = (imageWidth * numOriginalImages) + (imageMargin * (numOriginalImages - 1));
-
-        const totalScrollWidth = originalContentWidth * 2;
-        scrollContent.style.width = `${totalScrollWidth}px`;
-
-        let currentPosition = 0;
-        const scrollSpeed = 0.5; 
-        let isPaused = false;
-
-        function animateScroll() {
-            if (!isPaused) {
-                currentPosition -= scrollSpeed; 
-                
-                if (Math.abs(currentPosition) >= originalContentWidth) {
-                    currentPosition = 0;
-                }
-                
-                scrollContent.style.transform = `translateX(${currentPosition}px)`;
-            }
-
-            requestAnimationFrame(animateScroll);
-        }
-
-        animateScroll();
-
-        const scrollContainer = document.querySelector('.image-scroll-container');
-        if (scrollContainer) {
-            scrollContainer.addEventListener('mouseenter', () => { isPaused = true; });
-            scrollContainer.addEventListener('mouseleave', () => { isPaused = false; });
-            
-            // Gestion du tactile pour mobile
-            scrollContainer.addEventListener('touchstart', () => { isPaused = true; });
-            scrollContainer.addEventListener('touchend', () => { 
-                setTimeout(() => { isPaused = false; }, 500); 
-            });
-        }
+    // Après le changement d'état, on s'assure que la logique de la page est lancée
+    // Surtout pour les pages qui dépendent de l'état de l'utilisateur (comme admin.html)
+    if (window.initPage) {
+        window.initPage();
     }
 });
+
+// Récupère le rôle de l'utilisateur dans Firestore
+const fetchUserRole = async (uid) => {
+    if (!uid) {
+        isAdmin = false;
+        return;
+    }
+    try {
+        const userDocRef = doc(db, 'artifacts', appId, 'public/data/users', uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            isAdmin = userData.role === 'admin';
+        } else {
+            isAdmin = false;
+        }
+        console.log("Is Admin:", isAdmin);
+    } catch (error) {
+        console.error("Error fetching user role:", error);
+        isAdmin = false;
+    }
+};
+
+// Initialisation lors du chargement de la page
+initializeAuth();
+
+// --- 2. LOGIQUE DU FORMULAIRE D'INSCRIPTION ---
+
+// Fonction pour afficher un message (succès/erreur)
+const displayMessage = (elementId, message, isSuccess = true) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = message;
+        element.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+        if (isSuccess) {
+            element.classList.add('bg-green-100', 'text-green-700');
+        } else {
+            element.classList.add('bg-red-100', 'text-red-700');
+        }
+    }
+};
+
+/**
+ * Gère la soumission du formulaire d'inscription.
+ * @param {Event} e L'événement de soumission du formulaire.
+ */
+const handleSignUp = async (e) => {
+    e.preventDefault();
+    const messageElementId = 'signup-message';
+    displayMessage(messageElementId, 'Création du compte en cours...', false); // Message temporaire
+
+    const name = document.getElementById('signup-name').value;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    
+    // Déterminer le rôle
+    // L'email ADMIN_EMAIL est le seul à donner le rôle 'admin'
+    const ADMIN_EMAIL = 'admin@mindcompta.com'; 
+    const role = (email === ADMIN_EMAIL) ? 'admin' : 'user';
+
+    try {
+        // 1. Création du compte Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        // 2. Enregistrement des données utilisateur (y compris le rôle) dans Firestore
+        const userDocRef = doc(db, 'artifacts', appId, 'public/data/users', user.uid);
+        
+        await setDoc(userDocRef, {
+            name: name,
+            email: email,
+            role: role,
+            createdAt: new Date().toISOString(),
+        });
+
+        displayMessage(messageElementId, `Compte créé avec succès ! Vous êtes un utilisateur ${role}. Redirection...`, true);
+        
+        // Redirection après succès
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 2000);
+
+    } catch (error) {
+        console.error("Erreur d'inscription:", error);
+        let errorMessage = "Erreur lors de la création du compte. Veuillez réessayer.";
+
+        // Traduction des erreurs Firebase communes
+        switch (error.code) {
+            case 'auth/email-already-in-use':
+                errorMessage = "Cette adresse e-mail est déjà utilisée.";
+                break;
+            case 'auth/invalid-email':
+                errorMessage = "L'adresse e-mail n'est pas valide.";
+                break;
+            case 'auth/weak-password':
+                errorMessage = "Le mot de passe doit contenir au moins 6 caractères.";
+                break;
+        }
+
+        displayMessage(messageElementId, errorMessage, false);
+    }
+};
+
+// Écouteur pour le formulaire d'inscription
+document.addEventListener('DOMContentLoaded', () => {
+    const signUpForm = document.getElementById('signup-form');
+    if (signUpForm) {
+        signUpForm.addEventListener('submit', handleSignUp);
+    }
+});
+
+
+// --- 3. LOGIQUE DU FORMULAIRE DE CONNEXION ---
+
+/**
+ * Gère la soumission du formulaire de connexion.
+ * @param {Event} e L'événement de soumission du formulaire.
+ */
+const handleSignIn = async (e) => {
+    e.preventDefault();
+    const messageElementId = 'login-message';
+    displayMessage(messageElementId, 'Connexion en cours...', true); // Message temporaire
+
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    try {
+        // 1. Connexion Firebase Auth
+        await signInWithEmailAndPassword(auth, email, password);
+        
+        displayMessage(messageElementId, `Connexion réussie ! Redirection...`, true);
+
+        // Redirection après succès
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1000);
+
+    } catch (error) {
+        console.error("Erreur de connexion:", error);
+        let errorMessage = "Erreur de connexion. Veuillez vérifier votre email et mot de passe.";
+
+        // Traduction des erreurs Firebase communes
+        switch (error.code) {
+            case 'auth/invalid-credential':
+            case 'auth/user-not-found':
+            case 'auth/wrong-password':
+                errorMessage = "Identifiants invalides.";
+                break;
+            case 'auth/invalid-email':
+                errorMessage = "L'adresse e-mail n'est pas valide.";
+                break;
+        }
+
+        displayMessage(messageElementId, errorMessage, false);
+    }
+};
+
+// Écouteur pour le formulaire de connexion
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleSignIn);
+    }
+});
+
+
+// Exporte les variables et fonctions nécessaires pour les autres fichiers
+export { currentUserId, isAdmin, db, appId, auth, fetchUserRole };
