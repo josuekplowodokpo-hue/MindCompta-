@@ -97,22 +97,25 @@
                     
                     <form id="signup-form" class="space-y-4">
                         <div>
-                            <label for="signup-name" class="block text-sm font-medium text-gray-100">Nom et Prénom</label>
+                            <!-- Amélioration de la visibilité: text-white et font-semibold -->
+                            <label for="signup-name" class="block text-sm font-semibold text-white">Nom et Prénom</label>
                             <input type="text" id="signup-name" name="name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
                         </div>
                         <div>
-                            <label for="signup-email" class="block text-sm font-medium text-gray-100">Adresse Email</label>
+                            <!-- Amélioration de la visibilité: text-white et font-semibold -->
+                            <label for="signup-email" class="block text-sm font-semibold text-white">Adresse Email</label>
                             <input type="email" id="signup-email" name="email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
                         </div>
                         <div>
-                            <label for="signup-password" class="block text-sm font-medium text-gray-100">Mot de Passe (min. 6 caractères)</label>
+                            <!-- Amélioration de la visibilité: text-white et font-semibold -->
+                            <label for="signup-password" class="block text-sm font-semibold text-white">Mot de Passe (min. 6 caractères)</label>
                             <input type="password" id="signup-password" name="password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
                         </div>
                         
                         <!-- Message d'erreur/succès -->
                         <div id="signup-message" class="text-center p-2 rounded-lg text-sm hidden"></div>
                         
-                        
+                        <!-- La NOTE ADMIN a été retirée de l'interface utilisateur, conformément à la demande -->
 
                         <button type="submit" class="w-full bg-accent text-white font-semibold py-2 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01]">
                             Créer un Compte
@@ -170,6 +173,11 @@
                 document.getElementById('signup-section').classList.add('hidden');
                 document.getElementById('login-section').classList.add('w-full');
                 document.getElementById('login-section').classList.remove('md:w-1/2', 'hidden');
+            });
+
+            // Gère l'affichage du menu mobile
+            document.getElementById('menu-button')?.addEventListener('click', () => {
+                document.getElementById('mobile-menu')?.classList.toggle('hidden');
             });
 
 
