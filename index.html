@@ -158,7 +158,7 @@
     <script type="module" src="script.js"></script>
     <script type="module">
         // Logique pour afficher/cacher les boutons de connexion/déconnexion et le lien Admin
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 
         // Configuration Firebase (dupliquée pour la robustesse des écouteurs d'état)
@@ -175,6 +175,23 @@
         if (firebaseConfig.apiKey) {
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
+
+            // Fonction de Déconnexion globale (utilisée sur tous les boutons de déconnexion)
+            window.handleSignOut = async () => {
+                try {
+                    await signOut(auth);
+                    // Rediriger vers la page d'accueil
+                    window.location.href = 'index.html'; 
+                } catch (error) {
+                    console.error("Erreur de déconnexion:", error);
+                }
+            };
+
+            // Gère l'affichage du menu mobile
+            document.getElementById('menu-button')?.addEventListener('click', () => {
+                document.getElementById('mobile-menu')?.classList.toggle('hidden');
+            });
+
 
             onAuthStateChanged(auth, (user) => {
                 const loginBtnDesktop = document.getElementById('nav-login-btn');
