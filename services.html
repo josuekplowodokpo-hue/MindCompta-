@@ -4,136 +4,227 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Services</title>
-    <!-- Chargement de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- LIAISON VERS LE FICHIER CSS EXTERNE PARTAGÉ -->
-    <link rel="stylesheet" href="style.css"> 
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .bg-brand-dark { background-color: #0d47a1; }
+        .text-brand-dark { color: #0d47a1; }
+        .bg-accent { background-color: #42a5f5; }
+        .hover-accent:hover { background-color: #1e88e5; }
+        .nav-link { @apply text-sm font-medium hover:text-gray-200 transition duration-200; }
+        .mobile-link { @apply block py-2 px-3 text-base font-medium rounded-lg hover:bg-[#345b85] transition duration-200; }
+        .active-link { color: #42a5f5; font-weight: 600; }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- EN-TÊTE ET NAVIGATION (Utilise style.css pour le style) -->
+    <!-- EN-TÊTE ET NAVIGATION -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center">
-                    <!-- LOGO -->
                     <img src="logo.jpg" 
                          alt="MindCompta Logo" 
                          class="h-10 w-auto rounded-full mr-3 border-2 border-white">
                     <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
                 </div>
-                <!-- Menu Desktop -->
                 <nav id="desktop-nav" class="hidden sm:flex items-center space-x-6">
                     <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="services.html" class="nav-link active-link">Services</a>
+                    <a href="services.html" class="nav-link active-link bg-accent py-2 px-4 rounded-lg">Services (Livre)</a>
                     <a href="about.html" class="nav-link">À Propos</a>
                     <a href="calculator.html" class="nav-link">Calculatrice</a>
-                    <a href="contact.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                        Contact
+                    <!-- Lien Admin (visible si connecté) -->
+                    <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-lg hidden">Admin</a> 
+
+                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white hidden">
+                        Se Connecter
                     </a>
+                    <button onclick="handleSignOut()" id="nav-logout-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white hidden">
+                        Déconnexion
+                    </button>
                 </nav>
-                <!-- Bouton Menu Mobile (Hamburger) -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
             </div>
-            <!-- Menu Mobile Déroulant -->
             <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
                 <a href="index.html" class="mobile-link">Accueil</a>
-                <a href="services.html" class="mobile-link active-link bg-[#1855a8]">Services</a>
+                <a href="services.html" class="mobile-link bg-accent text-center font-semibold text-white py-3 active-link">Services (Livre)</a>
                 <a href="about.html" class="mobile-link">À Propos</a>
                 <a href="calculator.html" class="mobile-link">Calculatrice</a>
-                <a href="contact.html" class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3">Contact</a>
+                 <!-- Lien Admin Mobile (visible si connecté) -->
+                <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-400 text-center font-semibold text-white py-3 hidden">Admin</a>
+
+                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3 hidden">Se Connecter</a>
+                <button onclick="handleSignOut()" id="mobile-logout-btn" class="mobile-link bg-red-500 text-center font-semibold hover:bg-red-600 text-white py-3 hidden w-full">Déconnexion</button>
             </nav>
         </div>
     </header>
 
-    <!-- CONTENU PRINCIPAL DES SERVICES -->
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-16 md:py-24 pt-[100px] sm:pt-[120px]">
+    <!-- CONTENU PRINCIPAL -->
+    <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
+        <h1 class="text-4xl font-extrabold text-brand-dark mb-10 mt-4 text-center">
+            Notre Offre de Services et Contenus (Livre)
+        </h1>
 
-        <div class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">Nos Services d'Aide à la Conformité</h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                Accédez aux réglementations clés et aux outils de calcul essentiels pour la gestion financière en zone OHADA.
-            </p>
+        <!-- Grille de Services -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            
+            <!-- Service 1: Conseil Financier -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent hover:shadow-2xl transition duration-300">
+                <div class="text-accent text-4xl mb-4">💰</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">Conseil en Gestion & Financement</h3>
+                <p class="text-gray-600 mb-4">
+                    Optimisez votre trésorerie et vos stratégies d'investissement. Nous vous accompagnons dans la recherche de financements adaptés à votre croissance.
+                </p>
+                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
+                    <li>Planification de la trésorerie.</li>
+                    <li>Évaluation des projets.</li>
+                    <li>Montage de dossiers de crédit.</li>
+                </ul>
+                <a href="contact.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">En savoir plus →</a>
+            </div>
+
+            <!-- Service 2: Conformité OHADA -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent hover:shadow-2xl transition duration-300">
+                <div class="text-accent text-4xl mb-4">📜</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">Conformité Réglementaire OHADA</h3>
+                <p class="text-gray-600 mb-4">
+                    Assurez-vous que vos comptes et rapports financiers respectent toutes les directives de l'Organisation pour l'Harmonisation en Afrique du Droit des Affaires.
+                </p>
+                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
+                    <li>Mise à jour des normes.</li>
+                    <li>Formation du personnel.</li>
+                    <li>Audits de conformité.</li>
+                </ul>
+                <a href="contact.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Demander un Audit →</a>
+            </div>
+
+            <!-- Service 3: Contenu Éducatif (Le Livre) -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent hover:shadow-2xl transition duration-300">
+                <div class="text-accent text-4xl mb-4">📚</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">Accès Exclusif au "Livre Blanc"</h3>
+                <p class="text-gray-600 mb-4 font-bold">
+                    Toute notre documentation, études de cas et guides pratiques sur la comptabilité et la fiscalité en Afrique de l'Ouest.
+                </p>
+                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
+                    <li>Guides complets (PDF, Ebook).</li>
+                    <li>Analyses de jurisprudence OHADA.</li>
+                    <li>Modèles et formulaires financiers.</li>
+                </ul>
+                <a href="#" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Lire le Chapitre 1 →</a>
+            </div>
+            
+             <!-- Service 4: Support Technique -->
+            <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent hover:shadow-2xl transition duration-300">
+                <div class="text-accent text-4xl mb-4">🛠️</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">Support Technique Dédié</h3>
+                <p class="text-gray-600 mb-4">
+                    Un problème avec un calcul ? Une question sur l'utilisation d'un outil ? Notre équipe est là pour vous assister rapidement et efficacement.
+                </p>
+                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
+                    <li>Assistance par chat et e-mail.</li>
+                    <li>FAQ et documentation complète.</li>
+                    <li>Dépannage personnalisé de vos calculs.</li>
+                </ul>
+                <a href="contact.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Contacter le Support →</a>
+            </div>
         </div>
 
-        <!-- SECTION D'INTÉGRATION DU PDF PROFESSIONNELLE (Utilise les classes de style.css) -->
-        <section class="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-gray-200 mb-16">
-            <h2 class="text-3xl font-extrabold text-brand-dark mb-4 text-center">Consultation : Acte Uniforme OHADA (Droit Comptable)</h2>
-            <p class="text-center text-gray-500 mb-8 max-w-4xl mx-auto">
-                Accédez à la source réglementaire officielle pour une conformité totale. Le document est présenté dans un aperçu professionnel et est téléchargeable.
-            </p>
-
-            <!-- Conteneur d'aperçu stylisé utilisant les classes du style.css -->
-            <div class="flex justify-center w-full">
-                <div class="pdf-preview-container w-full max-w-3xl">
-                    <iframe 
-                        src="comptable.pdf" 
-                        title="Acte Uniforme OHADA Droit Comptable" 
-                        class="pdf-frame-stylized"
-                        loading="lazy"
-                    >
-                        <!-- Message de secours si l'iframe n'est pas supporté -->
-                        Ce navigateur ne supporte pas l'intégration de PDF. Vous pouvez le télécharger ici : 
-                        <a href="comptable.pdf" class="text-accent hover:underline font-semibold" download>Télécharger l'Acte Uniforme.</a>
-                    </iframe>
-                </div>
-            </div>
-
-            <!-- Bouton de Téléchargement -->
-             <div class="text-center mt-8">
-                <a href="comptable.pdf" download="Acte_Uniforme_OHADA_Comptable.pdf" 
-                   class="inline-flex items-center py-3 px-8 bg-accent text-white font-bold rounded-full shadow-lg hover-accent transition duration-300 transform hover:scale-105">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Télécharger l'Acte Uniforme (PDF)
+        <!-- Message d'Authentification (caché par défaut) -->
+        <div id="auth-check-message" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+            <div class="bg-white p-8 rounded-xl shadow-2xl text-center max-w-sm">
+                <p class="text-2xl font-bold text-red-600 mb-4">Accès Restreint</p>
+                <p class="text-gray-700 mb-6">Ce contenu premium est réservé aux membres connectés.</p>
+                <a href="login.html" class="bg-accent text-white font-bold py-3 px-6 rounded-full hover-accent transition duration-300 shadow-lg">
+                    Se Connecter Maintenant
                 </a>
             </div>
-        </section>
-
-
-        <!-- Section des Services Complémentaires -->
-        <section class="mt-16 grid md:grid-cols-2 gap-8">
-            <!-- Service 1 : Calculs OHADA -->
-            <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-200 hover:shadow-2xl transition duration-300">
-                <div class="text-accent text-5xl mb-4">🧮</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Outils de Calcul Économique</h3>
-                <p class="text-gray-600 mb-4">
-                    Notre calculatrice intégrée permet d'effectuer des analyses clés (TMS, TMST, Marge) en toute conformité avec les normes OHADA.
-                </p>
-                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside ml-4">
-                    <li>Analyse de Bilan et Ratios.</li>
-                    <li>Calcul du Taux Marginal de Substitution Technique (TMST).</li>
-                    <li>Détermination de la Marge et du Seuil de Rentabilité.</li>
-                </ul>
-                <a href="calculator.html" class="mt-6 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Accéder à la Calculatrice →</a>
-            </div>
-
-            <!-- Service 2 : Support Technique -->
-            <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-200 hover:shadow-2xl transition duration-300">
-                <div class="text-accent text-5xl mb-4">🛠️</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Support Expert & Assistance</h3>
-                <p class="text-gray-600 mb-4">
-                    Besoin d'aide pour interpréter une règle ou un calcul complexe ? Notre équipe est disponible pour vous assister.
-                </p>
-                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside ml-4">
-                    <li>Assistance rapide par e-mail et WhatsApp.</li>
-                    <li>Conseils sur l'application de l'Acte Uniforme.</li>
-                    <li>Documentation et guides pour les outils.</li>
-                </ul>
-                <a href="contact.html" class="mt-6 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Contacter l'Équipe →</a>
-            </div>
-        </section>
+        </div>
 
     </main>
 
-    <!-- PIED DE PAGE (Utilise style.css pour le style) -->
+    <!-- PIED DE PAGE -->
     <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LIAISON VERS LE FICHIER JAVASCRIPT EXTERNE PARTAGÉ -->
-    <script src="script.js"></script>
+    <!-- LOGIQUE JAVASCRIPT ET VÉRIFICATION D'ACCÈS -->
+    <script type="module" src="script.js"></script>
+    <script type="module">
+        // Import des modules Firebase nécessaires
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        
+        // Configuration Firebase (Doit correspondre à script.js)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
+            authDomain: "mindcompta-cbb69.firebaseapp.com",
+            projectId: "mindcompta-cbb69",
+            storageBucket: "mindcompta-cbb69.firebasestorage.app",
+            messagingSenderId: "470368630296",
+            appId: "1:470368630296:web:510de914f335b27b3d356d",
+            measurementId: "G-SKSVSV0H70"
+        };
+        
+        let auth;
+        if (firebaseConfig.apiKey) {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            
+            // Écouteur pour vérifier l'état de l'authentification
+            onAuthStateChanged(auth, (user) => {
+                const checkMessage = document.getElementById('auth-check-message');
+                const navLoginBtn = document.getElementById('nav-login-btn');
+                const navLogoutBtn = document.getElementById('nav-logout-btn');
+                const navAdminBtn = document.getElementById('nav-admin-btn');
+                const mobileLoginBtn = document.getElementById('mobile-login-btn');
+                const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+                const mobileAdminBtn = document.getElementById('mobile-admin-btn');
+
+                // 1. Gérer l'affichage des boutons de navigation
+                if (user && !user.isAnonymous) {
+                    // Utilisateur connecté (authentifié)
+                    if (navLoginBtn) navLoginBtn.classList.add('hidden');
+                    if (navLogoutBtn) navLogoutBtn.classList.remove('hidden');
+                    if (navAdminBtn) navAdminBtn.classList.remove('hidden');
+                    if (mobileLoginBtn) mobileLoginBtn.classList.add('hidden');
+                    if (mobileLogoutBtn) mobileLogoutBtn.classList.remove('hidden');
+                    if (mobileAdminBtn) mobileAdminBtn.classList.remove('hidden');
+
+                    // Masquer le message d'accès restreint
+                    if (checkMessage) checkMessage.classList.add('hidden');
+
+                } else {
+                    // Utilisateur déconnecté ou anonyme
+                    if (navLoginBtn) navLoginBtn.classList.remove('hidden');
+                    if (navLogoutBtn) navLogoutBtn.classList.add('hidden');
+                    if (navAdminBtn) navAdminBtn.classList.add('hidden');
+                    if (mobileLoginBtn) mobileLoginBtn.classList.remove('hidden');
+                    if (mobileLogoutBtn) mobileLogoutBtn.classList.add('hidden');
+                    if (mobileAdminBtn) mobileAdminBtn.classList.add('hidden');
+
+                    // Afficher le message d'accès restreint
+                    if (checkMessage) checkMessage.classList.remove('hidden');
+                }
+            });
+
+        } else {
+            console.error("Firebase non configuré.");
+        }
+
+        // Gérer le menu mobile (répété ici car c'est une page standalone)
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuButton = document.getElementById('menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (menuButton && mobileMenu) {
+                menuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
 
