@@ -4,8 +4,8 @@ import {
     signInAnonymously, 
     signInWithCustomToken, 
     onAuthStateChanged,
-    createUserWithEmailAndPassword, // Ajouté pour l'inscription
-    signInWithEmailAndPassword,     // Ajouté pour la connexion
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword,     
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { 
     getFirestore, 
@@ -74,7 +74,6 @@ onAuthStateChanged(auth, async (user) => {
         console.log("User is signed out.");
     }
     // Après le changement d'état, on s'assure que la logique de la page est lancée
-    // Surtout pour les pages qui dépendent de l'état de l'utilisateur (comme admin.html)
     if (window.initPage) {
         window.initPage();
     }
@@ -87,6 +86,7 @@ const fetchUserRole = async (uid) => {
         return;
     }
     try {
+        // Chemin de la collection : /artifacts/{appId}/public/data/users/{userId}
         const userDocRef = doc(db, 'artifacts', appId, 'public/data/users', uid);
         const userDoc = await getDoc(userDocRef);
 
@@ -94,6 +94,7 @@ const fetchUserRole = async (uid) => {
             const userData = userDoc.data();
             isAdmin = userData.role === 'admin';
         } else {
+            // Si le document n'existe pas, l'utilisateur est considéré comme normal (ou doit s'inscrire)
             isAdmin = false;
         }
         console.log("Is Admin:", isAdmin);
@@ -129,14 +130,13 @@ const displayMessage = (elementId, message, isSuccess = true) => {
 const handleSignUp = async (e) => {
     e.preventDefault();
     const messageElementId = 'signup-message';
-    displayMessage(messageElementId, 'Création du compte en cours...', false); // Message temporaire
+    displayMessage(messageElementId, 'Création du compte en cours...', true); // Utiliser true pour un fond neutre en cours
 
     const name = document.getElementById('signup-name').value;
     const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
     
-    // Déterminer le rôle
-    // L'email ADMIN_EMAIL est le seul à donner le rôle 'admin'
+    // E-mail spécifique pour le rôle d'administrateur
     const ADMIN_EMAIL = 'admin@mindcompta.com'; 
     const role = (email === ADMIN_EMAIL) ? 'admin' : 'user';
 
@@ -177,6 +177,8 @@ const handleSignUp = async (e) => {
             case 'auth/weak-password':
                 errorMessage = "Le mot de passe doit contenir au moins 6 caractères.";
                 break;
+            default:
+                errorMessage = `Erreur: ${error.code}`;
         }
 
         displayMessage(messageElementId, errorMessage, false);
@@ -201,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
 const handleSignIn = async (e) => {
     e.preventDefault();
     const messageElementId = 'login-message';
-    displayMessage(messageElementId, 'Connexion en cours...', true); // Message temporaire
+    displayMessage(messageElementId, 'Connexion en cours...', true); // Utiliser true pour un fond neutre en cours
 
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
@@ -231,6 +233,8 @@ const handleSignIn = async (e) => {
             case 'auth/invalid-email':
                 errorMessage = "L'adresse e-mail n'est pas valide.";
                 break;
+            default:
+                errorMessage = `Erreur: ${error.code}`;
         }
 
         displayMessage(messageElementId, errorMessage, false);
