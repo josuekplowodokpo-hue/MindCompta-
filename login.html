@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Connexion & Inscription</title>
+    <!-- Chargement de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <style>
         /* Import the Inter font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -89,7 +90,7 @@
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
-                
+
                 <!-- LOGO/BRAND (CLICKABLE) -->
                 <a href="index.html" class="flex items-center group">
                     <img src="logo.jpg" 
@@ -102,16 +103,15 @@
                 <!-- NAVIGATION DESKTOP -->
                 <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
                     <a href="index.html" class="nav-link">Accueil</a>
+                    <!-- Les liens de navigation Services, À Propos, etc. sont laissés pour la structure future -->
                     <a href="services.html" class="nav-link">Services (Livre)</a>
                     <a href="about.html" class="nav-link">À Propos</a>
                     <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
                     
-                    <!-- Boutons et liens gérés par JS -->
-                    <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-full hidden text-white hover:bg-red-500">Admin</a> 
-                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 active-link-desktop text-brand-dark">Se Connecter</a>
-                    <button id="nav-logout-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white hidden">Déconnexion</button>
+                    <!-- Ici, on est sur la page de connexion, donc pas de déconnexion/admin affiché -->
+                    <a href="login_firebase.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 active-link-desktop text-brand-dark">Se Connecter</a>
                 </nav>
-                
+
                 <!-- BOUTON MENU MOBILE -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -130,17 +130,14 @@
         </button>
         <div class="pt-12 space-y-3">
             <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
-            
+
             <a href="index.html" class="mobile-link">Accueil</a>
             <a href="services.html" class="mobile-link">Services (Livre)</a>
             <a href="about.html" class="mobile-link">À Propos</a>
             <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
-            
-            <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 hidden">Admin</a>
 
             <div class="pt-6 border-t border-gray-700 mt-6 space-y-3">
-                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn active-link-mobile text-brand-dark">Se Connecter</a>
-                <button id="mobile-logout-btn" class="mobile-link bg-red-500 mobile-link-btn text-white hidden">Déconnexion</button>
+                <a href="login_firebase.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn active-link-mobile text-brand-dark">Se Connecter</a>
             </div>
         </div>
     </nav>
@@ -149,9 +146,8 @@
     <!-- CONTENU PRINCIPAL (FORMULAIRES) -->
     <main class="flex-grow flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden md:max-w-xl">
-            <div class="md:flex">
+            <div id="form-container" class="md:flex">
                 <!-- Section Connexion -->
-                <!-- Par défaut : w-full sur mobile, md:w-1/2 sur desktop -->
                 <div id="login-section" class="w-full md:w-1/2 p-8 transition-all duration-500">
                     <h2 class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
 
@@ -168,14 +164,10 @@
                         <!-- Message d'erreur/succès -->
                         <div id="login-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4" role="alert"></div>
 
-                        <button type="submit" class="w-full bg-accent text-white font-semibold py-3 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01] mt-6">
+                        <button type="submit" id="login-button" class="w-full bg-accent text-white font-semibold py-3 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01] mt-6">
                             Se Connecter
                         </button>
                     </form>
-
-                    <div id="login-status" class="mt-4 p-2 text-sm text-center font-semibold hidden rounded-lg bg-gray-100 text-brand-dark border-b-2 border-accent">
-                        Connecté en tant que: <span id="logged-in-email" class="text-accent"></span>
-                    </div>
 
                     <div class="mt-6 text-center">
                         <p class="text-sm text-gray-600">
@@ -208,7 +200,7 @@
                         <!-- Message d'erreur/succès pour l'inscription -->
                         <div id="signup-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4 text-white" role="alert"></div>
 
-                        <button type="submit" class="w-full bg-accent text-white font-semibold py-3 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01] mt-6">
+                        <button type="submit" id="signup-button" class="w-full bg-accent text-white font-semibold py-3 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01] mt-6">
                             Créer un Compte
                         </button>
                     </form>
@@ -231,13 +223,41 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT SIMULÉE -->
-    <script>
-        // --- IDENTIFIANTS D'ADMINISTRATEUR CODÉS EN DUR ---
-        const ADMIN_EMAIL = 'admin@mindcompta.com';
-        const ADMIN_PASSWORD = 'admin123';
-        // --------------------------------------------------
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc,
+            setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // --- Firebase Setup ---
+        
+        setLogLevel('debug');
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+        let auth;
+        let db;
+
+        if (Object.keys(firebaseConfig).length > 0) {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } else {
+            console.error("Firebase config is missing.");
+        }
+        
+        // --- DOM Elements ---
         const elements = {
             loginSection: document.getElementById('login-section'),
             signupSection: document.getElementById('signup-section'),
@@ -245,157 +265,204 @@
             signupForm: document.getElementById('signup-form'),
             loginMessage: document.getElementById('login-message'),
             signupMessage: document.getElementById('signup-message'),
-            loginStatus: document.getElementById('login-status'),
-            loggedInEmail: document.getElementById('logged-in-email'),
-            // Navigation
-            navLoginBtn: document.getElementById('nav-login-btn'),
-            navLogoutBtn: document.getElementById('nav-logout-btn'),
-            navAdminBtn: document.getElementById('nav-admin-btn'),
-            mobileLoginBtn: document.getElementById('mobile-login-btn'),
-            mobileLogoutBtn: document.getElementById('mobile-logout-btn'),
-            mobileAdminBtn: document.getElementById('mobile-admin-btn'),
+            loginButton: document.getElementById('login-button'),
+            signupButton: document.getElementById('signup-button'),
+            formContainer: document.getElementById('form-container'),
+            // Navigation Mobile
             mobileMenu: document.getElementById('mobile-menu'),
             overlay: document.getElementById('mobile-menu-overlay'),
             menuButton: document.getElementById('menu-button'),
             closeMenuButton: document.getElementById('close-menu-button'),
+            showSignupBtnDesktop: document.getElementById('show-signup-btn-desktop'),
+            showLoginBtnMobile: document.getElementById('show-login-btn-mobile')
         };
 
-        // Fonction pour mettre à jour l'état de la barre de navigation
-        function updateAuthUI() {
-            const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-            const userEmail = localStorage.getItem('userEmail');
-            const userRole = localStorage.getItem('userRole');
 
-            // 1. Gérer les boutons de connexion/déconnexion
-            const setVisibility = (element, isVisible) => {
-                if (element) {
-                    element.classList.toggle('hidden', !isVisible);
-                }
-            };
-
-            setVisibility(elements.navLoginBtn, !isAuthenticated);
-            setVisibility(elements.navLogoutBtn, isAuthenticated);
-            setVisibility(elements.mobileLoginBtn, !isAuthenticated);
-            setVisibility(elements.mobileLogoutBtn, isAuthenticated);
-            
-            // 2. Gérer le lien Admin
-            const isAdmin = userRole === 'admin';
-            setVisibility(elements.navAdminBtn, isAdmin);
-            setVisibility(elements.mobileAdminBtn, isAdmin);
-
-            // 3. Gérer le statut de connexion sur la page elle-même
-            setVisibility(elements.loginStatus, isAuthenticated && !isAdmin);
-            if (isAuthenticated && !isAdmin && userEmail) {
-                elements.loggedInEmail.textContent = userEmail;
-            } else if (elements.loginStatus) {
-                elements.loginStatus.classList.add('hidden');
-            }
-        }
-        
-        // Fonction de Déconnexion globale
-        window.handleSignOut = () => {
-            localStorage.removeItem('isAuthenticated');
-            localStorage.removeItem('userEmail');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userRole');
-            window.location.href = 'index.html'; 
-        };
-
-        // Attacher les écouteurs de déconnexion aux boutons du header
-        elements.navLogoutBtn?.addEventListener('click', window.handleSignOut);
-        elements.mobileLogoutBtn?.addEventListener('click', window.handleSignOut);
-
-
-        // --- LOGIQUE DE FORMULAIRE ---
+        // --- Utility Functions ---
 
         // Affiche un message d'état
         function showMessage(element, message, isSuccess) {
-            element.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'border-red-500', 'bg-vibrant-green/20', 'text-brand-dark', 'border-vibrant-green');
+            element.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'border-red-500', 'bg-vibrant-green/20', 'text-brand-dark', 'border-vibrant-green', 'text-white');
             element.textContent = message;
+            
             if (isSuccess) {
                 element.classList.add('bg-vibrant-green/20', 'text-brand-dark', 'border-vibrant-green');
             } else {
                 element.classList.add('bg-red-100', 'text-red-700', 'border-red-500');
             }
+            
+            // Adjust text color for the signup section background
             if (element === elements.signupMessage) {
                  element.classList.add('text-white');
                  element.classList.remove('text-brand-dark');
+                 if (isSuccess) element.classList.add('border-vibrant-green');
+                 else element.classList.add('border-red-500');
+            }
+        }
+        
+        function setButtonLoadingState(button, isLoading, originalText) {
+            button.disabled = isLoading;
+            button.textContent = isLoading ? 'Chargement...' : originalText;
+            button.classList.toggle('opacity-50', isLoading);
+            button.classList.toggle('cursor-not-allowed', isLoading);
+        }
+
+
+        // --- CORE FIREBASE LOGIC ---
+
+        /**
+         * Sauvegarde le profil de l'utilisateur (nom, email, rôle) dans Firestore
+         * Le chemin suit la structure sécurisée: /artifacts/{appId}/users/{userId}/users_data/profile
+         * @param {string} userId - L'UID de l'utilisateur nouvellement créé
+         * @param {string} userName - Le nom complet de l'utilisateur
+         * @param {string} userEmail - L'email de l'utilisateur
+         * @param {string} role - Le rôle ('user' par défaut)
+         */
+        async function saveUserProfile(userId, userName, userEmail, role = 'user') {
+            if (!db || !userId) return;
+
+            // Chemin du document: /artifacts/{appId}/users/{userId}/users_data/profile
+            const profileDocPath = `/artifacts/${appId}/users/${userId}/users_data/profile`;
+            const userDocRef = doc(db, profileDocPath);
+            
+            const userData = {
+                userName: userName,
+                email: userEmail,
+                role: role,
+                createdAt: new Date()
+            };
+
+            try {
+                // Utilise setDoc avec l'UID comme ID du document pour un accès facile
+                await setDoc(userDocRef, userData);
+                console.log("Profil utilisateur sauvegardé avec succès dans Firestore.");
+            } catch (e) {
+                console.error("Erreur lors de la sauvegarde du profil:", e);
+                // Note: L'utilisateur est créé dans Auth, mais le profil Firestore a échoué.
+                // Cela sera géré lors de la connexion.
             }
         }
 
-        // 1. GESTION DE L'INSCRIPTION (Simulée)
-        elements.signupForm.addEventListener('submit', function(e) {
+        // 1. GESTION DE L'INSCRIPTION (Firebase)
+        elements.signupForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const name = document.getElementById('signup-name').value;
             const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const name = document.getElementById('signup-name').value;
+            
+            setButtonLoadingState(elements.signupButton, true, 'Créer un Compte');
+            elements.signupMessage.classList.add('hidden');
 
-            // Vider le formulaire et afficher le message
-            elements.signupForm.reset();
-            showMessage(elements.signupMessage, `Création de compte réussie pour ${name} (${email}). Vous pouvez maintenant vous connecter.`, true);
+            try {
+                // Étape 1: Créer l'utilisateur dans Firebase Authentication
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Étape 2: Sauvegarder le profil dans Firestore
+                await saveUserProfile(user.uid, name, email);
+
+                // Succès et redirection
+                showMessage(elements.signupMessage, `Compte créé avec succès pour ${name} ! Redirection...`, true);
+
+                setTimeout(() => {
+                    window.location.href = 'index.html'; // Redirection vers le tableau de bord
+                }, 1000);
+
+            } catch (error) {
+                let errorMessage;
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = "Cette adresse email est déjà utilisée.";
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = "Adresse email invalide.";
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = "Mot de passe trop faible (doit contenir au moins 6 caractères).";
+                        break;
+                    default:
+                        errorMessage = `Erreur d'inscription: ${error.message}`;
+                }
+                showMessage(elements.signupMessage, errorMessage, false);
+                console.error("Erreur d'inscription Firebase:", error);
+            } finally {
+                setButtonLoadingState(elements.signupButton, false, 'Créer un Compte');
+            }
         });
 
 
-        // 2. GESTION DE LA CONNEXION (Simulée)
-        elements.loginForm.addEventListener('submit', function(e) {
+        // 2. GESTION DE LA CONNEXION (Firebase)
+        elements.loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-
-            // Effacer les messages précédents
-            elements.loginMessage.classList.add('hidden');
-            elements.loginStatus.classList.add('hidden');
             
-            // ADMIN CHECK
-            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-                localStorage.setItem('isAuthenticated', 'true');
-                localStorage.setItem('userRole', 'admin');
-                localStorage.setItem('userEmail', email);
-                
-                showMessage(elements.loginMessage, 'Connexion Administrateur réussie ! Redirection...', true);
-                
+            setButtonLoadingState(elements.loginButton, true, 'Se Connecter');
+            elements.loginMessage.classList.add('hidden');
+
+            try {
+                // Tenter la connexion
+                await signInWithEmailAndPassword(auth, email, password);
+
+                // Succès (onAuthStateChanged dans index.html prendra le relais)
+                showMessage(elements.loginMessage, 'Connexion réussie ! Redirection...', true);
+
                 setTimeout(() => {
-                    window.location.href = 'admin.html';
-                }, 500);
-                return;
-            }
+                    window.location.href = 'index.html'; // Redirection vers le tableau de bord
+                }, 1000);
 
-            // SIMULATED USER LOGIN
-            // Nous considérons tout autre identifiant comme une connexion utilisateur réussie (simulée)
-            if (email.length > 0 && password.length >= 6) {
-                localStorage.setItem('isAuthenticated', 'true');
-                localStorage.setItem('userRole', 'user');
-                localStorage.setItem('userEmail', email); 
-                localStorage.setItem('userName', email.split('@')[0]); // Nom simulé
-
-                showMessage(elements.loginMessage, 'Connexion réussie (Simulée) !', true);
-                
-                // Mettre à jour l'UI après 500ms pour voir le message
-                setTimeout(() => {
-                    updateAuthUI();
-                }, 500);
-
-            } else {
-                // Échec de la connexion (champs vides ou mot de passe trop court)
-                showMessage(elements.loginMessage, 'Erreur: Identifiants invalides ou mot de passe trop court.', false);
+            } catch (error) {
+                let errorMessage;
+                switch (error.code) {
+                    case 'auth/invalid-credential':
+               
+case 'auth/wrong-password':
+                    case 'auth/user-not-found':
+                        errorMessage = "Email ou mot de passe incorrect.";
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = "Adresse email invalide.";
+                        break;
+                    default:
+                        errorMessage = `Erreur de connexion: ${error.message}`;
+                }
+                showMessage(elements.loginMessage, errorMessage, false);
+                console.error("Erreur de connexion Firebase:", error);
+            } finally {
+                 setButtonLoadingState(elements.loginButton, false, 'Se Connecter');
             }
         });
-
 
         // --- GESTION DU MENU MOBILE ET BASES UI ---
 
         // Gère l'affichage mobile/desktop des formulaires (bascule entre Login et Signup)
-        document.getElementById('show-signup-btn-desktop')?.addEventListener('click', () => {
-            elements.signupSection.classList.remove('hidden');
-            elements.loginSection.classList.add('md:w-1/2', 'hidden');
-            elements.loginSection.classList.remove('w-full');
-        });
+        
+        function updateFormLayout(showSignup) {
+            // Affichage Desktop (utilise les classes md:)
+            if (window.innerWidth >= 768) { 
+                elements.loginSection.classList.toggle('md:w-full', !showSignup);
+                elements.loginSection.classList.toggle('md:w-1/2', showSignup);
+                
+                elements.signupSection.classList.toggle('hidden', !showSignup);
+                elements.signupSection.classList.toggle('md:block', showSignup);
+                
+                elements.loginSection.classList.toggle('hidden', showSignup);
+                elements.loginSection.classList.toggle('block', !showSignup);
+                
+                elements.formContainer.classList.toggle('md:flex-row-reverse', showSignup); 
+            } else { 
+                // Affichage Mobile (utilise les classes w-full)
+                elements.loginSection.classList.toggle('hidden', showSignup);
+                elements.signupSection.classList.toggle('hidden', !showSignup);
+            }
+        }
+        
+        // Initial state: show login
+        updateFormLayout(false);
 
-        document.getElementById('show-login-btn-mobile')?.addEventListener('click', () => {
-            elements.signupSection.classList.add('hidden');
-            elements.loginSection.classList.add('w-full');
-            elements.loginSection.classList.remove('md:w-1/2', 'hidden');
-        });
+        elements.showSignupBtnDesktop?.addEventListener('click', () => updateFormLayout(true));
+        elements.showLoginBtnMobile?.addEventListener('click', () => updateFormLayout(false));
+
 
         // GESTIONNAIRE DU MENU MOBILE (Off-Canvas)
       function toggleMobileMenu(isOpen) {
@@ -416,9 +483,15 @@
         elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
         elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
         elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
+        
+        // Redirection si l'utilisateur est déjà connecté
+        onAuthStateChanged(auth, (user) => {
+            if (user && !user.isAnonymous) {
+                // Si l'utilisateur est connecté, rediriger vers la page principale
+                window.location.href = 'index.html';
+            }
+        });
 
-        // Initialisation : Mettre à jour l'UI au chargement de la page
-        document.addEventListener('DOMContentLoaded', updateAuthUI);
     </script>
 </body>
 </html>
