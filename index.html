@@ -7,23 +7,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        /* Importer la police Inter */
+        /* Import the Inter font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
-        /* Couleurs de la marque (Uniformisées) */
+        /* Brand Colors (Standardized) */
         :root {
-            --brand-dark: #1E3A8A; /* Bleu Profond (Indigo-900) */
-            --accent: #F59E0B; /* Orange Vif / Or (Amber-500) */
+            --brand-dark: #1E3A8A; /* Deep Blue (Indigo-900) */
+            --accent: #F59E0B; /* Vivid Orange / Gold (Amber-500) */
+            --vibrant-green: #10B981; /* Bright Green (Emerald-500) */
             font-family: 'Inter', sans-serif;
         }
 
-        /* Classes Tailwind personnalisées pour les couleurs */
+        /* Custom Tailwind classes for colors */
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-        .hover-accent:hover { background-color: #D97706; } /* Variante de l'Orange pour le hover */
+        .hover-accent:hover { background-color: #D97706; } 
+        .bg-vibrant-green { background-color: var(--vibrant-green); }
 
-        /* Styles de liens de navigation Desktop */
+        /* Navigation Link Styles */
         .nav-link {
             color: white;
             font-weight: 500;
@@ -34,14 +36,13 @@
         .nav-link:hover {
             background-color: #345b85;
         }
-        /* Lien actif pour Desktop */
         .active-link-desktop {
             background-color: var(--accent);
             font-weight: 600;
             color: var(--brand-dark) !important;
         }
 
-        /* --- STYLE DU MENU MOBILE (Off-Canvas) --- */
+        /* Mobile Menu Styles (Off-Canvas) */
         #mobile-menu {
             transform: translateX(100%);
             transition: transform 0.3s ease-in-out;
@@ -50,7 +51,7 @@
         #mobile-menu.open {
             transform: translateX(0);
         }
-        /* Superposition */
+        /* Overlay */
         #mobile-menu-overlay {
             display: none; 
             z-index: 40;
@@ -58,8 +59,6 @@
         #mobile-menu-overlay.open {
             display: block;
         }
-
-        /* Styles de liens de navigation Mobile */
         .mobile-link {
             display: block;
             padding: 0.75rem 1rem;
@@ -68,10 +67,6 @@
             border-radius: 0.5rem;
             transition: background-color 0.2s;
         }
-        .mobile-link:hover {
-            background-color: #345b85;
-        }
-        /* Lien actif pour Mobile */
         .mobile-link.active-link-mobile {
             background-color: var(--accent);
             color: var(--brand-dark);
@@ -86,32 +81,31 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- EN-TÊTE ET NAVIGATION -->
+    <!-- HEADER AND NAVIGATION -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
                 
-                <!-- LOGO/MARQUE (CLIQUABLE VERS INDEX.HTML) -->
+                <!-- LOGO/BRAND (CLICKABLE) -->
                 <a href="index.html" class="flex items-center group">
-                    <!-- Placeholder pour le logo - à remplacer par une image réelle -->
                     <img src="logo.jpg" 
-                         alt="MindCompta Logo" 
+                         alt="" 
                          onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
                          class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
                     <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
                 </a>
 
-                <!-- NAVIGATION DESKTOP -->
+                <!-- DESKTOP NAVIGATION -->
                 <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
                     <a href="index.html" class="nav-link active-link-desktop">Accueil</a>
                     <a href="services.html" class="nav-link">Services (Livre)</a>
                     <a href="about.html" class="nav-link">À Propos</a>
-                    <a href="youtube.html" class="nav-link">Vidéos YouTube</a> <!-- LIEN MIS À JOUR -->
+                    <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
                     
-                    <!-- Lien Admin (visible si connecté) -->
+                    <!-- Admin Link (visible if logged in) -->
                     <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-full hidden text-white hover:bg-red-500">Admin</a> 
 
-                    <!-- Boutons d'Action -->
+                    <!-- Action Buttons -->
                     <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
                         Se Connecter
                     </a>
@@ -120,7 +114,7 @@
                     </button>
                 </nav>
                 
-                <!-- BOUTON MENU MOBILE -->
+                <!-- MOBILE MENU BUTTON -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -130,7 +124,7 @@
         </div>
     </header>
 
-    <!-- MENU MOBILE OFF-CANVAS -->
+    <!-- MOBILE MENU OFF-CANVAS -->
     <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
     <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
         <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none">
@@ -142,7 +136,7 @@
             <a href="index.html" class="mobile-link active-link-mobile">Accueil</a>
             <a href="services.html" class="mobile-link">Services (Livre)</a>
             <a href="about.html" class="mobile-link">À Propos</a>
-            <a href="youtube.html" class="mobile-link">Vidéos YouTube</a> <!-- LIEN MIS À JOUR -->
+            <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
             
             <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 hidden">Admin</a>
 
@@ -152,50 +146,55 @@
             </div>
         </div>
     </nav>
-    <!-- FIN MENU MOBILE -->
+    <!-- END MOBILE MENU -->
 
-    <!-- HÉRO SECTION (Zone principale) -->
-    <section class="bg-white py-16 md:py-24 shadow-inner">
-        <div class="max-w-6xl mx-auto px-4 text-center">
-            <h1 class="text-5xl md:text-6xl font-extrabold text-brand-dark leading-tight mb-4">
-                L'Expertise Financière <span class="text-accent">Africaine</span>
-            </h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                MindCompta Finance est votre partenaire de confiance pour la conformité OHADA, le conseil financier stratégique et l'optimisation fiscale en Afrique de l'Ouest.
-            </p>
-            <div class="space-x-4">
-                <a href="services.html" class="bg-accent text-white font-bold py-3 px-8 rounded-full shadow-lg hover-accent transition duration-300 transform hover:scale-105 inline-block">
-                    Découvrir nos Services
-                </a>
-                <a href="contact.html" class="bg-brand-dark text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-[#345b85] transition duration-300 transform hover:scale-105 inline-block">
-                    Nous Contacter
+    <!-- HERO SECTION (Fixed Banner - Replaces Carousel) -->
+    <section class="w-full max-w-6xl mx-auto mt-6 px-4">
+        <div class="relative bg-brand-dark rounded-2xl h-96 flex items-center justify-center p-6 sm:p-10 shadow-2xl overflow-hidden">
+            <!-- Background Visuals -->
+            <img src="https://placehold.co/1200x500/1E3A8A/ffffff?text=CONSEIL+FISCAL+ET+OHADA" 
+                 alt="[Image d'un bureau de conseil financier]" 
+                 class="w-full h-full object-cover absolute inset-0 opacity-50 rounded-2xl"
+                 onerror="this.style.display='none'; this.closest('div').classList.add('bg-brand-dark');">
+            <div class="absolute inset-0 bg-black bg-opacity-40 rounded-2xl"></div>
+            
+            <!-- Content Block -->
+            <div class="relative z-10 text-center text-white p-4 sm:p-8 rounded-xl max-w-3xl">
+                <h1 class="text-4xl sm:text-6xl font-extrabold mb-4 tracking-tight leading-tight">
+                    Votre Conformité OHADA & Croissance Fiscale
+                </h1>
+                <p class="text-lg sm:text-xl font-light max-w-2xl mx-auto mb-8">
+                    Maîtrisez les lois d'affaires de l'espace UEMOA et sécurisez vos transactions avec l'expertise MindCompta.
+                </p>
+                <a href="services.html" class="inline-block bg-accent text-brand-dark font-bold py-3 px-8 rounded-full shadow-xl transition duration-300 transform hover:scale-105 hover:shadow-2xl">
+                    Découvrir Nos Services
                 </a>
             </div>
         </div>
     </section>
-
-    <!-- SECTION DES AVANTAGES -->
+    
+    <!-- ADVANTAGES SECTION -->
     <section class="py-16">
         <div class="max-w-6xl mx-auto px-4">
             <h2 class="text-3xl font-bold text-center text-brand-dark mb-12">Pourquoi choisir MindCompta ?</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                 
-                <!-- Avantage 1: Conformité -->
-                <div class="bg-white p-6 rounded-xl shadow-lg border-b-4 border-accent">
+                <!-- Advantage 1: Compliance -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-b-4 border-accent hover:shadow-xl transition duration-300">
                     <div class="text-5xl text-accent mb-4">📜</div>
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Conformité OHADA Assurée</h3>
                     <p class="text-gray-600">Restez serein. Nos experts garantissent que vos pratiques sont à jour avec la législation régionale.</p>
                 </div>
                 
-                <!-- Avantage 2: Stratégie -->
-                <div class="bg-white p-6 rounded-xl shadow-lg border-b-4 border-accent">
+                <!-- Advantage 2: Strategy -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-b-4 border-accent hover:shadow-xl transition duration-300">
                     <div class="text-5xl text-accent mb-4">📈</div>
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Croissance Stratégique</h3>
                     <p class="text-gray-600">Nous élaborons des plans financiers personnalisés pour maximiser votre potentiel de croissance et d'investissement.</p>
                 </div>
                 
-                <!-- Avantage 3: Expertise Locale -->
-                <div class="bg-white p-6 rounded-xl shadow-lg border-b-4 border-accent">
+                <!-- Advantage 3: Local Expertise -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-b-4 border-accent hover:shadow-xl transition duration-300">
                     <div class="text-5xl text-accent mb-4">🌍</div>
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Expertise Régionale Profonde</h3>
                     <p class="text-gray-600">Des connaissances précises des marchés locaux pour des conseils pertinents et efficaces.</p>
@@ -205,7 +204,7 @@
         </div>
     </section>
 
-    <!-- SECTION APPEL À L'ACTION POUR LE LIVRE PREMIUM -->
+    <!-- CALL TO ACTION SECTION FOR PREMIUM BOOK -->
     <section class="bg-brand-dark text-white py-16">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-accent">
@@ -220,18 +219,19 @@
         </div>
     </section>
 
-    <!-- PIED DE PAGE -->
+    <!-- FOOTER -->
     <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT ET AUTHENTIFICATION -->
+    <!-- JAVASCRIPT LOGIC AND AUTHENTICATION -->
     <script type="module">
-        // Import des modules Firebase nécessaires
+        // Firebase imports
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
         import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 
-        // Configuration Firebase (Identique aux autres pages)
+        // Firebase Configuration (Placeholder - Should be injected by environment)
+        // Using provided static config for development environment
         const firebaseConfig = {
             apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
             authDomain: "mindcompta-cbb69.firebaseapp.com",
@@ -251,40 +251,40 @@
                 app = getApp();
             }
             auth = getAuth(app);
-            console.log("Firebase Auth Initialized.");
+            console.log("Firebase Auth Initialized. (index.html)");
 
-            // Fonction de Déconnexion globale
+            // Global Sign Out Function
             window.handleSignOut = async () => {
                 try {
                     await signOut(auth);
-                    window.location.href = 'index.html'; // Rediriger après déconnexion
+                    window.location.href = 'index.html'; 
                 } catch (error) {
                     console.error("Erreur de déconnexion:", error);
                 }
             };
 
-            // Attache les écouteurs pour les boutons de déconnexion
+            // Attach listeners for sign out buttons
             document.getElementById('nav-logout-btn')?.addEventListener('click', window.handleSignOut);
             document.getElementById('mobile-logout-btn')?.addEventListener('click', window.handleSignOut);
 
         } else {
-            console.error("Firebase non configuré. Les fonctionnalités d'authentification sont désactivées.");
+            console.error("Firebase non configuré. Les fonctionnalités d'authentification sont désactivées. (index.html)");
         }
 
-        // --- GESTION DU MENU MOBILE ---
+        // --- MOBILE MENU HANDLER ---
         const mobileMenu = document.getElementById('mobile-menu');
         const overlay = document.getElementById('mobile-menu-overlay');
         const menuButton = document.getElementById('menu-button');
         const closeMenuButton = document.getElementById('close-menu-button');
 
-        /** Bascule l'état ouvert/fermé du menu mobile */
+        /** Toggles the open/closed state of the mobile menu */
         function toggleMobileMenu(isOpen) {
             const isOpening = isOpen === undefined ? !mobileMenu.classList.contains('open') : isOpen;
 
             if (isOpening) {
                 mobileMenu.classList.add('open');
                 overlay.classList.add('open');
-                document.body.style.overflow = 'hidden'; // Empêcher le scroll du corps
+                document.body.style.overflow = 'hidden'; 
             } else {
                 mobileMenu.classList.remove('open');
                 overlay.classList.remove('open');
@@ -292,12 +292,12 @@
             }
         }
 
-        // Écouteurs d'événements pour l'ouverture/fermeture du menu
+        // Event listeners for menu open/close
         menuButton?.addEventListener('click', () => toggleMobileMenu(true));
         closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
         overlay?.addEventListener('click', () => toggleMobileMenu(false));
 
-        // --- GESTION DE L'AUTHENTIFICATION ---
+        // --- AUTHENTICATION STATE HANDLER ---
         if (auth) {
             onAuthStateChanged(auth, (user) => {
                 const elements = {
@@ -311,14 +311,14 @@
 
                 const isUserLoggedIn = user && !user.isAnonymous;
 
-                // Fonction utilitaire pour basculer la visibilité
+                // Utility function to toggle visibility
                 const setVisibility = (element, isVisible) => {
                     if (element) {
                         element.classList.toggle('hidden', !isVisible);
                     }
                 };
 
-                // Gérer les boutons de connexion/déconnexion du menu
+                // Handle login/logout buttons
                 setVisibility(elements.loginDesktop, !isUserLoggedIn);
                 setVisibility(elements.logoutDesktop, isUserLoggedIn);
                 setVisibility(elements.adminDesktop, isUserLoggedIn);
