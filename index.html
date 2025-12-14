@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- LE TITRE STATIQUE EST ICI -->
     <title>MindCompta - Accueil</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -42,17 +43,13 @@
 
         /* --- STYLE DU MENU MOBILE (Off-Canvas) --- */
         #mobile-menu {
-            /* État initial : poussé hors écran à droite */
             transform: translateX(100%);
             transition: transform 0.3s ease-in-out;
-            /* Utilisation d'un z-index élevé */
             z-index: 50; 
         }
         #mobile-menu.open {
-            /* État final : visible à l'écran */
             transform: translateX(0);
         }
-        /* Superposition pour l'accessibilité et la fermeture */
         #mobile-menu-overlay {
             display: none; 
             z-index: 40;
@@ -91,7 +88,6 @@
         }
         .image-scroll-content {
             display: inline-block;
-            /* La vitesse d'animation peut être ajustée ici */
             animation: scroll-left 40s linear infinite;
         }
         .image-scroll-content:hover {
@@ -295,6 +291,7 @@
         import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 
         // Configuration Firebase (Doit être un JSON)
+        // NOTE: En environnement de production, cette config serait chargée dynamiquement.
         const firebaseConfig = {
             apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
             authDomain: "mindcompta-cbb69.firebaseapp.com",
@@ -320,6 +317,11 @@
             console.warn("Firebase API Key missing. Auth features disabled.");
         }
 
+        // --- CORRECTION D'AFFICHAGE DU TITRE ---
+        // Cette ligne s'assure que le titre de l'onglet est bien celui défini dans la balise <title>
+        // et non le nom du fichier.
+        document.title = "MindCompta - Accueil";
+
 
         // --- FONCTIONNALITÉ DU MENU MOBILE ---
         const mobileMenu = document.getElementById('mobile-menu');
@@ -329,47 +331,33 @@
 
         /** Bascule l'état ouvert/fermé du menu mobile */
         function toggleMobileMenu(isOpen) {
-            // Détermine l'état souhaité
             const isOpening = isOpen === undefined ? !mobileMenu.classList.contains('open') : isOpen;
 
             if (isOpening) {
                 mobileMenu.classList.add('open');
                 overlay.classList.add('open');
-                // Verrouille le défilement du corps (important pour le mobile)
                 document.body.style.overflow = 'hidden'; 
             } else {
                 mobileMenu.classList.remove('open');
                 overlay.classList.remove('open');
-                document.body.style.overflow = ''; // Rétablit le défilement
+                document.body.style.overflow = '';
             }
         }
 
         // Écouteurs d'événements pour l'ouverture/fermeture du menu
-        menuButton?.addEventListener('click', () => {
-            console.log("Clic Menu Button.");
-            toggleMobileMenu(true);
-        });
-        closeMenuButton?.addEventListener('click', () => {
-            console.log("Clic Close Button.");
-            toggleMobileMenu(false);
-        });
-        overlay?.addEventListener('click', () => {
-            console.log("Clic Overlay.");
-            toggleMobileMenu(false);
-        });
+        menuButton?.addEventListener('click', () => toggleMobileMenu(true));
+        closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
+        overlay?.addEventListener('click', () => toggleMobileMenu(false));
         
         // --- LOGIQUE D'AUTHENTIFICATION ---
         if (auth) {
             // Fonction de Déconnexion globale
             window.handleSignOut = async () => {
                 try {
-                    console.log("Tentative de déconnexion...");
                     await signOut(auth);
-                    // Rediriger vers la page d'accueil après la déconnexion
                     window.location.href = 'index.html'; 
                 } catch (error) {
                     console.error("Erreur de déconnexion:", error);
-                    // Afficher un message d'erreur si nécessaire
                 }
             };
 
@@ -380,7 +368,6 @@
 
             // Gère l'affichage des boutons de connexion/déconnexion et du lien Admin
             onAuthStateChanged(auth, (user) => {
-                console.log("État d'authentification changé. Utilisateur:", user ? user.uid : "Déconnecté");
                 const elements = {
                     loginDesktop: document.getElementById('nav-login-btn'),
                     logoutDesktop: document.getElementById('nav-logout-btn'),
@@ -392,7 +379,7 @@
 
                 const isUserLoggedIn = user && !user.isAnonymous;
 
-                // Fonction utilitaire pour basculerla visibilité
+                // Fonction utilitaire pour basculer la visibilité
                 const setVisibility = (element, isVisible) => {
                     if (element) {
                         element.classList.toggle('hidden', !isVisible);
@@ -405,6 +392,7 @@
                 setVisibility(elements.loginMobile, !isUserLoggedIn);
                 setVisibility(elements.logoutMobile, isUserLoggedIn);
 
+                
                 // Gère la visibilité du lien Admin
                 setVisibility(elements.adminDesktop, isUserLoggedIn);
                 setVisibility(elements.adminMobile, isUserLoggedIn);
