@@ -6,53 +6,154 @@
     <title>MindCompta - À Propos de Nous</title>
     <!-- Chargement de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- LIAISON VERS LE FICHIER CSS EXTERNE PARTAGÉ -->
-    <link rel="stylesheet" href="style.css"> 
+    
+    <style>
+        /* Import the Inter font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        /* Brand Colors (Standardized) */
+        :root {
+            --brand-dark: #1E3A8A; /* Deep Blue (Indigo-900) */
+            --accent: #F59E0B; /* Vivid Orange / Gold (Amber-500) */
+            --vibrant-green: #10B981; /* Bright Green (Emerald-500) */
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom Tailwind classes for colors */
+        .bg-brand-dark { background-color: var(--brand-dark); }
+        .text-brand-dark { color: var(--brand-dark); }
+        .bg-accent { background-color: var(--accent); }
+        .hover-accent:hover { background-color: #D97706; } 
+        .bg-vibrant-green { background-color: var(--vibrant-green); }
+
+        /* Navigation Link Styles - Desktop */
+        .nav-link {
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .nav-link:hover {
+            background-color: #345b85;
+        }
+        .active-link-desktop {
+            background-color: var(--accent);
+            font-weight: 600;
+            color: var(--brand-dark) !important;
+        }
+
+        /* Mobile Menu Styles (Off-Canvas) */
+        #mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 50; 
+        }
+        #mobile-menu.open {
+            transform: translateX(0);
+        }
+        /* Overlay */
+        #mobile-menu-overlay {
+            display: none; 
+            z-index: 40;
+        }
+        #mobile-menu-overlay.open {
+            display: block;
+        }
+        .mobile-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .mobile-link.active-link-mobile {
+            background-color: var(--accent);
+            color: var(--brand-dark);
+            font-weight: 700;
+        }
+        .mobile-link-btn {
+             display: block;
+             width: 100%;
+             text-align: center;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- EN-TÊTE ET NAVIGATION (Utilise style.css pour le style) -->
+    <!-- HEADER AND NAVIGATION -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                    <!-- LOGO -->
+                
+                <!-- LOGO/BRAND (CLICKABLE) -->
+                <a href="index.html" class="flex items-center group">
                     <img src="logo.jpg" 
-                         alt="MindCompta Logo" 
-                         class="h-10 w-auto rounded-full mr-3 border-2 border-white">
-                    <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
-                </div>
-                <!-- Menu Desktop -->
-                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-6">
+                         alt="" 
+                         onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
+                         class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
+                    <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
+                </a>
+
+                <!-- DESKTOP NAVIGATION -->
+                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
                     <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="services.html" class="nav-link">Services</a>
-                    <a href="about.html" class="nav-link active-link">À Propos</a>
-                    <a href="calculator.html" class="nav-link">Calculatrice</a>
-                    <a href="contact.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                        Contact
+                    <a href="services.html" class="nav-link">Services (Livre)</a>
+                    <a href="about.html" class="nav-link active-link-desktop">À Propos</a>
+                    <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
+                    
+                    <!-- Admin Link (visible if logged in) -->
+                    <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-full hidden text-white hover:bg-red-500">Admin</a> 
+
+                    <!-- Action Buttons -->
+                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+                        Se Connecter
                     </a>
+                    <button id="nav-logout-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white hidden">
+                        Déconnexion
+                    </button>
                 </nav>
-                <!-- Bouton Menu Mobile (Hamburger) -->
+                
+                <!-- MOBILE MENU BUTTON -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
                 </button>
             </div>
-            <!-- Menu Mobile Déroulant -->
-            <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
-                <a href="index.html" class="mobile-link">Accueil</a>
-                <a href="services.html" class="mobile-link">Services</a>
-                <a href="about.html" class="mobile-link active-link bg-[#1855a8]">À Propos</a>
-                <a href="calculator.html" class="mobile-link">Calculatrice</a>
-                <a href="contact.html" class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3">Contact</a>
-            </nav>
         </div>
     </header>
+
+    <!-- MOBILE MENU OFF-CANVAS -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
+        <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none">
+            &times;
+        </button>
+        <div class="pt-12 space-y-3">
+            <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
+            
+            <a href="index.html" class="mobile-link">Accueil</a>
+            <a href="services.html" class="mobile-link">Services (Livre)</a>
+            <a href="about.html" class="mobile-link active-link-mobile">À Propos</a>
+            <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
+            
+            <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 hidden">Admin</a>
+
+            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3">
+                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
+                <button id="mobile-logout-btn" class="mobile-link bg-red-500 mobile-link-btn text-white hidden">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+    <!-- END MOBILE MENU -->
 
     <!-- CONTENU PRINCIPAL -->
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-16 md:py-24">
 
         <div class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">Notre Mission : Simplifier l'OHADA</h1>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-brand-dark mb-4">Notre Mission : Simplifier l'OHADA</h1>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto">
                 MindCompta a été créé pour transformer l'accès à la finance et au droit comptable en Afrique.
             </p>
@@ -60,16 +161,16 @@
 
         <!-- Section 1 : Histoire du Fondateur -->
         <section class="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-gray-200 mb-16">
-            
+
             <div class="md:flex md:items-start md:space-x-10">
-                
+
                 <!-- Bloc Photo (Place réservée) -->
                 <div class="md:w-1/3 flex justify-center mb-8 md:mb-0">
                     <div class="w-56 h-56 rounded-full overflow-hidden shadow-2xl border-4 border-accent p-1 bg-white">
                         <!-- Source de l'image : Placehold.co est une alternative si vous n'avez pas d'image -->
                         <img 
                             src="photo.jpg" 
-                            onerror="this.onerror=null; this.src='https://placehold.co/216x216/0d47a1/ffffff?text=Josu%C3%A9+KPLOWODOKPO';"
+                            onerror="this.onerror=null; this.src='https://placehold.co/216x216/1E3A8A/ffffff?text=Josu%C3%A9+KPLOWODOKPO';"
                             alt="Portrait du fondateur Josué KPLOWODOKPO" 
                             class="w-full h-full object-cover rounded-full"
                             loading="lazy"
@@ -98,22 +199,22 @@
 
         <!-- Section 2 : Nos Valeurs et Engagement -->
         <section class="mb-16">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-10">Nos Valeurs</h2>
+            <h2 class="text-3xl font-bold text-center text-brand-dark mb-10">Nos Valeurs</h2>
             <div class="grid md:grid-cols-3 gap-8 text-center">
-                
-                <div class="p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+
+                <div class="p-6 bg-white rounded-xl shadow-lg border-b-4 border-accent">
                     <div class="text-accent text-4xl mb-3">🎯</div>
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Précision</h3>
                     <p class="text-gray-500 text-sm">Des outils de calcul et des sources réglementaires d'une exactitude irréprochable.</p>
                 </div>
-                
-                <div class="p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+
+                <div class="p-6 bg-white rounded-xl shadow-lg border-b-4 border-accent">
                     <div class="text-accent text-4xl mb-3">🌐</div>
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Accessibilité</h3>
                     <p class="text-gray-500 text-sm">Rendre l'information financière complexe simple et disponible pour tous, partout.</p>
                 </div>
 
-                <div class="p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+                <div class="p-6 bg-white rounded-xl shadow-lg border-b-4 border-accent">
                     <div class="text-accent text-4xl mb-3">💡</div>
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Innovation</h3>
                     <p class="text-gray-500 text-sm">Utiliser les meilleures technologies pour automatiser les tâches complexes.</p>
@@ -123,8 +224,8 @@
 
         <div class="text-center mt-12 p-8 bg-brand-dark rounded-xl shadow-2xl">
             <h3 class="text-3xl font-bold text-white mb-4">Prêt à simplifier votre conformité ?</h3>
-            <a href="contact.html" class="inline-block py-3 px-8 text-lg font-semibold text-brand-dark rounded-full bg-accent hover-accent transition duration-300 shadow-xl transform hover:scale-105 text-white">
-                Nous Contacter
+            <a href="login.html" class="inline-block py-3 px-8 text-lg font-semibold text-brand-dark rounded-full bg-accent hover-accent transition duration-300 shadow-xl transform hover:scale-105 text-white">
+                Accéder aux Outils
             </a>
         </div>
 
@@ -135,8 +236,110 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LIAISON VERS LE FICHIER JAVASCRIPT EXTERNE PARTAGÉ -->
-    <script src="script.js"></script>
+    <!-- JAVASCRIPT LOGIC AND AUTHENTICATION -->
+    <script type="module">
+        // Firebase imports
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+
+        // Firebase Configuration (Placeholder - Should be injected by environment)
+        // Using provided static config for development environment
+        const firebaseConfig = {
+            apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
+            authDomain: "mindcompta-cbb69.firebaseapp.com",
+            projectId: "mindcompta-cbb69",
+            storageBucket: "mindcompta-cbb69.firebasestorage.app",
+            messagingSenderId: "470368630296",
+            appId: "1:470368630296:web:510de914f335b27b3d356d",
+            measurementId: "G-SKSVSV0H70"
+        };
+
+        let auth;
+        if (firebaseConfig.apiKey) {
+            let app;
+            if (!getApps().length) {
+                app = initializeApp(firebaseConfig);
+            } else {
+                app = getApp();
+            }
+            auth = getAuth(app);
+            console.log("Firebase Auth Initialized. (about.html)");
+
+            // Global Sign Out Function
+            window.handleSignOut = async () => {
+                try {
+                    await signOut(auth);
+                    window.location.href = 'index.html'; 
+                } catch (error) {
+                    console.error("Erreur de déconnexion:", error);
+                }
+            };
+
+            // Attach listeners for sign out buttons
+            document.getElementById('nav-logout-btn')?.addEventListener('click', window.handleSignOut);
+            document.getElementById('mobile-logout-btn')?.addEventListener('click', window.handleSignOut);
+
+        } else {
+            console.error("Firebase non configuré. Les fonctionnalités d'authentification sont désactivées. (about.html)");
+        }
+
+        // --- MOBILE MENU HANDLER ---
+        const mobileMenu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('mobile-menu-overlay');
+        const menuButton = document.getElementById('menu-button');
+        const closeMenuButton = document.getElementById('close-menu-button');
+
+        /** Toggles the open/closed state of the mobile menu */
+        function toggleMobileMenu(isOpen) {
+            const isOpening = isOpen === undefined ? !mobileMenu.classList.contains('open') : isOpen;
+
+            if (isOpening) {
+                mobileMenu.classList.add('open');
+                overlay.classList.add('open');
+                document.body.style.overflow = 'hidden'; 
+            } else {
+                mobileMenu.classList.remove('open');
+                overlay.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Event listeners for menu open/close
+        menuButton?.addEventListener('click', () => toggleMobileMenu(true));
+        closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
+        overlay?.addEventListener('click', () => toggleMobileMenu(false));
+
+        // --- AUTHENTICATION STATE HANDLER ---
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                const elements = {
+                    loginDesktop: document.getElementById('nav-login-btn'),
+                    logoutDesktop: document.getElementById('nav-logout-btn'),
+                    adminDesktop: document.getElementById('nav-admin-btn'),
+                    loginMobile: document.getElementById('mobile-login-btn'),
+                    logoutMobile: document.getElementById('mobile-logout-btn'),
+                    adminMobile: document.getElementById('mobile-admin-btn'),
+                };
+
+                const isUserLoggedIn = user && !user.isAnonymous;
+
+                // Utility function to toggle visibility
+                const setVisibility = (element, isVisible) => {
+                    if (element) {
+                        element.classList.toggle('hidden', !isVisible);
+                    }
+                };
+
+                // Handle login/logout buttons
+                setVisibility(elements.loginDesktop, !isUserLoggedIn);
+                setVisibility(elements.logoutDesktop, isUserLoggedIn);
+                setVisibility(elements.adminDesktop, isUserLoggedIn);
+                setVisibility(elements.loginMobile, !isUserLoggedIn);
+                setVisibility(elements.logoutMobile, isUserLoggedIn);
+                setVisibility(elements.adminMobile, isUserLoggedIn);
+            });
+        }
+    </script>
 </body>
 </html>
 
