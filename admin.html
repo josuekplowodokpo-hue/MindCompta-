@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Tableau de Bord Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <style>
         /* Import the Inter font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -22,8 +22,9 @@
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
+        .hover-accent:hover { background-color: #D97706; }
 
-        /* Navigation Link Styles */
+        /* Navigation Link Styles - Desktop */
         .nav-link {
             color: white;
             font-weight: 500;
@@ -34,11 +35,28 @@
         .nav-link:hover {
             background-color: #345b85;
         }
-        /* Active link for Admin Page */
-        .active-link {
+        .active-link-desktop {
             background-color: var(--accent); 
             font-weight: 600;
             color: var(--brand-dark) !important;
+        }
+
+        /* Mobile Menu Styles (Off-Canvas) */
+        #mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 50; 
+        }
+        #mobile-menu.open {
+            transform: translateX(0);
+        }
+        /* Overlay */
+        #mobile-menu-overlay {
+            display: none; 
+            z-index: 40;
+        }
+        #mobile-menu-overlay.open {
+            display: block;
         }
         .mobile-link {
             display: block;
@@ -48,10 +66,15 @@
             border-radius: 0.5rem;
             transition: background-color 0.2s;
         }
-        .mobile-link.active-link {
+        .mobile-link.active-link-mobile {
             background-color: var(--accent);
             color: var(--brand-dark);
             font-weight: 700;
+        }
+        .mobile-link-btn {
+             display: block;
+             width: 100%;
+             text-align: center;
         }
     </style>
 </head>
@@ -61,6 +84,8 @@
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
+
+                <!-- LOGO/BRAND (CLICKABLE) -->
                 <a href="index.html" class="flex items-center group">
                     <img src="logo.jpg" 
                          alt="MindCompta Logo" 
@@ -68,39 +93,67 @@
                          class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
                     <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Admin</span>
                 </a>
-                
-                <!-- NAVIGATION DESKTOP -->
-                <nav class="hidden sm:flex items-center space-x-6">
+
+                <!-- DESKTOP NAVIGATION -->
+                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
                     <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="admin.html" class="nav-link active-link py-2 px-4">Admin</a> 
-                    <button onclick="handleSignOut()" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
-                        Déconnexion
-                    </button>
+                    <a href="services.html" class="nav-link">Services (Livre)</a>
+                    <a href="about.html" class="nav-link">À Propos</a>
+                    <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
+                    <a href="admin.html" class="nav-link bg-red-500 py-2 px-4 active-link-desktop">Admin</a>
+
+                    <!-- Action Buttons and User Info (Managed by JS) -->
+                    <div id="auth-actions-desktop" class="flex items-center space-x-3">
+                        <!-- Default content, replaced by JS if connected -->
+                        <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
+                            <span class="hidden sm:inline">Bienvenue,</span> Admin
+                        </span>
+                        <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
+                            Déconnexion
+                        </button>
+                    </div>
                 </nav>
-                
-                <!-- BOUTON MENU MOBILE -->
+
+                <!-- MOBILE MENU BUTTON -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                 </button>
             </div>
-
-            <!-- MENU MOBILE HIDDEN BY DEFAULT -->
-            <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
-                <a href="index.html" class="mobile-link">Accueil</a>
-                <a href="admin.html" class="mobile-link active-link text-center font-semibold text-white py-3">Admin</a>
-                <button onclick="handleSignOut()" class="mobile-link bg-red-500 text-center font-semibold hover:bg-red-600 text-white py-3 w-full">Déconnexion</button>
-            </nav>
         </div>
     </header>
+
+    <!-- MOBILE MENU OFF-CANVAS -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
+        <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none">
+            &times;
+        </button>
+        <div class="pt-12 space-y-3">
+            <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
+            <a href="index.html" class="mobile-link">Accueil</a>
+            <a href="services.html" class="mobile-link">Services (Livre)</a>
+            <a href="about.html" class="mobile-link">À Propos</a>
+            <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
+            <a href="admin.html" class="mobile-link bg-red-500 active-link-mobile">Admin</a>
+
+            <!-- Authentication Actions Container (Filled by JS) -->
+            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
+                <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
+                <p class="text-white text-md font-semibold mb-3">Admin</p>
+                <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+    <!-- END MOBILE MENU -->
 
     <!-- CONTENU PRINCIPAL -->
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
         <h1 class="text-3xl font-extrabold text-brand-dark mb-6 mt-4">
             Tableau de Bord Administrateur
         </h1>
-        <p class="text-gray-600 mb-8">Liste des utilisateurs enregistrés et leur dernière activité. Les données sont mises à jour en temps réel.</p>
+        <p class="text-gray-600 mb-8">Liste des utilisateurs enregistrés, leur statut de connexion (basé sur la dernière activité) et leur identifiant.</p>
 
         <!-- Conteneur d'état de chargement/erreur -->
         <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-lg shadow-md transition duration-300" role="alert">
@@ -113,16 +166,18 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">UID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom Utilisateur</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dernière Connexion</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">UID</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Date Création</th>
                     </tr>
                 </thead>
                 <tbody id="user-list" class="bg-white divide-y divide-gray-200">
                     <!-- Les lignes d'utilisateurs seront insérées ici par JavaScript -->
                     <tr>
-                        <td colspan="4" class="py-12 text-center text-gray-400" id="no-data-row">
-                            Aucun utilisateur enregistré trouvé (hors connexion anonyme).
+                        <td colspan="6" class="py-12 text-center text-gray-400" id="no-data-row">
+                            Chargement des données...
                         </td>
                     </tr>
                 </tbody>
@@ -135,41 +190,84 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT GLOBALE -->
+    <!-- LOGIQUE JAVASCRIPT GLOBALE & GESTION DU MENU MOBILE -->
     <script>
-        // Fonction globale de déconnexion (appelée par les boutons)
-        window.handleSignOut = () => {
+        // Page de redirection en cas de déconnexion ou d'accès non autorisé
+        const REDIRECTION_PAGE = 'login.html'; 
+        const ADMIN_ROLE = 'admin';
+
+        /** Gère la déconnexion de l'utilisateur. */
+        window.handleLogout = () => {
             localStorage.removeItem('isAuthenticated');
             localStorage.removeItem('userEmail');
             localStorage.removeItem('userName');
             localStorage.removeItem('userRole');
-            // Redirection vers la page d'accueil ou de connexion
-            window.location.href = 'login.html'; 
+            localStorage.removeItem('token'); // Au cas où
+            window.location.href = REDIRECTION_PAGE; 
         };
-        
-        // Gestion du menu mobile
-        document.getElementById('menu-button').addEventListener('click', function() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        });
 
-        // --- Vérification d'accès Admin simulée ---
-        const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-        const userRole = localStorage.getItem('userRole');
+        // --- GESTION DE L'ACCÈS ADMIN ---
+        function checkAdminAccess() {
+            const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+            const userRole = localStorage.getItem('userRole');
+            const statusMessage = document.getElementById('status-message');
 
-        if (!isAuthenticated || userRole !== 'admin') {
-            document.getElementById('status-message').textContent = "Accès refusé. Redirection vers la page de connexion...";
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 1000); // Délai pour que l'utilisateur voie le message
+            if (!isAuthenticated || userRole !== ADMIN_ROLE) {
+                statusMessage.textContent = "Accès refusé. Redirection vers la page de connexion...";
+                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800');
+                statusMessage.classList.add('bg-red-100', 'text-red-800');
+                setTimeout(() => {
+                    window.location.href = REDIRECTION_PAGE;
+                }, 1000); 
+                return false;
+            }
+            return true;
         }
 
+        // --- GESTIONNAIRE DU MENU MOBILE (Off-Canvas) ---
+        const elements = {
+            mobileMenu: document.getElementById('mobile-menu'),
+            overlay: document.getElementById('mobile-menu-overlay'),
+            menuButton: document.getElementById('menu-button'),
+            closeMenuButton: document.getElementById('close-menu-button'),
+        };
+
+        function toggleMobileMenu(isOpen) {
+            const isOpening = isOpen === undefined ? !elements.mobileMenu.classList.contains('open') : isOpen;
+            if (isOpening) {
+                elements.mobileMenu.classList.add('open');
+                elements.overlay.classList.add('open');
+                document.body.style.overflow = 'hidden'; 
+            } else {
+                elements.mobileMenu.classList.remove('open');
+                elements.overlay.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+        }
+        elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
+        elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
+        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
+
+
+        // Exécution au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+             // 1. Mise à jour des boutons de déconnexion pour utiliser la fonction globale
+             document.getElementById('logout-desktop-btn')?.addEventListener('click', window.handleLogout);
+             document.getElementById('logout-mobile-btn')?.addEventListener('click', window.handleLogout);
+             // 2. Vérification de l'accès Admin
+             checkAdminAccess();
+        });
     </script>
 
 
     <!-- LOGIQUE JAVASCRIPT POUR FIREBASE (Exécutée SEULEMENT si l'utilisateur est Admin) -->
     <script type="module">
-        // Nous importons les modules Firebase nécessaires.
+        // Garde : Arrêter l'exécution du module si l'accès n'est pas autorisé par le script global
+        if (localStorage.getItem('userRole') !== 'admin') {
+            return;
+        }
+        
+        // --- IMPORTS FIREBASE ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
@@ -180,15 +278,9 @@
             setLogLevel 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Garde : Arrêter l'exécution du module si l'accès n'est pas autorisé par le script global
-        if (localStorage.getItem('userRole') !== 'admin') {
-            console.log("Accès non autorisé au script Firebase.");
-            return;
-        }
-
-        // --- CONFIGURATION FIREBASE ---
-        // Utilisé ici à titre d'exemple. Dans l'environnement Canvas, cela vient d'une variable globale.
+        // --- CONFIGURATION ET INITIALISATION ---
         const firebaseConfig = {
+            // NOTE: Ces valeurs sont des placeholders. L'environnement Canvas les fournit via __firebase_config.
             apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
             authDomain: "mindcompta-cbb69.firebaseapp.com",
             projectId: "mindcompta-cbb69",
@@ -198,18 +290,20 @@
             measurementId: "G-SKSVSV0H70"
         };
         
-        // Variables globales Canvas
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
-        const app = initializeApp(firebaseConfig);
+        // Utiliser la configuration réelle si disponible
+        const config = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
+
+
+        const app = initializeApp(config);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        setLogLevel('debug'); // Afficher les logs dans la console
+        setLogLevel('debug'); 
 
         const userListElement = document.getElementById('user-list');
         const statusMessage = document.getElementById('status-message');
-        const noDataRow = document.getElementById('no-data-row');
 
         /**
          * Formate une date ISO string en format lisible.
@@ -236,17 +330,19 @@
          * Écoute en temps réel les changements dans la collection d'utilisateurs.
          */
         async function startUserListener() {
-            // Chemin de la collection publique où les comptes utilisateurs simulés seraient stockés: 
-            // /artifacts/{appId}/public/data/users
+            // Le chemin de la collection des utilisateurs enregistrés (public)
             const usersCollectionRef = collection(db, `artifacts/${appId}/public/data/users`);
             const usersQuery = query(usersCollectionRef);
 
             statusMessage.textContent = "Connexion à la base de données Firestore...";
-            statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800');
-            statusMessage.classList.add('bg-yellow-100', 'text-yellow-800');
-            
+            statusMessage.classList.remove('hidden');
+            statusMessage.className = 'p-4 bg-yellow-100 text-yellow-800 rounded-lg shadow-md transition duration-300'; // Reset classes
+
             userListElement.innerHTML = '';
-            noDataRow.classList.remove('hidden');
+            
+            // Constante pour déterminer si un utilisateur est considéré comme en ligne
+            // Si la dernière connexion/activité remonte à moins de 5 minutes.
+            const IS_ONLINE_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes en millisecondes
 
             const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
                 const users = [];
@@ -256,40 +352,71 @@
                 });
 
                 // Triez les utilisateurs par dernière connexion (plus récent en premier)
-                users.sort((a, b) => new Date(b.lastLogin) - new Date(a.lastLogin));
+                users.sort((a, b) => {
+                    const dateA = new Date(a.lastLogin || a.creationTime);
+                    const dateB = new Date(b.lastLogin || b.creationTime);
+                    return dateB.getTime() - dateA.getTime();
+                });
 
                 // Mise à jour de la table
                 userListElement.innerHTML = ''; 
 
                 if (users.length === 0) {
-                    // Si aucun utilisateur, ajoute la ligne "Aucune donnée"
-                    userListElement.appendChild(noDataRow.cloneNode(true));
+                    const noDataRow = document.createElement('tr');
+                    noDataRow.innerHTML = `<td colspan="6" class="py-12 text-center text-gray-400">Aucun utilisateur enregistré trouvé.</td>`;
+                    userListElement.appendChild(noDataRow);
                 } else {
                     users.forEach(user => {
+                        
+                        const lastLoginDate = new Date(user.lastLogin || user.creationTime);
+                        const timeSinceLastLogin = Date.now() - lastLoginDate.getTime();
+
+                        // Logique de présence simple basée sur le dernier login/activité
+                        const isOnline = timeSinceLastLogin < IS_ONLINE_THRESHOLD_MS;
+                        
+                        const statusText = isOnline ? 'EN LIGNE' : 'HORS LIGNE';
+                        const statusColor = isOnline 
+                            ? 'bg-vibrant-green text-white' 
+                            : 'bg-gray-400 text-white';
+
                         const row = document.createElement('tr');
                         row.classList.add('hover:bg-gray-50', 'transition', 'duration-150');
                         row.innerHTML = `
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.email || 'N/A'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-brand-dark">${user.userName || 'Nom Inconnu'}</td>
+                            
+                            <!-- STATUT -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">
+                                    ${statusText}
+                                </span>
+                            </td>
+
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">${formatISODate(user.lastLogin || user.creationTime)}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell truncate">${user.uid || 'N/A'}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">${formatISODate(user.lastLogin)}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">${formatISODate(user.creationTime)}</td>
                         `;
                         userListElement.appendChild(row);
                     });
                 }
-                
+
                 // Mettre à jour le message d'état
                 statusMessage.textContent = `Liste mise à jour: ${users.length} utilisateurs trouvés.`;
-                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800', 'hidden');
-                statusMessage.classList.add('bg-vibrant-green/20', 'text-brand-dark', 'border-l-4', 'border-vibrant-green');
+                statusMessage.className = 'p-4 bg-green-100 text-green-800 rounded-lg shadow-md transition duration-300';
                 setTimeout(() => { statusMessage.classList.add('hidden'); }, 3000);
 
 
             }, (error) => {
                 console.error("Erreur de connexion Firestore:", error);
                 statusMessage.textContent = "Erreur: Impossible de charger les données utilisateurs.";
-                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800');
-                statusMessage.classList.add('bg-red-100', 'text-red-800');
+                statusMessage.className = 'p-4 bg-red-100 text-red-800 rounded-lg shadow-md transition duration-300';
+                setTimeout(() => { statusMessage.classList.add('hidden'); }, 3000);
+
+
+            }, (error) => {
+                console.error("Erreur de connexion Firestore:", error);
+                statusMessage.textContent = "Erreur: Impossible de charger les données utilisateurs.";
+                statusMessage.className = 'p-4 bg-red-100 text-red-800 rounded-lg shadow-md transition duration-300';
             });
 
             return unsubscribe;
@@ -297,24 +424,24 @@
 
 
         // --- Authentification et Initialisation de l'Écouteur ---
-        // Tenter l'authentification avec le token fourni par Canvas.
         async function authenticateAndStart() {
             try {
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                     console.log("Connexion Firebase réussie via token Canvas.");
                 } else {
-                    console.error("Token d'authentification Canvas manquant. Le listener Firestore peut échouer si les règles de sécurité sont strictes.");
+                    console.error("Token d'authentification Canvas manquant. Connexion anonyme.");
+                    // Tentative de connexion anonyme comme solution de repli
+                    await signInAnonymously(auth); 
                 }
-                
+
                 // Lancer l'écouteur de données (après la connexion)
                 startUserListener();
 
             } catch (error) {
                 console.error("Erreur lors de la connexion Firebase :", error);
                 statusMessage.textContent = "Erreur critique d'authentification Firebase. Veuillez vérifier les logs.";
-                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800');
-                statusMessage.classList.add('bg-red-100', 'text-red-800');
+                statusMessage.className = 'p-4 bg-red-100 text-red-800 rounded-lg shadow-md transition duration-300';
             }
         }
 
@@ -324,4 +451,3 @@
     </script>
 </body>
 </html>
-
