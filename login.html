@@ -243,46 +243,40 @@
         // Active les logs de débogage pour voir les communications Firestore/Auth
         setLogLevel('debug');
         
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        let firebaseConfig = {};
+        // Config fournie par l'utilisateur
+        const firebaseConfig = {
+          apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
+          authDomain: "mindcompta-cbb69.firebaseapp.com",
+          databaseURL: "https://mindcompta-cbb69-default-rtdb.firebaseio.com",
+          projectId: "mindcompta-cbb69",
+          storageBucket: "mindcompta-cbb69.firebasestorage.app",
+          messagingSenderId: "470368630296",
+          appId: "1:470368630296:web:510de914f335b27b3d356d",
+          measurementId: "G-SKSVSV0H70"
+        };
         
-        // Tentative de chargement de la configuration
-        try {
-            // Vérifie si la variable est définie et non vide
-            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-                // Tente de parser la chaîne JSON
-                firebaseConfig = JSON.parse(__firebase_config);
-            }
-        } catch (e) {
-            console.error("Erreur lors du parsing de __firebase_config. La configuration n'est pas un JSON valide.", e);
-        }
+        // Utilise l'ID de l'application fourni par l'environnement ou le projectId comme fallback
+        const appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId;
 
         let auth;
         let db;
         let firebaseInitialized = false;
 
         // VÉRIFICATION CRITIQUE DE L'INITIALISATION
-        if (Object.keys(firebaseConfig).length > 0 && firebaseConfig.apiKey) {
+        if (firebaseConfig.apiKey) {
             try {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
                 firebaseInitialized = true;
-                console.log("Firebase initialisé avec succès.");
+                console.log("Firebase initialisé avec la configuration fournie.");
             } catch (e) {
                 console.error("Erreur lors de l'initialisation de Firebase:", e);
+                // Si l'initialisation échoue, on reste sur firebaseInitialized = false
             }
-        } else {
-            console.error("ATTENTION: La configuration Firebase est manquante ou invalide. Les fonctions d'Auth et Firestore seront désactivées.");
-            
-            // Si la config est manquante, affiche un message d'erreur aux utilisateurs
-            setTimeout(() => {
-                showMessage(elements.signupMessage, "Erreur: La configuration Firebase est manquante. Impossible de créer un compte.", false);
-                showMessage(elements.loginMessage, "Erreur: La configuration Firebase est manquante. Impossible de se connecter.", false);
-            }, 100);
         }
         
-        // --- Éléments du DOM ---
+        // --- Éléments du DOM (déplacé après la déclaration des variables pour JS) ---
         const elements = {
             loginSection: document.getElementById('login-section'),
             signupSection: document.getElementById('signup-section'),
@@ -301,7 +295,15 @@
             showSignupBtnDesktop: document.getElementById('show-signup-btn-desktop'),
             showLoginBtnMobile: document.getElementById('show-login-btn-mobile')
         };
-
+        
+        // Afficher un message d'erreur initial si Firebase n'a pas pu être initialisé
+        if (!firebaseInitialized) {
+            setTimeout(() => {
+                const errorMessage = "Erreur critique : Firebase n'a pas pu être initialisé. Vérifiez votre configuration.";
+                showMessage(elements.signupMessage, errorMessage, false);
+                showMessage(elements.loginMessage, errorMessage, false);
+            }, 100);
+        }
 
         // --- Fonctions Utilitaires ---
 
@@ -327,17 +329,16 @@
         }
         
         function setButtonLoadingState(button, isLoading, originalText) {
+            // Désactiver si en chargement OU si Firebase n'est pas initialisé
             button.disabled = isLoading || !firebaseInitialized;
             button.textContent = isLoading ? 'Chargement...' : originalText;
             button.classList.toggle('opacity-50', isLoading || !firebaseInitialized);
             button.classList.toggle('cursor-not-allowed', isLoading || !firebaseInitialized);
         }
 
-        // Si Firebase n'est pas initialisé, désactiver les boutons
-        if (!firebaseInitialized) {
-            setButtonLoadingState(elements.signupButton, false, 'Créer un Compte');
-            setButtonLoadingState(elements.loginButton, false, 'Se Connecter');
-        }
+        // Désactiver les boutons immédiatement si Firebase est hors service
+        setButtonLoadingState(elements.signupButton, false, 'Créer un Compte');
+        setButtonLoadingState(elements.loginButton, false, 'Se Connecter');
 
 
         // --- LOGIQUE FIREBASE AUTH & FIRESTORE ---
@@ -352,6 +353,7 @@
                 throw new Error("Base de données indisponible.");
             }
 
+            // Utilisez le chemin dynamique pour les données privées de l'utilisateur
             const profileDocPath = `/artifacts/${appId}/users/${userId}/users_data/profile`;
             const userDocRef = doc(db, profileDocPath);
             
@@ -406,6 +408,9 @@
             } catch (error) {
                 let errorMessage;
                 switch (error.code) {
+                    case 'auth/configuration-not-found':
+                        errorMessage = "Erreur: Le service d'Authentication Email/Mot de passe n'est pas activé dans votre console Firebase.";
+                        break;
                     case 'auth/email-already-in-use':
                         errorMessage = "Cette adresse email est déjà utilisée.";
                         break;
@@ -459,6 +464,9 @@
             } catch (error) {
                 let errorMessage;
                 switch (error.code) {
+                     case 'auth/configuration-not-found':
+                        errorMessage = "Erreur: Le service d'Authentication Email/Mot de passe n'est pas activé dans votre console Firebase.";
+                        break;
                     case 'auth/invalid-credential':
                     case 'auth/wrong-password':
                     case 'auth/user-not-found':
