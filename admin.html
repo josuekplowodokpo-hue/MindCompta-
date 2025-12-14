@@ -5,34 +5,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Tableau de Bord Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css"> 
+    
+    <style>
+        /* Import the Inter font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        /* Brand Colors (Standardized) */
+        :root {
+            --brand-dark: #1E3A8A; /* Deep Blue (Indigo-900) */
+            --accent: #F59E0B; /* Vivid Orange / Gold (Amber-500) */
+            --vibrant-green: #10B981; /* Bright Green (Emerald-500) */
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom Tailwind classes for colors */
+        .bg-brand-dark { background-color: var(--brand-dark); }
+        .text-brand-dark { color: var(--brand-dark); }
+        .bg-accent { background-color: var(--accent); }
+
+        /* Navigation Link Styles */
+        .nav-link {
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .nav-link:hover {
+            background-color: #345b85;
+        }
+        /* Active link for Admin Page */
+        .active-link {
+            background-color: var(--accent); 
+            font-weight: 600;
+            color: var(--brand-dark) !important;
+        }
+        .mobile-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .mobile-link.active-link {
+            background-color: var(--accent);
+            color: var(--brand-dark);
+            font-weight: 700;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans">
 
     <!-- EN-TÊTE ET NAVIGATION -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
-                <div class="flex items-center">
+                <a href="index.html" class="flex items-center group">
                     <img src="logo.jpg" 
                          alt="MindCompta Logo" 
-                         class="h-10 w-auto rounded-full mr-3 border-2 border-white">
-                    <span class="text-xl font-bold tracking-wider">MindCompta Admin</span>
-                </div>
+                         onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
+                         class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
+                    <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Admin</span>
+                </a>
+                
+                <!-- NAVIGATION DESKTOP -->
                 <nav class="hidden sm:flex items-center space-x-6">
                     <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="admin.html" class="nav-link active-link bg-red-400 py-2 px-4 rounded-lg">Admin</a> 
+                    <a href="admin.html" class="nav-link active-link py-2 px-4">Admin</a> 
                     <button onclick="handleSignOut()" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
                         Déconnexion
                     </button>
                 </nav>
+                
+                <!-- BOUTON MENU MOBILE -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
                 </button>
             </div>
+
+            <!-- MENU MOBILE HIDDEN BY DEFAULT -->
             <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
                 <a href="index.html" class="mobile-link">Accueil</a>
-                <a href="admin.html" class="mobile-link bg-red-400 text-center font-semibold text-white py-3">Admin</a>
+                <a href="admin.html" class="mobile-link active-link text-center font-semibold text-white py-3">Admin</a>
                 <button onclick="handleSignOut()" class="mobile-link bg-red-500 text-center font-semibold hover:bg-red-600 text-white py-3 w-full">Déconnexion</button>
             </nav>
         </div>
@@ -44,14 +101,14 @@
             Tableau de Bord Administrateur
         </h1>
         <p class="text-gray-600 mb-8">Liste des utilisateurs enregistrés et leur dernière activité. Les données sont mises à jour en temps réel.</p>
-        
+
         <!-- Conteneur d'état de chargement/erreur -->
-        <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-lg shadow-md hidden">
-            Chargement des données...
+        <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-lg shadow-md transition duration-300" role="alert">
+            Vérification des droits d'accès...
         </div>
 
         <!-- TABLEAU DES UTILISATEURS -->
-        <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+        <div class="bg-white rounded-xl shadow-xl overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -78,20 +135,59 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT POUR LA PAGE ADMIN -->
+    <!-- LOGIQUE JAVASCRIPT GLOBALE -->
+    <script>
+        // Fonction globale de déconnexion (appelée par les boutons)
+        window.handleSignOut = () => {
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            // Redirection vers la page d'accueil ou de connexion
+            window.location.href = 'login.html'; 
+        };
+        
+        // Gestion du menu mobile
+        document.getElementById('menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // --- Vérification d'accès Admin simulée ---
+        const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+        const userRole = localStorage.getItem('userRole');
+
+        if (!isAuthenticated || userRole !== 'admin') {
+            document.getElementById('status-message').textContent = "Accès refusé. Redirection vers la page de connexion...";
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1000); // Délai pour que l'utilisateur voie le message
+        }
+
+    </script>
+
+
+    <!-- LOGIQUE JAVASCRIPT POUR FIREBASE (Exécutée SEULEMENT si l'utilisateur est Admin) -->
     <script type="module">
-        // Import des modules Firebase nécessaires
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        // Nous importons les modules Firebase nécessaires.
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore, 
             collection, 
             query, 
             onSnapshot, 
             setLogLevel 
-        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configuration Firebase (Doit correspondre à script.js)
+        // Garde : Arrêter l'exécution du module si l'accès n'est pas autorisé par le script global
+        if (localStorage.getItem('userRole') !== 'admin') {
+            console.log("Accès non autorisé au script Firebase.");
+            return;
+        }
+
+        // --- CONFIGURATION FIREBASE ---
+        // Utilisé ici à titre d'exemple. Dans l'environnement Canvas, cela vient d'une variable globale.
         const firebaseConfig = {
             apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
             authDomain: "mindcompta-cbb69.firebaseapp.com",
@@ -101,16 +197,19 @@
             appId: "1:470368630296:web:510de914f335b27b3d356d",
             measurementId: "G-SKSVSV0H70"
         };
-
+        
+        // Variables globales Canvas
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        setLogLevel('debug');
+        setLogLevel('debug'); // Afficher les logs dans la console
 
         const userListElement = document.getElementById('user-list');
         const statusMessage = document.getElementById('status-message');
         const noDataRow = document.getElementById('no-data-row');
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         /**
          * Formate une date ISO string en format lisible.
@@ -136,17 +235,18 @@
         /**
          * Écoute en temps réel les changements dans la collection d'utilisateurs.
          */
-        function startUserListener() {
-            // Chemin de la collection publique: /artifacts/{appId}/public/data/users
+        async function startUserListener() {
+            // Chemin de la collection publique où les comptes utilisateurs simulés seraient stockés: 
+            // /artifacts/{appId}/public/data/users
             const usersCollectionRef = collection(db, `artifacts/${appId}/public/data/users`);
             const usersQuery = query(usersCollectionRef);
 
-            statusMessage.textContent = "Connexion à la base de données...";
-            statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-800');
+            statusMessage.textContent = "Connexion à la base de données Firestore...";
+            statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800');
             statusMessage.classList.add('bg-yellow-100', 'text-yellow-800');
+            
             userListElement.innerHTML = '';
             noDataRow.classList.remove('hidden');
-
 
             const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
                 const users = [];
@@ -159,19 +259,18 @@
                 users.sort((a, b) => new Date(b.lastLogin) - new Date(a.lastLogin));
 
                 // Mise à jour de la table
-                userListElement.innerHTML = ''; // Vide la liste existante
+                userListElement.innerHTML = ''; 
 
                 if (users.length === 0) {
-                    userListElement.appendChild(noDataRow);
-                    noDataRow.classList.remove('hidden');
+                    // Si aucun utilisateur, ajoute la ligne "Aucune donnée"
+                    userListElement.appendChild(noDataRow.cloneNode(true));
                 } else {
-                    noDataRow.classList.add('hidden');
                     users.forEach(user => {
                         const row = document.createElement('tr');
                         row.classList.add('hover:bg-gray-50', 'transition', 'duration-150');
                         row.innerHTML = `
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.email || 'N/A'}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">${user.uid}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell truncate">${user.uid || 'N/A'}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">${formatISODate(user.lastLogin)}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">${formatISODate(user.creationTime)}</td>
                         `;
@@ -179,42 +278,50 @@
                     });
                 }
                 
+                // Mettre à jour le message d'état
                 statusMessage.textContent = `Liste mise à jour: ${users.length} utilisateurs trouvés.`;
-                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800');
-                statusMessage.classList.add('bg-green-100', 'text-green-800');
+                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800', 'hidden');
+                statusMessage.classList.add('bg-vibrant-green/20', 'text-brand-dark', 'border-l-4', 'border-vibrant-green');
                 setTimeout(() => { statusMessage.classList.add('hidden'); }, 3000);
 
 
             }, (error) => {
                 console.error("Erreur de connexion Firestore:", error);
-                statusMessage.textContent = "Erreur: Impossible de charger les données utilisateurs. (Vérifiez la console pour les détails)";
+                statusMessage.textContent = "Erreur: Impossible de charger les données utilisateurs.";
                 statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800');
-                statusMessage.classList.add('bg-red-100', 'text-red-800', 'hidden');
+                statusMessage.classList.add('bg-red-100', 'text-red-800');
             });
-            
-            // Retourne la fonction de désabonnement au cas où nous aurions besoin de l'arrêter
+
             return unsubscribe;
         }
 
-        // --- Vérification de l'authentification et lancement du listener ---
-        onAuthStateChanged(auth, (user) => {
-            if (user && !user.isAnonymous) {
-                // Utilisateur connecté. Lancer le chargement des données.
-                console.log("Utilisateur connecté. Chargement du tableau de bord admin.");
-                startUserListener();
-            } else {
-                // Utilisateur non connecté ou anonyme. Redirection vers la page de connexion.
-                console.log("Accès refusé. Redirection vers la connexion.");
-                const message = "Accès restreint. Veuillez vous connecter avec un compte non-anonyme.";
-                // Utilisation d'un modal simple pour prévenir l'utilisateur (remplace l'alerte)
-                if (confirm(message + "\nOK pour aller à la page de connexion.")) {
-                    window.location.href = 'login.html';
+
+        // --- Authentification et Initialisation de l'Écouteur ---
+        // Tenter l'authentification avec le token fourni par Canvas.
+        async function authenticateAndStart() {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                    console.log("Connexion Firebase réussie via token Canvas.");
+                } else {
+                    console.error("Token d'authentification Canvas manquant. Le listener Firestore peut échouer si les règles de sécurité sont strictes.");
                 }
+                
+                // Lancer l'écouteur de données (après la connexion)
+                startUserListener();
+
+            } catch (error) {
+                console.error("Erreur lors de la connexion Firebase :", error);
+                statusMessage.textContent = "Erreur critique d'authentification Firebase. Veuillez vérifier les logs.";
+                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800');
+                statusMessage.classList.add('bg-red-100', 'text-red-800');
             }
-        });
-        
+        }
+
+        // Lancer le processus au chargement du module
+        authenticateAndStart();
+
     </script>
-    <!-- Le script.js global est chargé par le module ci-dessus si nécessaire -->
 </body>
 </html>
 
