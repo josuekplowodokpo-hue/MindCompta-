@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Vidéos YouTube</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <style>
         /* Importer la police Inter */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -108,7 +108,7 @@
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
-                
+
                 <!-- LOGO/MARQUE (CLIQUABLE VERS INDEX.HTML) -->
                 <a href="index.html" class="flex items-center group">
                     <img src="logo.jpg" 
@@ -123,20 +123,17 @@
                     <a href="index.html" class="nav-link">Accueil</a>
                     <a href="services.html" class="nav-link">Services (Livre)</a>
                     <a href="about.html" class="nav-link">À Propos</a>
-                    <a href="youtube.html" class="nav-link active-link-desktop">Vidéos YouTube</a>
-                    
-                    <!-- Lien Admin (visible si connecté) -->
-                    <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-full hidden text-white hover:bg-red-500">Admin</a> 
+                    <a href="youtube.html" class="nav-link active-link-desktop text-brand-dark">Vidéos YouTube</a>
 
-                    <!-- Boutons d'Action -->
-                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                        Se Connecter
-                    </a>
-                    <button id="nav-logout-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white hidden">
-                        Déconnexion
-                    </button>
+                    <!-- Boutons d'Action (Gérés par JS) -->
+                    <div id="auth-actions-desktop" class="flex items-center space-x-3">
+                        <!-- Le bouton de connexion par défaut sera remplacé par JS -->
+                        <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+                            Se Connecter
+                        </a>
+                    </div>
                 </nav>
-                
+
                 <!-- BOUTON MENU MOBILE -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -155,17 +152,15 @@
         </button>
         <div class="pt-12 space-y-3">
             <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
-            
+
             <a href="index.html" class="mobile-link">Accueil</a>
             <a href="services.html" class="mobile-link">Services (Livre)</a>
             <a href="about.html" class="mobile-link">À Propos</a>
-            <a href="youtube.html" class="mobile-link active-link-mobile">Vidéos YouTube</a>
-            
-            <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 hidden">Admin</a>
+            <a href="youtube.html" class="mobile-link active-link-mobile text-brand-dark">Vidéos YouTube</a>
 
-            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3">
+            <!-- Boutons d'Action Mobile (Gérés par JS) -->
+            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
                 <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
-                <button id="mobile-logout-btn" class="mobile-link bg-red-500 mobile-link-btn text-white hidden">Déconnexion</button>
             </div>
         </div>
     </nav>
@@ -174,7 +169,7 @@
 
     <!-- CONTENU PRINCIPAL -->
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
-        
+
         <h1 class="text-4xl font-extrabold text-brand-dark mb-4 mt-4 text-center">
             Notre Chaîne YouTube : Guides & Tutoriels
         </h1>
@@ -232,11 +227,11 @@
                 <h3 class="text-lg font-bold text-gray-800 mb-1">Comment éviter les problèmes de trésorerie</h3>
                 <p class="text-sm text-gray-600">Méthodes simples et efficaces pour une gestion proactive de votre liquidité.</p>
             </div>
-            
+
             <!-- Ajoutez plus de vidéos ici au besoin -->
 
         </div>
-        
+
         <div class="text-center mt-12 mb-6">
             <a href="https://youtube.com/@mindcompta-info?si=LY336pOcyBtM3YkN" target="_blank" class="bg-red-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-red-700 transition duration-300 flex items-center justify-center space-x-2 max-w-xs mx-auto">
                 <!-- Icône YouTube -->
@@ -252,108 +247,102 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT AUTH & MENU -->
+    <!-- LOGIQUE JAVASCRIPT AUTH & MENU (LOCAL STORAGE) -->
     <script type="module">
-        // Import des modules Firebase nécessaires
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        // Page de redirection en cas de déconnexion
+        const REDIRECTION_PAGE = 'login.html'; 
 
-        // Configuration Firebase (Identique aux autres pages)
-        const firebaseConfig = {
-            apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
-            authDomain: "mindcompta-cbb69.firebaseapp.com",
-            projectId: "mindcompta-cbb69",
-            storageBucket: "mindcompta-cbb69.firebasestorage.app",
-            messagingSenderId: "470368630296",
-            appId: "1:470368630296:web:510de914f335b27b3d356d",
-            measurementId: "G-SKSVSV0H70"
-        };
-
-        let auth;
-        if (firebaseConfig.apiKey) {
-            let app;
-            if (!getApps().length) {
-                app = initializeApp(firebaseConfig);
-            } else {
-                app = getApp();
-            }
-            auth = getAuth(app);
-            console.log("Firebase Auth Initialized.");
-
-            // Fonction de Déconnexion globale
-            window.handleSignOut = async () => {
-                try {
-                    await signOut(auth);
-                    window.location.href = 'index.html'; 
-                } catch (error) {
-                    console.error("Erreur de déconnexion:", error);
-                }
-            };
-
-            // Attache les écouteurs pour les boutons de déconnexion
-            document.getElementById('nav-logout-btn')?.addEventListener('click', window.handleSignOut);
-            document.getElementById('mobile-logout-btn')?.addEventListener('click', window.handleSignOut);
-
-        } else {
-            console.error("Firebase non configuré. Les fonctionnalités d'authentification sont désactivées.");
+        // --- GESTION DE LA SESSION ---
+        
+        /** Gère la déconnexion de l'utilisateur. */
+        function handleLogout() {
+            // Suppression des informations de session du stockage local
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            // Redirection vers la page de connexion
+            window.location.href = REDIRECTION_PAGE;
         }
 
-        // --- GESTION DU MENU MOBILE ---
-        const mobileMenu = document.getElementById('mobile-menu');
-        const overlay = document.getElementById('mobile-menu-overlay');
-        const menuButton = document.getElementById('menu-button');
-        const closeMenuButton = document.getElementById('close-menu-button');
+        /**
+         * Vérifie l'état de la session et met à jour l'interface utilisateur.
+         */
+        function checkSessionAndRenderHeader() {
+            const userName = localStorage.getItem('userName');
+            const userRole = localStorage.getItem('userRole');
+            
+            const desktopActions = document.getElementById('auth-actions-desktop');
+            const mobileActions = document.getElementById('auth-actions-mobile');
+            
+            // Si pas de nom d'utilisateur, affichons seulement le bouton de connexion
+            if (!userName) {
+                desktopActions.innerHTML = `
+                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+                        Se Connecter
+                    </a>
+                `;
+                mobileActions.innerHTML = `
+                    <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
+                `;
+                return;
+            }
+            
+            // --- Utilisateur Connecté ---
+            
+            // 1. Affichage du nom d'utilisateur et du bouton de déconnexion (Desktop)
+            desktopActions.innerHTML = `
+                ${userRole === 'Admin' ? 
+                    `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
+                    : ''}
+                <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
+                    <span class="hidden sm:inline">Bienvenue,</span> ${userName}
+                </span>
+                <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
+                    Déconnexion
+                </button>
+            `;
 
-        /** Bascule l'état ouvert/fermé du menu mobile */
+            // 2. Affichage du nom d'utilisateur et du bouton de déconnexion (Mobile)
+            mobileActions.innerHTML = `
+                ${userRole === 'Admin' ? 
+                    `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3">Admin</a>`
+                    : ''}
+                <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
+                <p class="text-white text-md font-semibold mb-3">${userName}</p>
+                <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
+            `;
+
+            // 3. Attacher les écouteurs d'événements de déconnexion aux éléments dynamiques
+            document.getElementById('logout-desktop-btn')?.addEventListener('click', handleLogout);
+            document.getElementById('logout-mobile-btn')?.addEventListener('click', handleLogout);
+        }
+
+        // --- GESTIONNAIRE DU MENU MOBILE (Off-Canvas) ---
+        const elements = {
+            mobileMenu: document.getElementById('mobile-menu'),
+            overlay: document.getElementById('mobile-menu-overlay'),
+            menuButton: document.getElementById('menu-button'),
+            closeMenuButton: document.getElementById('close-menu-button'),
+        };
+
         function toggleMobileMenu(isOpen) {
-            const isOpening = isOpen === undefined ? !mobileMenu.classList.contains('open') : isOpen;
-
+            const isOpening = isOpen === undefined ? !elements.mobileMenu.classList.contains('open') : isOpen;
             if (isOpening) {
-                mobileMenu.classList.add('open');
-                overlay.classList.add('open');
+                elements.mobileMenu.classList.add('open');
+                elements.overlay.classList.add('open');
                 document.body.style.overflow = 'hidden'; 
             } else {
-                mobileMenu.classList.remove('open');
-                overlay.classList.remove('open');
+                elements.mobileMenu.classList.remove('open');
+                elements.overlay.classList.remove('open');
                 document.body.style.overflow = '';
             }
         }
-
-        // Écouteurs d'événements pour l'ouverture/fermeture du menu
-        menuButton?.addEventListener('click', () => toggleMobileMenu(true));
-        closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
-        overlay?.addEventListener('click', () => toggleMobileMenu(false));
-
-        // --- GESTION DE L'AUTHENTIFICATION ---
-        if (auth) {
-            onAuthStateChanged(auth, (user) => {
-                const elements = {
-                    loginDesktop: document.getElementById('nav-login-btn'),
-                    logoutDesktop: document.getElementById('nav-logout-btn'),
-                    adminDesktop: document.getElementById('nav-admin-btn'),
-                    loginMobile: document.getElementById('mobile-login-btn'),
-                    logoutMobile: document.getElementById('mobile-logout-btn'),
-                    adminMobile: document.getElementById('mobile-admin-btn'),
-                };
-
-                const isUserLoggedIn = user && !user.isAnonymous;
-
-                // Fonction utilitaire pour basculer la visibilité
-                const setVisibility = (element, isVisible) => {
-                    if (element) {
-                        element.classList.toggle('hidden', !isVisible);
-                    }
-                };
-
-                // Gérer les boutons de connexion/déconnexion du menu
-                setVisibility(elements.loginDesktop, !isUserLoggedIn);
-                setVisibility(elements.logoutDesktop, isUserLoggedIn);
-                setVisibility(elements.adminDesktop, isUserLoggedIn);
-                setVisibility(elements.loginMobile, !isUserLoggedIn);
-                setVisibility(elements.logoutMobile, isUserLoggedIn);
-                setVisibility(elements.adminMobile, isUserLoggedIn);
-            });
-        }
+        elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
+        elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
+        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
+        
+        // --- Exécution principale ---
+        document.addEventListener('DOMContentLoaded', checkSessionAndRenderHeader);
+        
     </script>
 </body>
 </html>
