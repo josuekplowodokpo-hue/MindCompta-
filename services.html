@@ -7,23 +7,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        /* Importer la police Inter */
+        /* Import the Inter font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
-        /* Couleurs de la marque (Uniformisées avec index.html) */
+        /* Brand Colors (Standardized) */
         :root {
-            --brand-dark: #1E3A8A; /* Bleu Profond */
-            --accent: #F59E0B; /* Orange Vif / Or */
+            --brand-dark: #1E3A8A; /* Deep Blue (Indigo-900) */
+            --accent: #F59E0B; /* Vivid Orange / Gold (Amber-500) */
+            --vibrant-green: #10B981; /* Bright Green (Emerald-500) */
             font-family: 'Inter', sans-serif;
         }
 
-        /* Classes Tailwind personnalisées pour les couleurs */
+        /* Custom Tailwind classes for colors */
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-        .hover-accent:hover { background-color: #D97706; } /* Variante de l'Orange pour le hover */
+        .hover-accent:hover { background-color: #D97706; } 
+        .bg-vibrant-green { background-color: var(--vibrant-green); }
 
-        /* Styles de liens de navigation Desktop */
+        /* Navigation Link Styles - Desktop */
         .nav-link {
             color: white;
             font-weight: 500;
@@ -34,14 +36,13 @@
         .nav-link:hover {
             background-color: #345b85;
         }
-        /* Lien actif pour Desktop */
         .active-link-desktop {
             background-color: var(--accent);
             font-weight: 600;
             color: var(--brand-dark) !important;
         }
 
-        /* --- STYLE DU MENU MOBILE (Off-Canvas) --- */
+        /* Mobile Menu Styles (Off-Canvas) */
         #mobile-menu {
             transform: translateX(100%);
             transition: transform 0.3s ease-in-out;
@@ -50,7 +51,7 @@
         #mobile-menu.open {
             transform: translateX(0);
         }
-        /* Superposition */
+        /* Overlay */
         #mobile-menu-overlay {
             display: none; 
             z-index: 40;
@@ -58,8 +59,6 @@
         #mobile-menu-overlay.open {
             display: block;
         }
-
-        /* Styles de liens de navigation Mobile */
         .mobile-link {
             display: block;
             padding: 0.75rem 1rem;
@@ -68,10 +67,6 @@
             border-radius: 0.5rem;
             transition: background-color 0.2s;
         }
-        .mobile-link:hover {
-            background-color: #345b85;
-        }
-        /* Lien actif pour Mobile */
         .mobile-link.active-link-mobile {
             background-color: var(--accent);
             color: var(--brand-dark);
@@ -86,12 +81,12 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- EN-TÊTE ET NAVIGATION -->
+    <!-- HEADER AND NAVIGATION -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
 
-                <!-- LOGO/MARQUE (CLIQUABLE VERS INDEX.HTML) -->
+                <!-- LOGO/BRAND (CLICKABLE) -->
                 <a href="index.html" class="flex items-center group">
                     <img src="logo.jpg" 
                          alt="MindCompta Logo" 
@@ -100,23 +95,23 @@
                     <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
                 </a>
 
-                <!-- NAVIGATION DESKTOP -->
+                <!-- DESKTOP NAVIGATION -->
                 <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
                     <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="services.html" class="nav-link active-link-desktop text-brand-dark">Services (Livre)</a>
+                    <a href="services.html" class="nav-link active-link-desktop">Services (Livre)</a>
                     <a href="about.html" class="nav-link">À Propos</a>
                     <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
 
-                    <!-- Conteneur pour les actions d'authentification (géré par JS) -->
+                    <!-- Action Buttons and User Info (Managed by JS) -->
                     <div id="auth-actions-desktop" class="flex items-center space-x-3">
-                        <!-- Rempli par JavaScript -->
+                        <!-- Default Login Button -->
                         <a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
                             Se Connecter
                         </a>
                     </div>
                 </nav>
 
-                <!-- BOUTON MENU MOBILE -->
+                <!-- MOBILE MENU BUTTON -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -126,7 +121,7 @@
         </div>
     </header>
 
-    <!-- MENU MOBILE OFF-CANVAS -->
+    <!-- MOBILE MENU OFF-CANVAS -->
     <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
     <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
         <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none">
@@ -136,121 +131,68 @@
             <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
 
             <a href="index.html" class="mobile-link">Accueil</a>
-            <a href="services.html" class="mobile-link active-link-mobile text-brand-dark">Services (Livre)</a>
+            <a href="services.html" class="mobile-link active-link-mobile">Services (Livre)</a>
             <a href="about.html" class="mobile-link">À Propos</a>
             <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
 
-            <!-- Conteneur pour les actions d'authentification mobiles (géré par JS) -->
+            <!-- Authentication Actions Container (Filled by JS) -->
             <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
-                <!-- Rempli par JavaScript -->
+                <!-- Default Login Button -->
                 <a href="login.html" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
             </div>
         </div>
     </nav>
-    <!-- FIN MENU MOBILE -->
-
+    <!-- END MOBILE MENU -->
 
     <!-- CONTENU PRINCIPAL -->
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
+    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-16 md:py-24">
 
-        <h1 class="text-4xl font-extrabold text-brand-dark mb-10 mt-4 text-center">
-            Notre Offre de Services et Contenus (Livre)
-        </h1>
+        <div class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-brand-dark mb-4">Espace Services : Le Livre Blanc OHADA</h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Accédez à nos ressources exclusives pour maîtriser le Droit Comptable OHADA.
+            </p>
+        </div>
 
-        <!-- Grille de Services -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <!-- Contenu conditionnel basé sur la connexion -->
+        <div id="service-content-gated" class="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-gray-200">
+            <!-- Ce contenu sera affiché si l'utilisateur est connecté -->
+            <h2 class="text-3xl font-bold text-vibrant-green mb-6">Contenu Premium Débloqué</h2>
+            <div class="space-y-6 text-gray-700">
+                
+                <h3 class="text-2xl font-semibold text-brand-dark border-b pb-2">1. Le Guide Complet de la Fiscalité OHADA</h3>
+                <p>Ce guide détaille les obligations fiscales spécifiques à l'espace UEMOA, incluant la TVA, les impôts sur les sociétés, et les règles de déclaration pour les PME. Mises à jour trimestrielles garanties.</p>
 
-            <!-- Service 1: Conseil Financier (FREE) -->
-            <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent hover:shadow-2xl transition duration-300">
-                <div class="text-accent text-4xl mb-4">💰</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Conseil en Gestion & Financement</h3>
-                <p class="text-gray-600 mb-4">
-                    Optimisez votre trésorerie et vos stratégies d'investissement. Nous vous accompagnons dans la recherche de financements adaptés à votre croissance.
-                </p>
-                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
-                    <li>Planification de la trésorerie.</li>
-                    <li>Évaluation des projets.</li>
-                    <li>Montage de dossiers de crédit.</li>
-                </ul>
-                <a href="contact.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">En savoir plus →</a>
-            </div>
+                <h3 class="text-2xl font-semibold text-brand-dark border-b pb-2">2. Outils de Calcul d'Amortissement</h3>
+                <p>Accès à des simulateurs interactifs basés sur le référentiel comptable OHADA pour calculer avec précision les amortissements linéaires, dégressifs et par unités d'œuvre. Évitez les redressements fiscaux.</p>
 
-            <!-- Service 2: Conformité OHADA (FREE) -->
-            <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent hover:shadow-2xl transition duration-300">
-                <div class="text-accent text-4xl mb-4">📜</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Conformité Réglementaire OHADA</h3>
-                <p class="text-gray-600 mb-4">
-                    Assurez-vous que vos comptes et rapports financiers respectent toutes les directives de l'Organisation pour l'Harmonisation en Afrique du Droit des Affaires.
-                </p>
-                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
-                    <li>Mise à jour des normes.</li>
-                    <li>Formation du personnel.</li>
-                    <li>Audits de conformité.</li>
-                </ul>
-                <a href="contact.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Demander un Audit →</a>
-            </div>
+                <h3 class="text-2xl font-semibold text-brand-dark border-b pb-2">3. Modèles de Rapports Financiers</h3>
+                <p>Téléchargez des modèles de documents pré-formatés (Bilan, Compte de Résultat, État des Flux de Trésorerie) conformes aux exigences de l'OHADA, prêts à l'emploi.</p>
 
-            <!-- Service 3: Contenu Éducatif (Le Livre / Bibliothèque) - PREMIUM -->
-            <div id="service-premium-card" class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-500 hover:shadow-2xl transition duration-300 relative overflow-hidden">
-                <h3 class="text-2xl font-bold text-gray-800 mb-3 flex items-center">
-                    <span class="text-red-500 text-3xl mr-3">📚</span> Bibliothèque Exclusif
-                </h3>
-
-                <!-- Contenu DÉVERROUILLÉ (Affiché si connecté) -->
-                <div id="premium-content-unlocked" class="hidden space-y-4">
-                    <p class="text-gray-600 font-bold">
-                        Accédez à la collection complète d'ouvrages et de guides :
-                    </p>
-                    
-                    <!-- FORMULAIRE D'ADMINISTRATION (Pour ajouter un livre) -->
-                    <form id="admin-add-form" class="hidden bg-red-50 p-4 rounded-lg border border-red-200">
-                        <h4 class="text-lg font-semibold text-red-600 mb-2">Espace Admin (Ajouter)</h4>
-                        <input type="text" id="book-title" placeholder="Titre du livre (Ex: Guide Fiscal 2025)" required
-                               class="w-full p-2 mb-2 border rounded-md focus:ring-red-500 focus:border-red-500">
-                        <input type="url" id="book-url" placeholder="Lien de téléchargement (URL)" required
-                               class="w-full p-2 mb-3 border rounded-md focus:ring-red-500 focus:border-red-500">
-                        <button type="submit" class="w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition">
-                            Ajouter le Livre
-                        </button>
-                    </form>
-
-                    <!-- LISTE DES LIVRES CHARGÉS PAR LocalStorage -->
-                    <div id="library-list" class="space-y-3 pt-2">
-                        <p class="text-center text-sm text-gray-400">Chargement de la bibliothèque...</p>
-                        <!-- Les livres seront insérés ici -->
-                    </div>
-                    
-                </div>
-
-                <!-- Contenu VERROUILLÉ (Affiché si déconnecté) -->
-                <div id="premium-content-locked" class="absolute inset-0 bg-white bg-opacity-95 backdrop-blur-sm flex flex-col items-center justify-center p-6 rounded-xl border-t-4 border-red-500">
-                    <div class="text-red-500 text-5xl mb-3">🔒</div>
-                    <p class="text-lg font-bold text-gray-800 mb-4 text-center">Bibliothèque Verrouillée</p>
-                    <p class="text-sm text-gray-600 mb-6 text-center px-2">
-                        Veuillez vous connecter pour accéder à tous les livres et guides de la bibliothèque.
-                    </p>
-                    <a href="login.html" class="bg-accent text-white font-bold py-2 px-5 rounded-full hover-accent transition duration-300 shadow-lg">
-                        Se Connecter / S'inscrire
+                <div class="text-center mt-10">
+                    <a href="#" class="inline-flex items-center bg-vibrant-green text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-emerald-700 transition duration-300">
+                        <!-- Icône de téléchargement -->
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2v-4a2 2 0 012-2h10a2 2 0 012 2v4a2 2 0 01-2 2z"></path></svg>
+                        Télécharger le Livre Blanc
                     </a>
                 </div>
             </div>
-
-            <!-- Service 4: Support Technique (FREE) -->
-            <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent hover:shadow-2xl transition duration-300">
-                <div class="text-accent text-4xl mb-4">🛠️</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Support Technique Dédié</h3>
-                <p class="text-gray-600 mb-4">
-                    Un problème avec un calcul ? Une question sur l'utilisation d'un outil ? Notre équipe est là pour vous assister rapidement et efficacement.
-                </p>
-                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
-                    <li>Assistance par chat et e-mail.</li>
-                    <li>FAQ et documentation complète.</li>
-                    <li>Dépannage personnalisé de vos calculs.</li>
-                </ul>
-                <a href="contact.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Contacter le Support →</a>
-            </div>
         </div>
 
+        <!-- Contenu affiché si l'utilisateur est déconnecté -->
+        <div id="service-content-locked" class="bg-red-100 p-8 rounded-xl shadow-inner border-2 border-red-300 text-center hidden">
+            <div class="text-red-600 text-5xl mb-4">🔒</div>
+            <h2 class="text-3xl font-bold text-red-700 mb-3">Accès Limité</h2>
+            <p class="text-xl text-red-600 mb-6">
+                Le contenu exclusif du Livre Blanc est réservé aux membres connectés.
+            </p>
+            <p class="text-gray-700 mb-8">
+                Veuillez vous connecter pour accéder aux guides, simulateurs et modèles OHADA premium.
+            </p>
+            <a href="login.html" class="inline-block bg-accent text-brand-dark font-bold py-3 px-8 rounded-full shadow-xl hover-accent transition duration-300 transform hover:scale-105">
+                Se Connecter Maintenant
+            </a>
+        </div>
     </main>
 
     <!-- PIED DE PAGE -->
@@ -258,236 +200,120 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT ET GESTION DE LA SESSION/BIBLIOTHÈQUE -->
-    <script>
-        // --- CONSTANTES DE SESSION ET D'ADMINISTRATION ---
-        const SESSION_KEY = 'currentUser';
-        const LIBRARY_STORAGE_KEY = 'mindcompta_library_books';
-        const ADMIN_USERNAME = 'admin-Josue'; 
-        const REDIRECTION_PAGE = 'login.html';
-        
-        // --- GESTION DE LA SESSION UTILISATEUR (LocalStorage/SessionStorage) ---
+    <!-- JAVASCRIPT LOGIC AND AUTHENTICATION (LOCAL STORAGE) -->
+    <script type="module">
+        // Page de redirection en cas de déconnexion ou d'accès non autorisé
+        const REDIRECTION_PAGE = 'login.html'; 
+        const ADMIN_ROLE = 'Admin';
 
-        /** * Récupère l'utilisateur connecté depuis sessionStorage.
-         * @returns {object|null} L'objet utilisateur ou null si déconnecté.
-         */
-        function getCurrentUser() {
-            const userJson = sessionStorage.getItem(SESSION_KEY);
-            try {
-                return userJson ? JSON.parse(userJson) : null;
-            } catch (e) {
-                console.error("Erreur de parsing de l'utilisateur en session:", e);
-                return null;
-            }
-        }
+        // --- GESTION DE LA SESSION ---
 
         /** Gère la déconnexion de l'utilisateur. */
-        function handleSignOut() {
-            sessionStorage.removeItem(SESSION_KEY);
-            // Recharger la page pour mettre à jour l'état UI
+        function handleLogout() {
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
             window.location.href = 'index.html'; 
         }
 
-        // --- GESTION DU MENU MOBILE (Off-Canvas) ---
-        const mobileMenu = document.getElementById('mobile-menu');
-        const overlay = document.getElementById('mobile-menu-overlay');
-        const menuButton = document.getElementById('menu-button');
-        const closeMenuButton = document.getElementById('close-menu-button');
+        /**
+         * Vérifie l'état de la session et met à jour l'interface utilisateur et le contenu de la page.
+         */
+        function checkSessionAndRenderHeader() {
+            const userName = localStorage.getItem('userName');
+            const userRole = localStorage.getItem('userRole');
 
-        function toggleMobileMenu(isOpen) {
-            const isOpening = isOpen === undefined ? !mobileMenu.classList.contains('open') : isOpen;
-            if (isOpening) {
-                mobileMenu.classList.add('open');
-                overlay.classList.add('open');
-                document.body.style.overflow = 'hidden'; 
-            } else {
-                mobileMenu.classList.remove('open');
-                overlay.classList.remove('open');
-                document.body.style.overflow = '';
-            }
-        }
-
-        menuButton?.addEventListener('click', () => toggleMobileMenu(true));
-        closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
-        overlay?.addEventListener('click', () => toggleMobileMenu(false));
-        
-        // --- LOGIQUE AUTHENTIFICATION/HEADER/ACCÈS PREMIUM ---
-
-        /** Met à jour le header pour refléter l'état de connexion. */
-        function updateHeaderUI(user) {
-            const isUserLoggedIn = user !== null;
             const desktopActions = document.getElementById('auth-actions-desktop');
             const mobileActions = document.getElementById('auth-actions-mobile');
             
-            // Si l'utilisateur est déconnecté
-            if (!isUserLoggedIn) {
-                const loginHtml = `
-                    <a href="${REDIRECTION_PAGE}" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+            const gatedContent = document.getElementById('service-content-gated');
+            const lockedContent = document.getElementById('service-content-locked');
+
+            // --- Utilisateur Connecté ---
+            if (userName) {
+                const isUserAdmin = userRole === ADMIN_ROLE;
+
+                // Afficher le contenu Gated
+                gatedContent.classList.remove('hidden');
+                lockedContent.classList.add('hidden');
+
+                // 1. Desktop Actions (Cache "Se Connecter" et affiche le profil/déconnexion)
+                const adminButtonHtml = isUserAdmin 
+                    ? `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
+                    : '';
+                
+                desktopActions.innerHTML = `
+                    ${adminButtonHtml}
+                    <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
+                        <span class="hidden sm:inline">Bienvenue,</span> ${userName}
+                    </span>
+                    <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
+                        Déconnexion
+                    </button>
+                `;
+
+                // 2. Mobile Actions
+                mobileActions.innerHTML = `
+                    ${isUserAdmin ? 
+                        `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
+                        : ''}
+                    <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
+                    <p class="text-white text-md font-semibold mb-3">${userName}</p>
+                    <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
+                `;
+
+                // 3. Attacher les écouteurs de déconnexion
+                document.getElementById('logout-desktop-btn')?.addEventListener('click', handleLogout);
+                document.getElementById('logout-mobile-btn')?.addEventListener('click', handleLogout);
+                
+            } else {
+                // --- Utilisateur Déconnecté ---
+                
+                // Afficher le contenu Verrouillé
+                gatedContent.classList.add('hidden');
+                lockedContent.classList.remove('hidden');
+
+                // 1. Desktop Actions (Affiche uniquement "Se Connecter")
+                desktopActions.innerHTML = `
+                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
                         Se Connecter
                     </a>
                 `;
-                desktopActions.innerHTML = loginHtml;
-                mobileActions.innerHTML = `<a href="${REDIRECTION_PAGE}" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>`;
-                return;
-            }
 
-            // Utilisateur connecté
-            const isUserAdmin = user.username === ADMIN_USERNAME;
-            const userNameDisplay = user.username || "Utilisateur";
-
-            const adminButtonHtml = isUserAdmin 
-                ? `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
-                : '';
-            
-            // 1. Desktop
-            desktopActions.innerHTML = `
-                ${adminButtonHtml}
-                <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600 hidden sm:inline">
-                    Bienvenue, ${userNameDisplay}
-                </span>
-                <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
-                    Déconnexion
-                </button>
-            `;
-
-            // 2. Mobile
-            mobileActions.innerHTML = `
-                ${isUserAdmin ? 
-                    `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
-                    : ''}
-                <p class="text-accent text-lg font-bold mb-2">Connecté</p>
-                <p class="text-white text-md font-semibold mb-3">${userNameDisplay}</p>
-                <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
-            `;
-
-            // 3. Attacher les écouteurs de déconnexion
-            document.getElementById('logout-desktop-btn')?.addEventListener('click', handleSignOut);
-            document.getElementById('logout-mobile-btn')?.addEventListener('click', handleSignOut);
-        }
-
-        /** Gère la visibilité de l'accès Premium et charge la bibliothèque. */
-        function updatePremiumAccess(user) {
-            const premiumUnlocked = document.getElementById('premium-content-unlocked');
-            const premiumLocked = document.getElementById('premium-content-locked');
-            
-            if (user) {
-                // Utilisateur connecté
-                premiumUnlocked?.classList.remove('hidden');
-                premiumLocked?.classList.add('hidden');
-                setupLibrary(user.username);
-            } else {
-                // Utilisateur déconnecté
-                premiumUnlocked?.classList.add('hidden');
-                premiumLocked?.classList.remove('hidden');
-            }
-        }
-
-
-        // --- GESTION DE LA BIBLIOTHÈQUE (LocalStorage) ---
-        
-        /** Charge la liste des livres depuis localStorage. */
-        function loadBooksFromStorage() {
-            const booksJson = localStorage.getItem(LIBRARY_STORAGE_KEY);
-            if (booksJson) {
-                try {
-                    return JSON.parse(booksJson);
-                } catch (e) {
-                    console.error("Erreur de parsing des livres:", e);
-                    return [];
-                }
-            }
-            // Initialiser avec quelques livres par défaut si c'est la première fois
-            return [
-                { id: Date.now() + 1, title: "OHADA : Acte Uniforme Droit Commercial", url: "https://example.com/ohada-droit-commercial" },
-                { id: Date.now() + 2, title: "Guide Fiscal des PME en Afrique de l'Ouest", url: "https://example.com/guide-pme-fiscalite" },
-                { id: Date.now() + 3, title: "Méthodes d'Évaluation d'Entreprise", url: "https://example.com/evaluation-entreprise-methods" }
-            ];
-        }
-
-        /** Sauvegarde la liste des livres dans localStorage. */
-        function saveBooksToStorage(books) {
-            localStorage.setItem(LIBRARY_STORAGE_KEY, JSON.stringify(books));
-        }
-
-        /** Affiche la liste des livres dans l'interface utilisateur. */
-        function renderLibrary(books) {
-            const listContainer = document.getElementById('library-list');
-            listContainer.innerHTML = ''; 
-
-            if (books.length === 0) {
-                listContainer.innerHTML = '<p class="text-center text-gray-500 italic">Aucun livre n\'a été ajouté à la bibliothèque pour l\'instant.</p>';
-                return;
-            }
-
-            // Tri par titre pour une meilleure lisibilité
-            books.sort((a, b) => a.title.localeCompare(b.title));
-
-            books.forEach(book => {
-                const bookElement = document.createElement('div');
-                bookElement.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg shadow-sm border-l-4 border-brand-dark';
-                bookElement.innerHTML = `
-                    <span class="text-sm font-medium text-gray-700 truncate">${book.title}</span>
-                    <a href="${book.url}" target="_blank" rel="noopener noreferrer" 
-                       class="bg-accent text-white text-xs font-semibold py-1 px-3 rounded-full hover-accent transition duration-300 ml-4">
-                        Télécharger
-                    </a>
+                // 2. Mobile Actions
+                mobileActions.innerHTML = `
+                    <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
                 `;
-                listContainer.appendChild(bookElement);
-            });
-        }
-        
-        /** Initialise le chargement de la bibliothèque et la gestion du formulaire Admin. */
-        function setupLibrary(currentUsername) {
-            const adminForm = document.getElementById('admin-add-form');
-            let books = loadBooksFromStorage();
-            renderLibrary(books); // Affichage initial
-            
-            // Afficher le formulaire d'ajout si l'utilisateur est l'Admin
-            if (currentUsername === ADMIN_USERNAME) {
-                adminForm.classList.remove('hidden');
-                
-                // Gérer la soumission du formulaire
-                adminForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const title = document.getElementById('book-title').value.trim();
-                    const url = document.getElementById('book-url').value.trim();
-                    
-                    if (title && url) {
-                        const newBook = {
-                            id: Date.now(), // ID unique simple
-                            title: title,
-                            url: url,
-                            addedBy: currentUsername,
-                            createdAt: new Date().toISOString()
-                        };
-
-                        books.push(newBook);
-                        saveBooksToStorage(books);
-                        renderLibrary(books); // Réaffichage avec le nouveau livre
-                        
-                        // Réinitialiser le formulaire
-                        adminForm.reset();
-                    }
-                });
-            } else {
-                adminForm.classList.add('hidden');
             }
         }
 
-        // --- EXÉCUTION AU CHARGEMENT DE LA PAGE ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const currentUser = getCurrentUser();
-            
-            updateHeaderUI(currentUser);
-            updatePremiumAccess(currentUser);
+        // --- GESTIONNAIRE DU MENU MOBILE (Off-Canvas) ---
+        const elements = {
+            mobileMenu: document.getElementById('mobile-menu'),
+            overlay: document.getElementById('mobile-menu-overlay'),
+            menuButton: document.getElementById('menu-button'),
+            closeMenuButton: document.getElementById('close-menu-button'),
+        };
 
-            if (currentUser && currentUser.username) {
-                console.log(`Utilisateur connecté: ${currentUser.username}`);
+        function toggleMobileMenu(isOpen) {
+            const isOpening = isOpen === undefined ? !elements.mobileMenu.classList.contains('open') : isOpen;
+            if (isOpening) {
+                elements.mobileMenu.classList.add('open');
+                elements.overlay.classList.add('open');
+                document.body.style.overflow = 'hidden'; 
             } else {
-                console.log("Aucun utilisateur n'est connecté.");
+                elements.mobileMenu.classList.remove('open');
+                elements.overlay.classList.remove('open');
+                document.body.style.overflow = '';
             }
-        });
+        }
+        elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
+        elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
+        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
+
+        // --- Exécution principale ---
+        document.addEventListener('DOMContentLoaded', checkSessionAndRenderHeader);
 
     </script>
 </body>
 </html>
+
