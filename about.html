@@ -6,7 +6,7 @@
     <title>MindCompta - À Propos de Nous</title>
     <!-- Chargement de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <style>
         /* Import the Inter font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -86,11 +86,11 @@
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
-                
+
                 <!-- LOGO/BRAND (CLICKABLE) -->
                 <a href="index.html" class="flex items-center group">
                     <img src="logo.jpg" 
-                         alt="" 
+                         alt="MindCompta Logo" 
                          onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
                          class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
                     <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
@@ -102,19 +102,16 @@
                     <a href="services.html" class="nav-link">Services (Livre)</a>
                     <a href="about.html" class="nav-link active-link-desktop">À Propos</a>
                     <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
-                    
-                    <!-- Admin Link (visible if logged in) -->
-                    <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-full hidden text-white hover:bg-red-500">Admin</a> 
 
-                    <!-- Action Buttons -->
-                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                        Se Connecter
-                    </a>
-                    <button id="nav-logout-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white hidden">
-                        Déconnexion
-                    </button>
+                    <!-- Authentication Actions Container (Filled by JS) -->
+                    <div id="auth-actions-desktop" class="flex items-center space-x-3">
+                        <!-- Default Login Button -->
+                        <a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+                            Se Connecter
+                        </a>
+                    </div>
                 </nav>
-                
+
                 <!-- MOBILE MENU BUTTON -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -133,17 +130,16 @@
         </button>
         <div class="pt-12 space-y-3">
             <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
-            
+
             <a href="index.html" class="mobile-link">Accueil</a>
             <a href="services.html" class="mobile-link">Services (Livre)</a>
             <a href="about.html" class="mobile-link active-link-mobile">À Propos</a>
             <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
-            
-            <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 hidden">Admin</a>
 
-            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3">
-                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
-                <button id="mobile-logout-btn" class="mobile-link bg-red-500 mobile-link-btn text-white hidden">Déconnexion</button>
+            <!-- Authentication Actions Container (Filled by JS) -->
+            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
+                <!-- Default Login Button -->
+                <a href="login.html" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
             </div>
         </div>
     </nav>
@@ -159,45 +155,40 @@
             </p>
         </div>
 
-        <!-- Section 1 : Histoire du Fondateur -->
+        <!-- Section 1 : Notre Philosophie (Remplace le message du fondateur) -->
         <section class="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-gray-200 mb-16">
 
-            <div class="md:flex md:items-start md:space-x-10">
-
-                <!-- Bloc Photo (Place réservée) -->
-                <div class="md:w-1/3 flex justify-center mb-8 md:mb-0">
-                    <div class="w-56 h-56 rounded-full overflow-hidden shadow-2xl border-4 border-accent p-1 bg-white">
-                        <!-- Source de l'image : Placehold.co est une alternative si vous n'avez pas d'image -->
-                        <img 
-                            src="photo.jpg" 
-                            onerror="this.onerror=null; this.src='https://placehold.co/216x216/1E3A8A/ffffff?text=Josu%C3%A9+KPLOWODOKPO';"
-                            alt="Portrait du fondateur Josué KPLOWODOKPO" 
-                            class="w-full h-full object-cover rounded-full"
-                            loading="lazy"
-                        >
-                    </div>
-                </div>
-
-                <!-- Bloc Texte du Fondateur -->
-                <div class="md:w-2/3">
-                    <h2 class="text-3xl font-bold text-brand-dark mb-4">Message du Fondateur</h2>
-                    <p class="text-lg text-gray-700 mb-4 font-semibold">
-                        Je suis Josué KPLOWODOKPO, et j'ai fondé MindCompta.
-                    </p>
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-brand-dark mb-6">Un Partenaire pour la Conformité et la Croissance</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3 flex items-center">
+                        <span class="text-accent mr-3">🚀</span> Notre Vision
+                    </h3>
                     <p class="text-gray-600 mb-4">
-                        L'idée derrière ce site est née d'une frustration commune : la complexité et le manque d'accessibilité des outils de conformité financière en zone OHADA. J'ai constaté que beaucoup de professionnels et d'entrepreneurs perdaient un temps précieux à chercher des textes réglementaires ou à effectuer des calculs manuels risqués.
+                        Nous visons un avenir où chaque entrepreneur et professionnel de la finance en Afrique de l'Ouest puisse accéder facilement, rapidement et avec certitude aux outils nécessaires pour la conformité OHADA. Fini les recherches fastidieuses et les risques d'erreurs dues à des calculs manuels.
                     </p>
                     <p class="text-gray-600">
-                        Notre objectif est clair : **démocratiser l'accès au Droit Comptable OHADA et fournir des outils digitaux fiables** pour garantir une gestion financière précise et sans erreur. MindCompta est votre allié quotidien pour la conformité et l'analyse économique.
+                        MindCompta est le pont entre la complexité réglementaire et la simplicité opérationnelle, vous permettant de vous concentrer sur ce qui compte : la croissance de votre activité.
                     </p>
-                    <p class="mt-6 text-right italic text-brand-dark font-medium">
-                        — Josué KPLOWODOKPO
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3 flex items-center">
+                        <span class="text-accent mr-3">🤝</span> Notre Engagement
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        Nous nous engageons à maintenir nos ressources à jour avec les dernières révisions de l'OHADA. La fiabilité de nos outils est notre priorité absolue. Nous croyons que la démocratisation du savoir financier est essentielle pour le développement économique régional.
+                    </p>
+                    <p class="text-gray-600">
+                        Rejoignez la communauté MindCompta pour transformer la manière dont vous abordez vos obligations comptables et fiscales.
                     </p>
                 </div>
             </div>
         </section>
 
-        <!-- Section 2 : Nos Valeurs et Engagement -->
+        <!-- Section 2 : Nos Valeurs et Engagement (Maintenue) -->
         <section class="mb-16">
             <h2 class="text-3xl font-bold text-center text-brand-dark mb-10">Nos Valeurs</h2>
             <div class="grid md:grid-cols-3 gap-8 text-center">
@@ -236,54 +227,36 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- JAVASCRIPT LOGIC AND AUTHENTICATION -->
-    <script type="module">
-        // Firebase imports
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    <!-- JAVASCRIPT LOGIC AND AUTHENTICATION (LOCAL STORAGE) -->
+    <script>
+        // --- CONSTANTES DE SESSION ET D'ADMINISTRATION ---
+        const SESSION_KEY = 'currentUser';
+        const ADMIN_USERNAME = 'admin-Josue'; 
+        const REDIRECTION_PAGE = 'login.html';
+        
+        // --- GESTION DE LA SESSION UTILISATEUR (SessionStorage) ---
 
-        // Firebase Configuration (Placeholder - Should be injected by environment)
-        // Using provided static config for development environment
-        const firebaseConfig = {
-            apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
-            authDomain: "mindcompta-cbb69.firebaseapp.com",
-            projectId: "mindcompta-cbb69",
-            storageBucket: "mindcompta-cbb69.firebasestorage.app",
-            messagingSenderId: "470368630296",
-            appId: "1:470368630296:web:510de914f335b27b3d356d",
-            measurementId: "G-SKSVSV0H70"
-        };
-
-        let auth;
-        if (firebaseConfig.apiKey) {
-            let app;
-            if (!getApps().length) {
-                app = initializeApp(firebaseConfig);
-            } else {
-                app = getApp();
+        /** * Récupère l'utilisateur connecté depuis sessionStorage.
+         * @returns {object|null} L'objet utilisateur ou null si déconnecté.
+         */
+        function getCurrentUser() {
+            const userJson = sessionStorage.getItem(SESSION_KEY);
+            try {
+                return userJson ? JSON.parse(userJson) : null;
+            } catch (e) {
+                console.error("Erreur de parsing de l'utilisateur en session:", e);
+                return null;
             }
-            auth = getAuth(app);
-            console.log("Firebase Auth Initialized. (about.html)");
-
-            // Global Sign Out Function
-            window.handleSignOut = async () => {
-                try {
-                    await signOut(auth);
-                    window.location.href = 'index.html'; 
-                } catch (error) {
-                    console.error("Erreur de déconnexion:", error);
-                }
-            };
-
-            // Attach listeners for sign out buttons
-            document.getElementById('nav-logout-btn')?.addEventListener('click', window.handleSignOut);
-            document.getElementById('mobile-logout-btn')?.addEventListener('click', window.handleSignOut);
-
-        } else {
-            console.error("Firebase non configuré. Les fonctionnalités d'authentification sont désactivées. (about.html)");
         }
 
-        // --- MOBILE MENU HANDLER ---
+        /** Gère la déconnexion de l'utilisateur. */
+        function handleSignOut() {
+            sessionStorage.removeItem(SESSION_KEY);
+            // Recharger la page pour mettre à jour l'état UI
+            window.location.href = 'index.html'; 
+        }
+
+        // --- GESTION DU MENU MOBILE (Off-Canvas) ---
         const mobileMenu = document.getElementById('mobile-menu');
         const overlay = document.getElementById('mobile-menu-overlay');
         const menuButton = document.getElementById('menu-button');
@@ -309,36 +282,66 @@
         closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
         overlay?.addEventListener('click', () => toggleMobileMenu(false));
 
+
         // --- AUTHENTICATION STATE HANDLER ---
-        if (auth) {
-            onAuthStateChanged(auth, (user) => {
-                const elements = {
-                    loginDesktop: document.getElementById('nav-login-btn'),
-                    logoutDesktop: document.getElementById('nav-logout-btn'),
-                    adminDesktop: document.getElementById('nav-admin-btn'),
-                    loginMobile: document.getElementById('mobile-login-btn'),
-                    logoutMobile: document.getElementById('mobile-logout-btn'),
-                    adminMobile: document.getElementById('mobile-admin-btn'),
-                };
 
-                const isUserLoggedIn = user && !user.isAnonymous;
+        /** Met à jour l'interface utilisateur en fonction de l'état de connexion. */
+        function updateAuthUI(user) {
+            const desktopActions = document.getElementById('auth-actions-desktop');
+            const mobileActions = document.getElementById('auth-actions-mobile');
+            const isUserLoggedIn = user !== null;
+            const isUserAdmin = isUserLoggedIn && user.username === ADMIN_USERNAME;
+            const userNameDisplay = isUserLoggedIn ? (user.username || "Utilisateur") : "";
 
-                // Utility function to toggle visibility
-                const setVisibility = (element, isVisible) => {
-                    if (element) {
-                        element.classList.toggle('hidden', !isVisible);
-                    }
-                };
+            // --- Logique pour utilisateur DÉCONNECTÉ ---
+            if (!isUserLoggedIn) {
+                const loginHtml = `
+                    <a href="${REDIRECTION_PAGE}" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+                        Se Connecter
+                    </a>
+                `;
+                desktopActions.innerHTML = loginHtml;
+                mobileActions.innerHTML = `<a href="${REDIRECTION_PAGE}" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>`;
+                return;
+            }
 
-                // Handle login/logout buttons
-                setVisibility(elements.loginDesktop, !isUserLoggedIn);
-                setVisibility(elements.logoutDesktop, isUserLoggedIn);
-                setVisibility(elements.adminDesktop, isUserLoggedIn);
-                setVisibility(elements.loginMobile, !isUserLoggedIn);
-                setVisibility(elements.logoutMobile, isUserLoggedIn);
-                setVisibility(elements.adminMobile, isUserLoggedIn);
-            });
+            // --- Logique pour utilisateur CONNECTÉ ---
+            
+            const adminButtonHtml = isUserAdmin 
+                ? `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
+                : '';
+            
+            // 1. Desktop
+            desktopActions.innerHTML = `
+                ${adminButtonHtml}
+                <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600 hidden sm:inline">
+                    Bienvenue, ${userNameDisplay}
+                </span>
+                <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
+                    Déconnexion
+                </button>
+            `;
+
+            // 2. Mobile
+            mobileActions.innerHTML = `
+                ${isUserAdmin ? 
+                    `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
+                    : ''}
+                <p class="text-accent text-lg font-bold mb-2">Connecté</p>
+                <p class="text-white text-md font-semibold mb-3">${userNameDisplay}</p>
+                <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
+            `;
+
+            // 3. Attacher les écouteurs de déconnexion
+            document.getElementById('logout-desktop-btn')?.addEventListener('click', handleSignOut);
+            document.getElementById('logout-mobile-btn')?.addEventListener('click', handleSignOut);
         }
+
+        // --- EXÉCUTION AU CHARGEMENT DE LA PAGE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = getCurrentUser();
+            updateAuthUI(currentUser);
+        });
     </script>
 </body>
 </html>
