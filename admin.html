@@ -104,13 +104,7 @@
 
                     <!-- Action Buttons and User Info (Managed by JS) -->
                     <div id="auth-actions-desktop" class="flex items-center space-x-3">
-                        <!-- Default content, replaced by JS if connected -->
-                        <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
-                            <span class="hidden sm:inline">Bienvenue,</span> Admin
-                        </span>
-                        <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
-                            Déconnexion
-                        </button>
+                        <!-- Content managed by JS (checkSessionAndRenderHeader) -->
                     </div>
                 </nav>
 
@@ -140,9 +134,7 @@
 
             <!-- Authentication Actions Container (Filled by JS) -->
             <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
-                <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
-                <p class="text-white text-md font-semibold mb-3">Admin</p>
-                <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
+                <!-- Content managed by JS (checkSessionAndRenderHeader) -->
             </div>
         </div>
     </nav>
@@ -153,32 +145,33 @@
         <h1 class="text-3xl font-extrabold text-brand-dark mb-6 mt-4">
             Tableau de Bord Administrateur
         </h1>
-        <p class="text-gray-600 mb-8">Liste des utilisateurs enregistrés, leur statut de connexion (basé sur la dernière activité) et leur identifiant.</p>
 
         <!-- Conteneur d'état de chargement/erreur -->
         <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-lg shadow-md transition duration-300" role="alert">
             Vérification des droits d'accès...
         </div>
 
-        <!-- TABLEAU DES UTILISATEURS -->
+        <div class="mb-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg shadow-inner">
+            <p class="font-bold">⚠️ Note de Sécurité Importante :</p>
+            <p class="text-sm">Par principe de sécurité, les mots de passe ne sont jamais stockés dans le navigateur ni affichés dans le tableau de bord Admin. Les informations ci-dessous sont des exemples statiques des utilisateurs enregistrés.</p>
+        </div>
+        
+        <!-- TABLEAU DES UTILISATEURS SIMULÉS -->
         <div class="bg-white rounded-xl shadow-xl overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom Utilisateur</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email (Identifiant)</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rôle</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dernière Connexion</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">UID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Date Création</th>
                     </tr>
                 </thead>
                 <tbody id="user-list" class="bg-white divide-y divide-gray-200">
-                    <!-- Les lignes d'utilisateurs seront insérées ici par JavaScript -->
+                    <!-- Les lignes seront insérées par JavaScript -->
                     <tr>
-                        <td colspan="6" class="py-12 text-center text-gray-400" id="no-data-row">
-                            Chargement des données...
-                        </td>
+                        <td colspan="5" class="py-12 text-center text-gray-400">Chargement des données utilisateurs...</td>
                     </tr>
                 </tbody>
             </table>
@@ -196,15 +189,108 @@
         const REDIRECTION_PAGE = 'login.html'; 
         const ADMIN_ROLE = 'admin';
 
+        // --- Données Statiques des Utilisateurs (Simulant la base de données) ---
+        const USERS_DATA = [
+            { name: "Admin Principal", email: "admin@mindcompta.com", role: "Admin", status: "EN LIGNE", lastLogin: "14/12/2025 à 17:40" },
+            { name: "Chantal Finance", email: "chantal@mindcompta.com", role: "Comptable", status: "EN LIGNE", lastLogin: "14/12/2025 à 17:35" },
+            { name: "Pierre Comptable", email: "pierre@mindcompta.com", role: "Comptable", status: "HORS LIGNE", lastLogin: "13/12/2025 à 10:15" },
+            { name: "Jeanne Expert", email: "jeanne@mindcompta.com", role: "Expert", status: "EN LIGNE", lastLogin: "14/12/2025 à 17:38" },
+            { name: "Blessing Junior", email: "blessing@mindcompta.com", role: "Junior", status: "HORS LIGNE", lastLogin: "10/12/2025 à 09:00" },
+        ];
+
+
         /** Gère la déconnexion de l'utilisateur. */
         window.handleLogout = () => {
             localStorage.removeItem('isAuthenticated');
             localStorage.removeItem('userEmail');
             localStorage.removeItem('userName');
             localStorage.removeItem('userRole');
-            localStorage.removeItem('token'); // Au cas où
             window.location.href = REDIRECTION_PAGE; 
         };
+
+        /**
+         * Affiche la liste des utilisateurs à partir des données statiques.
+         */
+        function renderUsersTable() {
+            const userListElement = document.getElementById('user-list');
+            userListElement.innerHTML = ''; // Nettoyer la liste existante
+
+            USERS_DATA.forEach(user => {
+                const isOnline = user.status === 'EN LIGNE';
+                const statusColor = isOnline 
+                    ? 'bg-vibrant-green text-white' 
+                    : 'bg-gray-400 text-white';
+
+                const row = document.createElement('tr');
+                row.classList.add('hover:bg-gray-50', 'transition', 'duration-150');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-brand-dark">${user.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.email}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${user.role}</td>
+                    
+                    <!-- STATUT -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">
+                            ${user.status}
+                        </span>
+                    </td>
+
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">${user.lastLogin}</td>
+                `;
+                userListElement.appendChild(row);
+            });
+        }
+
+
+        /**
+         * Vérifie l'état de la session et met à jour l'interface utilisateur.
+         */
+        function checkSessionAndRenderHeader() {
+            const userName = localStorage.getItem('userName');
+            const userRole = localStorage.getItem('userRole');
+            const desktopActions = document.getElementById('auth-actions-desktop');
+            const mobileActions = document.getElementById('auth-actions-mobile');
+
+            // --- Utilisateur Connecté ---
+            if (userName) {
+                // 1. Desktop Actions 
+                desktopActions.innerHTML = `
+                    <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
+                        <span class="hidden sm:inline">Bienvenue,</span> ${userName}
+                    </span>
+                    <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
+                        Déconnexion
+                    </button>
+                `;
+
+                // 2. Mobile Actions
+                mobileActions.innerHTML = `
+                    <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
+                    <p class="text-white text-md font-semibold mb-3">${userName} (${userRole || 'Utilisateur'})</p>
+                    <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
+                `;
+
+                // 3. Attacher les écouteurs de déconnexion
+                document.getElementById('logout-desktop-btn')?.addEventListener('click', window.handleLogout);
+                document.getElementById('logout-mobile-btn')?.addEventListener('click', window.handleLogout);
+                
+            } else {
+                // --- Utilisateur Déconnecté ---
+                
+                // 1. Desktop Actions (Affiche uniquement "Se Connecter")
+                desktopActions.innerHTML = `
+                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+                        Se Connecter
+                    </a>
+                `;
+
+                // 2. Mobile Actions
+                mobileActions.innerHTML = `
+                    <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
+                `;
+            }
+        }
+
 
         // --- GESTION DE L'ACCÈS ADMIN ---
         function checkAdminAccess() {
@@ -212,7 +298,8 @@
             const userRole = localStorage.getItem('userRole');
             const statusMessage = document.getElementById('status-message');
 
-            if (!isAuthenticated || userRole !== ADMIN_ROLE) {
+            // Utilise toLowerCase() pour rendre la vérification insensible à la casse
+            if (!isAuthenticated || userRole?.toLowerCase() !== ADMIN_ROLE) {
                 statusMessage.textContent = "Accès refusé. Redirection vers la page de connexion...";
                 statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800');
                 statusMessage.classList.add('bg-red-100', 'text-red-800');
@@ -221,6 +308,8 @@
                 }, 1000); 
                 return false;
             }
+            // Si l'accès est autorisé, on cache le message d'état
+            statusMessage.classList.add('hidden');
             return true;
         }
 
@@ -251,203 +340,14 @@
 
         // Exécution au chargement
         document.addEventListener('DOMContentLoaded', () => {
-             // 1. Mise à jour des boutons de déconnexion pour utiliser la fonction globale
-             document.getElementById('logout-desktop-btn')?.addEventListener('click', window.handleLogout);
-             document.getElementById('logout-mobile-btn')?.addEventListener('click', window.handleLogout);
-             // 2. Vérification de l'accès Admin
-             checkAdminAccess();
+             const hasAccess = checkAdminAccess();
+             
+             if (hasAccess) {
+                 checkSessionAndRenderHeader();
+                 renderUsersTable(); // Afficher les utilisateurs si l'accès est autorisé
+             }
         });
-    </script>
-
-
-    <!-- LOGIQUE JAVASCRIPT POUR FIREBASE (Exécutée SEULEMENT si l'utilisateur est Admin) -->
-    <script type="module">
-        // Garde : Arrêter l'exécution du module si l'accès n'est pas autorisé par le script global
-        if (localStorage.getItem('userRole') !== 'admin') {
-            return;
-        }
-        
-        // --- IMPORTS FIREBASE ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            query, 
-            onSnapshot, 
-            setLogLevel 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- CONFIGURATION ET INITIALISATION ---
-        const firebaseConfig = {
-            // NOTE: Ces valeurs sont des placeholders. L'environnement Canvas les fournit via __firebase_config.
-            apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
-            authDomain: "mindcompta-cbb69.firebaseapp.com",
-            projectId: "mindcompta-cbb69",
-            storageBucket: "mindcompta-cbb69.firebasestorage.app",
-            messagingSenderId: "470368630296",
-            appId: "1:470368630296:web:510de914f335b27b3d356d",
-            measurementId: "G-SKSVSV0H70"
-        };
-        
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
-        // Utiliser la configuration réelle si disponible
-        const config = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
-
-
-        const app = initializeApp(config);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        setLogLevel('debug'); 
-
-        const userListElement = document.getElementById('user-list');
-        const statusMessage = document.getElementById('status-message');
-
-        /**
-         * Formate une date ISO string en format lisible.
-         * @param {string} isoString Date au format ISO.
-         * @returns {string} Date formatée.
-         */
-        function formatISODate(isoString) {
-            try {
-                const date = new Date(isoString);
-                if (isNaN(date)) return 'N/A';
-                return date.toLocaleString('fr-FR', {
-                    year: 'numeric',
-                    month: 'numeric',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            } catch (e) {
-                return 'Date invalide';
-            }
-        }
-
-        /**
-         * Écoute en temps réel les changements dans la collection d'utilisateurs.
-         */
-        async function startUserListener() {
-            // Le chemin de la collection des utilisateurs enregistrés (public)
-            const usersCollectionRef = collection(db, `artifacts/${appId}/public/data/users`);
-            const usersQuery = query(usersCollectionRef);
-
-            statusMessage.textContent = "Connexion à la base de données Firestore...";
-            statusMessage.classList.remove('hidden');
-            statusMessage.className = 'p-4 bg-yellow-100 text-yellow-800 rounded-lg shadow-md transition duration-300'; // Reset classes
-
-            userListElement.innerHTML = '';
-            
-            // Constante pour déterminer si un utilisateur est considéré comme en ligne
-            // Si la dernière connexion/activité remonte à moins de 5 minutes.
-            const IS_ONLINE_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes en millisecondes
-
-            const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
-                const users = [];
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    users.push(data);
-                });
-
-                // Triez les utilisateurs par dernière connexion (plus récent en premier)
-                users.sort((a, b) => {
-                    const dateA = new Date(a.lastLogin || a.creationTime);
-                    const dateB = new Date(b.lastLogin || b.creationTime);
-                    return dateB.getTime() - dateA.getTime();
-                });
-
-                // Mise à jour de la table
-                userListElement.innerHTML = ''; 
-
-                if (users.length === 0) {
-                    const noDataRow = document.createElement('tr');
-                    noDataRow.innerHTML = `<td colspan="6" class="py-12 text-center text-gray-400">Aucun utilisateur enregistré trouvé.</td>`;
-                    userListElement.appendChild(noDataRow);
-                } else {
-                    users.forEach(user => {
-                        
-                        const lastLoginDate = new Date(user.lastLogin || user.creationTime);
-                        const timeSinceLastLogin = Date.now() - lastLoginDate.getTime();
-
-                        // Logique de présence simple basée sur le dernier login/activité
-                        const isOnline = timeSinceLastLogin < IS_ONLINE_THRESHOLD_MS;
-                        
-                        const statusText = isOnline ? 'EN LIGNE' : 'HORS LIGNE';
-                        const statusColor = isOnline 
-                            ? 'bg-vibrant-green text-white' 
-                            : 'bg-gray-400 text-white';
-
-                        const row = document.createElement('tr');
-                        row.classList.add('hover:bg-gray-50', 'transition', 'duration-150');
-                        row.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.email || 'N/A'}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-brand-dark">${user.userName || 'Nom Inconnu'}</td>
-                            
-                            <!-- STATUT -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">
-                                    ${statusText}
-                                </span>
-                            </td>
-
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">${formatISODate(user.lastLogin || user.creationTime)}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell truncate">${user.uid || 'N/A'}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">${formatISODate(user.creationTime)}</td>
-                        `;
-                        userListElement.appendChild(row);
-                    });
-                }
-
-                // Mettre à jour le message d'état
-                statusMessage.textContent = `Liste mise à jour: ${users.length} utilisateurs trouvés.`;
-                statusMessage.className = 'p-4 bg-green-100 text-green-800 rounded-lg shadow-md transition duration-300';
-                setTimeout(() => { statusMessage.classList.add('hidden'); }, 3000);
-
-
-            }, (error) => {
-                console.error("Erreur de connexion Firestore:", error);
-                statusMessage.textContent = "Erreur: Impossible de charger les données utilisateurs.";
-                statusMessage.className = 'p-4 bg-red-100 text-red-800 rounded-lg shadow-md transition duration-300';
-                setTimeout(() => { statusMessage.classList.add('hidden'); }, 3000);
-
-
-            }, (error) => {
-                console.error("Erreur de connexion Firestore:", error);
-                statusMessage.textContent = "Erreur: Impossible de charger les données utilisateurs.";
-                statusMessage.className = 'p-4 bg-red-100 text-red-800 rounded-lg shadow-md transition duration-300';
-            });
-
-            return unsubscribe;
-        }
-
-
-        // --- Authentification et Initialisation de l'Écouteur ---
-        async function authenticateAndStart() {
-            try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                    console.log("Connexion Firebase réussie via token Canvas.");
-                } else {
-                    console.error("Token d'authentification Canvas manquant. Connexion anonyme.");
-                    // Tentative de connexion anonyme comme solution de repli
-                    await signInAnonymously(auth); 
-                }
-
-                // Lancer l'écouteur de données (après la connexion)
-                startUserListener();
-
-            } catch (error) {
-                console.error("Erreur lors de la connexion Firebase :", error);
-                statusMessage.textContent = "Erreur critique d'authentification Firebase. Veuillez vérifier les logs.";
-                statusMessage.className = 'p-4 bg-red-100 text-red-800 rounded-lg shadow-md transition duration-300';
-            }
-        }
-
-        // Lancer le processus au chargement du module
-        authenticateAndStart();
-
     </script>
 </body>
 </html>
+
