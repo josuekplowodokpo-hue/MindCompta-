@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCompta - Services (Livre)</title>
+    <title>MindCompta - Nos Services et le Livre</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -22,8 +22,7 @@
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-        .hover-accent:hover { background-color: #D97706; } 
-        .bg-vibrant-green { background-color: var(--vibrant-green); }
+        .hover-accent:hover { background-color: #D97706; }
 
         /* Navigation Link Styles - Desktop */
         .nav-link {
@@ -37,7 +36,7 @@
             background-color: #345b85;
         }
         .active-link-desktop {
-            background-color: var(--accent);
+            background-color: var(--accent); 
             font-weight: 600;
             color: var(--brand-dark) !important;
         }
@@ -79,9 +78,9 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans">
 
-    <!-- HEADER AND NAVIGATION -->
+    <!-- EN-TÊTE ET NAVIGATION -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
@@ -92,22 +91,20 @@
                          alt="MindCompta Logo" 
                          onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
                          class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
-                    <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
+                    <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta</span>
                 </a>
 
                 <!-- DESKTOP NAVIGATION -->
                 <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
                     <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="services.html" class="nav-link active-link-desktop">Services (Livre)</a>
+                    <!-- Lien actif pour Services -->
+                    <a href="services.html" class="nav-link active-link-desktop">Services (Livre)</a> 
                     <a href="about.html" class="nav-link">À Propos</a>
                     <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
 
                     <!-- Action Buttons and User Info (Managed by JS) -->
                     <div id="auth-actions-desktop" class="flex items-center space-x-3">
-                        <!-- Default Login Button -->
-                        <a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                            Se Connecter
-                        </a>
+                        <!-- Content managed by JS (checkSessionAndRenderHeader) -->
                     </div>
                 </nav>
 
@@ -129,7 +126,6 @@
         </button>
         <div class="pt-12 space-y-3">
             <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
-
             <a href="index.html" class="mobile-link">Accueil</a>
             <a href="services.html" class="mobile-link active-link-mobile">Services (Livre)</a>
             <a href="about.html" class="mobile-link">À Propos</a>
@@ -137,62 +133,74 @@
 
             <!-- Authentication Actions Container (Filled by JS) -->
             <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
-                <!-- Default Login Button -->
-                <a href="login.html" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
+                <!-- Content managed by JS (checkSessionAndRenderHeader) -->
             </div>
         </div>
     </nav>
     <!-- END MOBILE MENU -->
 
     <!-- CONTENU PRINCIPAL -->
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-16 md:py-24">
+    <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
+        <h1 class="text-4xl font-extrabold text-brand-dark mb-8 mt-4 border-b pb-2 border-accent">
+            Nos Services et Ressources
+        </h1>
 
-        <div class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-brand-dark mb-4">Espace Services : Le Livre Blanc OHADA</h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                Accédez à nos ressources exclusives pour maîtriser le Droit Comptable OHADA.
+        <!-- 1. MESSAGE NÉCESSITANT UNE CONNEXION (Affiché par défaut si non connecté) -->
+        <div id="login-required-message" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-lg shadow-lg text-center my-10 hidden">
+            <h2 class="text-2xl font-bold mb-3">Accès Restreint</h2>
+            <p class="text-lg mb-6">
+                Pour télécharger notre livre exclusif et accéder à nos ressources complètes, veuillez vous connecter ou vous inscrire.
             </p>
-        </div>
-
-        <!-- Contenu conditionnel basé sur la connexion -->
-        <div id="service-content-gated" class="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-gray-200">
-            <!-- Ce contenu sera affiché si l'utilisateur est connecté -->
-            <h2 class="text-3xl font-bold text-vibrant-green mb-6">Contenu Premium Débloqué</h2>
-            <div class="space-y-6 text-gray-700">
-                
-                <h3 class="text-2xl font-semibold text-brand-dark border-b pb-2">1. Le Guide Complet de la Fiscalité OHADA</h3>
-                <p>Ce guide détaille les obligations fiscales spécifiques à l'espace UEMOA, incluant la TVA, les impôts sur les sociétés, et les règles de déclaration pour les PME. Mises à jour trimestrielles garanties.</p>
-
-                <h3 class="text-2xl font-semibold text-brand-dark border-b pb-2">2. Outils de Calcul d'Amortissement</h3>
-                <p>Accès à des simulateurs interactifs basés sur le référentiel comptable OHADA pour calculer avec précision les amortissements linéaires, dégressifs et par unités d'œuvre. Évitez les redressements fiscaux.</p>
-
-                <h3 class="text-2xl font-semibold text-brand-dark border-b pb-2">3. Modèles de Rapports Financiers</h3>
-                <p>Téléchargez des modèles de documents pré-formatés (Bilan, Compte de Résultat, État des Flux de Trésorerie) conformes aux exigences de l'OHADA, prêts à l'emploi.</p>
-
-                <div class="text-center mt-10">
-                    <a href="#" class="inline-flex items-center bg-vibrant-green text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-emerald-700 transition duration-300">
-                        <!-- Icône de téléchargement -->
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2v-4a2 2 0 012-2h10a2 2 0 012 2v4a2 2 0 01-2 2z"></path></svg>
-                        Télécharger le Livre Blanc
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Contenu affiché si l'utilisateur est déconnecté -->
-        <div id="service-content-locked" class="bg-red-100 p-8 rounded-xl shadow-inner border-2 border-red-300 text-center hidden">
-            <div class="text-red-600 text-5xl mb-4">🔒</div>
-            <h2 class="text-3xl font-bold text-red-700 mb-3">Accès Limité</h2>
-            <p class="text-xl text-red-600 mb-6">
-                Le contenu exclusif du Livre Blanc est réservé aux membres connectés.
-            </p>
-            <p class="text-gray-700 mb-8">
-                Veuillez vous connecter pour accéder aux guides, simulateurs et modèles OHADA premium.
-            </p>
-            <a href="login.html" class="inline-block bg-accent text-brand-dark font-bold py-3 px-8 rounded-full shadow-xl hover-accent transition duration-300 transform hover:scale-105">
-                Se Connecter Maintenant
+            <a href="login.html" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-red-500 hover:bg-red-600 transition duration-300 transform hover:scale-[1.02]">
+                Se Connecter pour Accéder au Livre
             </a>
         </div>
+
+        <!-- 2. BLOC PRINCIPAL DU LIVRE (Affiché uniquement si connecté) -->
+        <div id="book-access-area" class="bg-white rounded-xl shadow-2xl p-6 sm:p-10 flex flex-col lg:flex-row gap-8 items-center">
+            
+            <!-- COUVERTURE SIMULÉE DU LIVRE (Placeholder) -->
+            <div class="w-full lg:w-1/3 flex justify-center">
+                <div class="w-48 h-64 sm:w-64 sm:h-80 bg-gray-200 border-4 border-gray-800 rounded-lg shadow-xl transform hover:scale-[1.02] transition duration-300 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-cover bg-center flex flex-col justify-between p-4 text-center" 
+                         style="background-image: url('https://placehold.co/600x800/1E3A8A/ffffff?text=Livre+Comptable%0AMindCompta');">
+                        <span class="text-lg font-bold">MindCompta</span>
+                        <h2 class="text-2xl font-black leading-tight">Le Guide du Comptable Moderne</h2>
+                        <span class="text-sm">Par Josué Kplowodokpo-Hue</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DÉTAILS ET LIEN DE TÉLÉCHARGEMENT -->
+            <div class="w-full lg:w-2/3 space-y-6">
+                <h2 class="text-3xl font-bold text-gray-800">
+                    Téléchargez Votre Livre Exclusif
+                </h2>
+                <p class="text-lg text-gray-600">
+                    Félicitations ! En tant qu'utilisateur connecté, vous avez un accès complet à notre guide indispensable sur les pratiques comptables essentielles pour les entreprises modernes.
+                </p>
+                
+                <ul class="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                    <li>Principes de la comptabilité simplifiée.</li>
+                    <li>Outils et techniques pour l'optimisation fiscale.</li>
+                    <li>Études de cas pratiques.</li>
+                </ul>
+
+                <!-- BOUTON DE TÉLÉCHARGEMENT -->
+                <a href="https://github.com/josuekplowodokpo-hue/MindCompta-/blob/Index/comptable.pdf" 
+                   target="_blank" 
+                   class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-brand-dark bg-vibrant-green hover:bg-opacity-90 transition duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-vibrant-green focus:ring-opacity-50">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Télécharger Maintenant (PDF)
+                </a>
+
+                <p class="text-sm text-gray-500 pt-2">
+                    Le fichier s'ouvrira dans un nouvel onglet pour la consultation ou le téléchargement.
+                </p>
+            </div>
+        </div>
+        <!-- FIN BLOC PRINCIPAL DU LIVRE -->
+
     </main>
 
     <!-- PIED DE PAGE -->
@@ -200,51 +208,43 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- JAVASCRIPT LOGIC AND AUTHENTICATION (LOCAL STORAGE) -->
-    <script type="module">
-        // Page de redirection en cas de déconnexion ou d'accès non autorisé
+    <!-- LOGIQUE JAVASCRIPT GLOBALE & GESTION DE LA SESSION -->
+    <script>
+        // Page de redirection par défaut 
         const REDIRECTION_PAGE = 'login.html'; 
-        const ADMIN_ROLE = 'Admin';
-
-        // --- GESTION DE LA SESSION ---
+        const ADMIN_ROLE = 'admin';
 
         /** Gère la déconnexion de l'utilisateur. */
-        function handleLogout() {
+        window.handleLogout = () => {
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('userEmail');
             localStorage.removeItem('userName');
             localStorage.removeItem('userRole');
-            window.location.href = 'index.html'; 
-        }
+            window.location.href = REDIRECTION_PAGE; 
+        };
 
         /**
-         * Vérifie l'état de la session et met à jour l'interface utilisateur et le contenu de la page.
+         * Vérifie l'état de la session et met à jour l'interface utilisateur.
          */
         function checkSessionAndRenderHeader() {
             const userName = localStorage.getItem('userName');
             const userRole = localStorage.getItem('userRole');
-
             const desktopActions = document.getElementById('auth-actions-desktop');
             const mobileActions = document.getElementById('auth-actions-mobile');
             
-            const gatedContent = document.getElementById('service-content-gated');
-            const lockedContent = document.getElementById('service-content-locked');
-
             // --- Utilisateur Connecté ---
             if (userName) {
-                const isUserAdmin = userRole === ADMIN_ROLE;
-
-                // Afficher le contenu Gated
-                gatedContent.classList.remove('hidden');
-                lockedContent.classList.add('hidden');
-
-                // 1. Desktop Actions (Cache "Se Connecter" et affiche le profil/déconnexion)
-                const adminButtonHtml = isUserAdmin 
-                    ? `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
-                    : '';
+                const isAdmin = userRole?.toLowerCase() === ADMIN_ROLE;
                 
+                let adminLinkHtml = isAdmin ? `
+                    <a href="admin.html" class="nav-link bg-red-500 hover:bg-red-600">Admin</a>
+                ` : '';
+
+                // 1. Desktop Actions 
                 desktopActions.innerHTML = `
-                    ${adminButtonHtml}
-                    <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
-                        <span class="hidden sm:inline">Bienvenue,</span> ${userName}
+                    ${adminLinkHtml}
+                    <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600 hidden lg:inline">
+                        Bienvenue, ${userName}
                     </span>
                     <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
                         Déconnexion
@@ -253,25 +253,19 @@
 
                 // 2. Mobile Actions
                 mobileActions.innerHTML = `
-                    ${isUserAdmin ? 
-                        `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
-                        : ''}
                     <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
-                    <p class="text-white text-md font-semibold mb-3">${userName}</p>
+                    <p class="text-white text-md font-semibold mb-3">${userName} (${userRole || 'Utilisateur'})</p>
+                    ${isAdmin ? '<a href="admin.html" class="mobile-link bg-red-500 mobile-link-btn mb-3">Admin</a>' : ''}
                     <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
                 `;
 
                 // 3. Attacher les écouteurs de déconnexion
-                document.getElementById('logout-desktop-btn')?.addEventListener('click', handleLogout);
-                document.getElementById('logout-mobile-btn')?.addEventListener('click', handleLogout);
+                document.getElementById('logout-desktop-btn')?.addEventListener('click', window.handleLogout);
+                document.getElementById('logout-mobile-btn')?.addEventListener('click', window.handleLogout);
                 
             } else {
                 // --- Utilisateur Déconnecté ---
                 
-                // Afficher le contenu Verrouillé
-                gatedContent.classList.add('hidden');
-                lockedContent.classList.remove('hidden');
-
                 // 1. Desktop Actions (Affiche uniquement "Se Connecter")
                 desktopActions.innerHTML = `
                     <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
@@ -285,6 +279,26 @@
                 `;
             }
         }
+
+        /**
+         * Gère l'affichage du contenu basé sur l'état d'authentification.
+         */
+        function checkContentAccess() {
+            const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+            const bookArea = document.getElementById('book-access-area');
+            const loginRequired = document.getElementById('login-required-message');
+
+            if (isAuthenticated) {
+                // Montrer le contenu du livre, cacher le message de connexion
+                bookArea.classList.remove('hidden');
+                loginRequired.classList.add('hidden');
+            } else {
+                // Cacher le contenu du livre, montrer le message de connexion
+                bookArea.classList.add('hidden');
+                loginRequired.classList.remove('hidden');
+            }
+        }
+
 
         // --- GESTIONNAIRE DU MENU MOBILE (Off-Canvas) ---
         const elements = {
@@ -310,9 +324,14 @@
         elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
         elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
 
-        // --- Exécution principale ---
-        document.addEventListener('DOMContentLoaded', checkSessionAndRenderHeader);
 
+        // Exécution au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+             // 1. Rendu de l'en-tête (gestion des boutons Se Connecter / Déconnexion)
+             checkSessionAndRenderHeader();
+             // 2. Gérer l'affichage conditionnel du contenu du livre
+             checkContentAccess();
+        });
     </script>
 </body>
 </html>
