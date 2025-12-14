@@ -7,23 +7,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        /* Importer la police Inter */
+        /* Import the Inter font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
-        /* Couleurs de la marque (Uniformisées) */
+        /* Brand Colors (Standardized) */
         :root {
-            --brand-dark: #1E3A8A; /* Bleu Profond */
-            --accent: #F59E0B; /* Orange Vif / Or */
+            --brand-dark: #1E3A8A; /* Deep Blue (Indigo-900) */
+            --accent: #F59E0B; /* Vivid Orange / Gold (Amber-500) */
+            --vibrant-green: #10B981; /* Bright Green (Emerald-500) */
             font-family: 'Inter', sans-serif;
         }
 
-        /* Classes Tailwind personnalisées pour les couleurs */
+        /* Custom Tailwind classes for colors */
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-        .hover-accent:hover { background-color: #D97706; } /* Variante de l'Orange pour le hover */
+        .hover-accent:hover { background-color: #D97706; } 
+        .bg-vibrant-green { background-color: var(--vibrant-green); }
 
-        /* Styles de liens de navigation Desktop */
+        /* Navigation Link Styles - Desktop */
         .nav-link {
             color: white;
             font-weight: 500;
@@ -34,14 +36,13 @@
         .nav-link:hover {
             background-color: #345b85;
         }
-        /* Lien actif pour Desktop */
         .active-link-desktop {
             background-color: var(--accent);
             font-weight: 600;
             color: var(--brand-dark) !important;
         }
 
-        /* --- STYLE DU MENU MOBILE (Off-Canvas) --- */
+        /* Mobile Menu Styles (Off-Canvas) */
         #mobile-menu {
             transform: translateX(100%);
             transition: transform 0.3s ease-in-out;
@@ -50,7 +51,7 @@
         #mobile-menu.open {
             transform: translateX(0);
         }
-        /* Superposition */
+        /* Overlay */
         #mobile-menu-overlay {
             display: none; 
             z-index: 40;
@@ -58,8 +59,6 @@
         #mobile-menu-overlay.open {
             display: block;
         }
-
-        /* Styles de liens de navigation Mobile */
         .mobile-link {
             display: block;
             padding: 0.75rem 1rem;
@@ -68,10 +67,6 @@
             border-radius: 0.5rem;
             transition: background-color 0.2s;
         }
-        .mobile-link:hover {
-            background-color: #345b85;
-        }
-        /* Lien actif pour Mobile */
         .mobile-link.active-link-mobile {
             background-color: var(--accent);
             color: var(--brand-dark);
@@ -82,34 +77,16 @@
              width: 100%;
              text-align: center;
         }
-
-        /* Conteneur pour assurer le ratio 16:9 des vidéos sur tous les écrans */
-        .video-container {
-            position: relative;
-            width: 100%;
-            padding-bottom: 56.25%; /* Ratio 16:9 */
-            height: 0;
-            overflow: hidden;
-            border-radius: 0.75rem; /* rounded-xl */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
-        }
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- EN-TÊTE ET NAVIGATION -->
+    <!-- HEADER AND NAVIGATION -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
 
-                <!-- LOGO/MARQUE (CLIQUABLE VERS INDEX.HTML) -->
+                <!-- LOGO/BRAND (CLICKABLE) -->
                 <a href="index.html" class="flex items-center group">
                     <img src="logo.jpg" 
                          alt="MindCompta Logo" 
@@ -118,23 +95,23 @@
                     <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
                 </a>
 
-                <!-- NAVIGATION DESKTOP -->
+                <!-- DESKTOP NAVIGATION -->
                 <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
                     <a href="index.html" class="nav-link">Accueil</a>
                     <a href="services.html" class="nav-link">Services (Livre)</a>
                     <a href="about.html" class="nav-link">À Propos</a>
-                    <a href="youtube.html" class="nav-link active-link-desktop text-brand-dark">Vidéos YouTube</a>
+                    <a href="youtube.html" class="nav-link active-link-desktop">Vidéos YouTube</a>
 
-                    <!-- Boutons d'Action (Gérés par JS) -->
+                    <!-- Action Buttons and User Info (Managed by JS) -->
                     <div id="auth-actions-desktop" class="flex items-center space-x-3">
-                        <!-- Le bouton de connexion par défaut sera remplacé par JS -->
-                        <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+                        <!-- Default Login Button -->
+                        <a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
                             Se Connecter
                         </a>
                     </div>
                 </nav>
 
-                <!-- BOUTON MENU MOBILE -->
+                <!-- MOBILE MENU BUTTON -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -144,7 +121,7 @@
         </div>
     </header>
 
-    <!-- MENU MOBILE OFF-CANVAS -->
+    <!-- MOBILE MENU OFF-CANVAS -->
     <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
     <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
         <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none">
@@ -156,89 +133,65 @@
             <a href="index.html" class="mobile-link">Accueil</a>
             <a href="services.html" class="mobile-link">Services (Livre)</a>
             <a href="about.html" class="mobile-link">À Propos</a>
-            <a href="youtube.html" class="mobile-link active-link-mobile text-brand-dark">Vidéos YouTube</a>
+            <a href="youtube.html" class="mobile-link active-link-mobile">Vidéos YouTube</a>
 
-            <!-- Boutons d'Action Mobile (Gérés par JS) -->
+            <!-- Authentication Actions Container (Filled by JS) -->
             <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
-                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
+                <!-- Default Login Button -->
+                <a href="login.html" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
             </div>
         </div>
     </nav>
-    <!-- FIN MENU MOBILE -->
-
+    <!-- END MOBILE MENU -->
 
     <!-- CONTENU PRINCIPAL -->
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
+    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-16 md:py-24">
 
-        <h1 class="text-4xl font-extrabold text-brand-dark mb-4 mt-4 text-center">
-            Notre Chaîne YouTube : Guides & Tutoriels
-        </h1>
-        <p class="text-center text-xl text-gray-600 mb-12">
-            Découvrez nos dernières analyses sur la conformité OHADA, la fiscalité et la gestion financière.
-        </p>
-
-        <!-- Grille de Vidéos -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-            <!-- Vidéo 1: L'essentiel de l'OHADA -->
-            <div class="bg-white p-4 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
-                <div class="video-container mb-3">
-                    <!-- Remplacez l'ID de la vidéo (dQw4w9WgXcQ) par l'ID de votre vidéo -->
-                    <iframe 
-                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-                        title="YouTube video player - OHADA" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-1">Maîtriser le Droit OHADA en 10 minutes</h3>
-                <p class="text-sm text-gray-600">Un guide rapide pour comprendre les principes fondamentaux du droit des affaires africain.</p>
-            </div>
-
-            <!-- Vidéo 2: Optimisation Fiscale -->
-            <div class="bg-white p-4 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
-                <div class="video-container mb-3">
-                    <!-- Remplacez l'ID de la vidéo (oHg5SJYRHA0) par l'ID de votre vidéo -->
-                    <iframe 
-                        src="https://www.youtube.com/embed/oHg5SJYRHA0" 
-                        title="YouTube video player - Fiscalité" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-1">Les 5 astuces pour optimiser sa fiscalité en 2025</h3>
-                <p class="text-sm text-gray-600">Nos experts décryptent les nouveautés fiscales pour les PME en Afrique de l'Ouest.</p>
-            </div>
-
-            <!-- Vidéo 3: Gestion de Trésorerie -->
-            <div class="bg-white p-4 rounded-xl shadow-lg hover:shadow-2xl transition duration-300">
-                <div class="video-container mb-3">
-                    <!-- Remplacez l'ID de la vidéo (EE-xtCF304Y) par l'ID de votre vidéo -->
-                    <iframe 
-                        src="https://www.youtube.com/embed/EE-xtCF304Y" 
-                        title="YouTube video player - Trésorerie" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-1">Comment éviter les problèmes de trésorerie</h3>
-                <p class="text-sm text-gray-600">Méthodes simples et efficaces pour une gestion proactive de votre liquidité.</p>
-            </div>
-
-            <!-- Ajoutez plus de vidéos ici au besoin -->
-
+        <div class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-brand-dark mb-4">Vidéos YouTube : Apprenez le Droit OHADA</h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Consultez nos tutoriels et analyses vidéo pour une compréhension visuelle des réglementations.
+            </p>
         </div>
 
-        <div class="text-center mt-12 mb-6">
-            <a href="https://youtube.com/@mindcompta-info?si=LY336pOcyBtM3YkN" target="_blank" class="bg-red-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-red-700 transition duration-300 flex items-center justify-center space-x-2 max-w-xs mx-auto">
-                <!-- Icône YouTube -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.228 0-3.978.271-4.321.439-4.387 4.199 0 3.76.046 8.356 0 12.115.066 3.761.409 3.929 4.387 4.199 3.601.246 11.628.246 15.228 0 3.979-.27 4.321-.438 4.387-4.199-.046-3.759-.001-8.355 0-12.115-.066-3.761-.408-3.929-4.387-4.199zm-5.718 10.885v-4.39l4.577 2.195-4.577 2.195z"/></svg>
-                <span>Visiter la Chaîne MindCompta</span>
-            </a>
-        </div>
+        <section class="grid md:grid-cols-2 gap-8">
+            <!-- Vidéo 1 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                <div class="aspect-w-16 aspect-h-9">
+                    <!-- Placeholder pour vidéo YouTube. Remplacer par un véritable iframe -->
+                    <div class="h-64 bg-gray-700 flex items-center justify-center text-white text-lg font-semibold">
+                        [Vidéo Placeholder : Fiscalité des Sociétés]
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-brand-dark mb-2">Décryptage : Les Nouveautés Fiscales UEMOA 2025</h3>
+                    <p class="text-gray-600 text-sm">Une analyse détaillée des dernières modifications réglementaires ayant un impact sur votre entreprise.</p>
+                </div>
+            </div>
+
+            <!-- Vidéo 2 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                <div class="aspect-w-16 aspect-h-9">
+                    <!-- Placeholder pour vidéo YouTube. Remplacer par un véritable iframe -->
+                    <div class="h-64 bg-gray-700 flex items-center justify-center text-white text-lg font-semibold">
+                        [Vidéo Placeholder : Comptabilité]
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-brand-dark mb-2">Tutoriel : Enregistrer les Opérations de Fin d'Exercice</h3>
+                    <p class="text-gray-600 text-sm">Étape par étape, comment préparer votre comptabilité de fin d'exercice selon les normes OHADA.</p>
+                </div>
+            </div>
+
+            <!-- Bouton vers la chaîne YouTube -->
+            <div class="md:col-span-2 text-center mt-8">
+                <a href="https://www.youtube.com/channel/votre_chaine" target="_blank" class="inline-flex items-center bg-red-500 text-white font-bold py-3 px-8 rounded-full shadow-xl hover:bg-red-600 transition duration-300 transform hover:scale-105">
+                    <!-- Icône YouTube (SVG standard) -->
+                    <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M21.543 7.104c-.114-.403-.385-.75-.789-.864-1.22-.33-6.108-.33-6.108-.33h-.002s-4.888 0-6.108.33c-.404.114-.675.461-.789.864-.33 1.22-.33 6.108-.33 6.108s0 4.888.33 6.108c.114.403.385.75.789.864 1.22.33 6.108.33 6.108.33s4.888 0 6.108-.33c.404-.114.675-.461.789-.864.33-1.22.33-6.108.33-6.108s0-4.888-.33-6.108zm-12.262 5.865V9.452l4.464 2.164-4.464 2.164z"/></svg>
+                    Voir toute la chaîne
+                </a>
+            </div>
+        </section>
 
     </main>
 
@@ -247,20 +200,19 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT AUTH & MENU (LOCAL STORAGE) -->
+    <!-- JAVASCRIPT LOGIC AND AUTHENTICATION (LOCAL STORAGE) -->
     <script type="module">
-        // Page de redirection en cas de déconnexion
+        // Page de redirection en cas de déconnexion ou d'accès non autorisé
         const REDIRECTION_PAGE = 'login.html'; 
+        const ADMIN_ROLE = 'Admin';
 
         // --- GESTION DE LA SESSION ---
-        
+
         /** Gère la déconnexion de l'utilisateur. */
         function handleLogout() {
-            // Suppression des informations de session du stockage local
             localStorage.removeItem('userName');
             localStorage.removeItem('userRole');
-            // Redirection vers la page de connexion
-            window.location.href = REDIRECTION_PAGE;
+            window.location.href = 'index.html'; 
         }
 
         /**
@@ -269,51 +221,58 @@
         function checkSessionAndRenderHeader() {
             const userName = localStorage.getItem('userName');
             const userRole = localStorage.getItem('userRole');
-            
+
             const desktopActions = document.getElementById('auth-actions-desktop');
             const mobileActions = document.getElementById('auth-actions-mobile');
-            
-            // Si pas de nom d'utilisateur, affichons seulement le bouton de connexion
-            if (!userName) {
+
+            // --- Utilisateur Connecté ---
+            if (userName) {
+                const isUserAdmin = userRole === ADMIN_ROLE;
+
+                // 1. Desktop Actions (Cache "Se Connecter" et affiche le profil/déconnexion)
+                const adminButtonHtml = isUserAdmin 
+                    ? `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
+                    : '';
+                
+                desktopActions.innerHTML = `
+                    ${adminButtonHtml}
+                    <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
+                        <span class="hidden sm:inline">Bienvenue,</span> ${userName}
+                    </span>
+                    <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
+                        Déconnexion
+                    </button>
+                `;
+
+                // 2. Mobile Actions
+                mobileActions.innerHTML = `
+                    ${isUserAdmin ? 
+                        `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
+                        : ''}
+                    <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
+                    <p class="text-white text-md font-semibold mb-3">${userName}</p>
+                    <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
+                `;
+
+                // 3. Attacher les écouteurs de déconnexion
+                document.getElementById('logout-desktop-btn')?.addEventListener('click', handleLogout);
+                document.getElementById('logout-mobile-btn')?.addEventListener('click', handleLogout);
+                
+            } else {
+                // --- Utilisateur Déconnecté ---
+                
+                // 1. Desktop Actions (Affiche uniquement "Se Connecter")
                 desktopActions.innerHTML = `
                     <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
                         Se Connecter
                     </a>
                 `;
+
+                // 2. Mobile Actions
                 mobileActions.innerHTML = `
                     <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
                 `;
-                return;
             }
-            
-            // --- Utilisateur Connecté ---
-            
-            // 1. Affichage du nom d'utilisateur et du bouton de déconnexion (Desktop)
-            desktopActions.innerHTML = `
-                ${userRole === 'Admin' ? 
-                    `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
-                    : ''}
-                <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
-                    <span class="hidden sm:inline">Bienvenue,</span> ${userName}
-                </span>
-                <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
-                    Déconnexion
-                </button>
-            `;
-
-            // 2. Affichage du nom d'utilisateur et du bouton de déconnexion (Mobile)
-            mobileActions.innerHTML = `
-                ${userRole === 'Admin' ? 
-                    `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3">Admin</a>`
-                    : ''}
-                <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
-                <p class="text-white text-md font-semibold mb-3">${userName}</p>
-                <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
-            `;
-
-            // 3. Attacher les écouteurs d'événements de déconnexion aux éléments dynamiques
-            document.getElementById('logout-desktop-btn')?.addEventListener('click', handleLogout);
-            document.getElementById('logout-mobile-btn')?.addEventListener('click', handleLogout);
         }
 
         // --- GESTIONNAIRE DU MENU MOBILE (Off-Canvas) ---
@@ -339,10 +298,10 @@
         elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
         elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
         elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
-        
+
         // --- Exécution principale ---
         document.addEventListener('DOMContentLoaded', checkSessionAndRenderHeader);
-        
+
     </script>
 </body>
 </html>
