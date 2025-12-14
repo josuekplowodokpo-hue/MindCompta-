@@ -3,18 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCompta - Services</title>
+    <title>MindCompta - Services (Livre)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .bg-brand-dark { background-color: #0d47a1; }
-        .text-brand-dark { color: #0d47a1; }
-        .bg-accent { background-color: #42a5f5; }
-        .hover-accent:hover { background-color: #1e88e5; }
-        .nav-link { @apply text-sm font-medium hover:text-gray-200 transition duration-200; }
-        .mobile-link { @apply block py-2 px-3 text-base font-medium rounded-lg hover:bg-[#345b85] transition duration-200; }
-        .active-link { color: #42a5f5; font-weight: 600; }
+        /* Importer la police Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        /* Couleurs de la marque (Uniformisées avec index.html) */
+        :root {
+            --brand-dark: #1E3A8A; /* Bleu Profond */
+            --accent: #F59E0B; /* Orange Vif / Or */
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Classes Tailwind personnalisées pour les couleurs */
+        .bg-brand-dark { background-color: var(--brand-dark); }
+        .text-brand-dark { color: var(--brand-dark); }
+        .bg-accent { background-color: var(--accent); }
+        .hover-accent:hover { background-color: #D97706; } /* Variante de l'Orange pour le hover */
+
+        /* Styles de liens de navigation Desktop */
+        .nav-link {
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .nav-link:hover {
+            background-color: #345b85;
+        }
+        /* Lien actif pour Desktop */
+        .active-link-desktop {
+            background-color: var(--accent);
+            font-weight: 600;
+            color: var(--brand-dark) !important;
+        }
+
+        /* --- STYLE DU MENU MOBILE (Off-Canvas) --- */
+        #mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 50; 
+        }
+        #mobile-menu.open {
+            transform: translateX(0);
+        }
+        /* Superposition */
+        #mobile-menu-overlay {
+            display: none; 
+            z-index: 40;
+        }
+        #mobile-menu-overlay.open {
+            display: block;
+        }
+
+        /* Styles de liens de navigation Mobile */
+        .mobile-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .mobile-link:hover {
+            background-color: #345b85;
+        }
+        /* Lien actif pour Mobile */
+        .mobile-link.active-link-mobile {
+            background-color: var(--accent);
+            color: var(--brand-dark);
+            font-weight: 700;
+        }
+        .mobile-link-btn {
+             display: block;
+             width: 100%;
+             text-align: center;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -23,55 +90,81 @@
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
-                <div class="flex items-center">
+                
+                <!-- LOGO/MARQUE (CLIQUABLE VERS INDEX.HTML) -->
+                <a href="index.html" class="flex items-center group">
                     <img src="logo.jpg" 
                          alt="MindCompta Logo" 
-                         class="h-10 w-auto rounded-full mr-3 border-2 border-white">
-                    <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
-                </div>
-                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-6">
+                         onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
+                         class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
+                    <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
+                </a>
+
+                <!-- NAVIGATION DESKTOP -->
+                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
                     <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="services.html" class="nav-link active-link bg-accent py-2 px-4 rounded-lg">Services (Livre)</a>
+                    <a href="services.html" class="nav-link active-link-desktop">Services (Livre)</a>
                     <a href="about.html" class="nav-link">À Propos</a>
                     <a href="calculator.html" class="nav-link">Calculatrice</a>
+                    
                     <!-- Lien Admin (visible si connecté) -->
-                    <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-lg hidden">Admin</a> 
+                    <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-full hidden text-white hover:bg-red-500">Admin</a> 
 
-                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white hidden">
+                    <!-- Boutons d'Action -->
+                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
                         Se Connecter
                     </a>
-                    <button onclick="handleSignOut()" id="nav-logout-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white hidden">
+                    <button id="nav-logout-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white hidden">
                         Déconnexion
                     </button>
                 </nav>
+                
+                <!-- BOUTON MENU MOBILE -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
                 </button>
             </div>
-            <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
-                <a href="index.html" class="mobile-link">Accueil</a>
-                <a href="services.html" class="mobile-link bg-accent text-center font-semibold text-white py-3 active-link">Services (Livre)</a>
-                <a href="about.html" class="mobile-link">À Propos</a>
-                <a href="calculator.html" class="mobile-link">Calculatrice</a>
-                 <!-- Lien Admin Mobile (visible si connecté) -->
-                <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-400 text-center font-semibold text-white py-3 hidden">Admin</a>
-
-                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3 hidden">Se Connecter</a>
-                <button onclick="handleSignOut()" id="mobile-logout-btn" class="mobile-link bg-red-500 text-center font-semibold hover:bg-red-600 text-white py-3 hidden w-full">Déconnexion</button>
-            </nav>
         </div>
     </header>
 
+    <!-- MENU MOBILE OFF-CANVAS -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
+        <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none">
+            &times;
+        </button>
+        <div class="pt-12 space-y-3">
+            <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
+            
+            <a href="index.html" class="mobile-link">Accueil</a>
+            <a href="services.html" class="mobile-link active-link-mobile">Services (Livre)</a>
+            <a href="about.html" class="mobile-link">À Propos</a>
+            <a href="calculator.html" class="mobile-link">Calculatrice</a>
+            
+            <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 hidden">Admin</a>
+
+            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3">
+                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
+                <button id="mobile-logout-btn" class="mobile-link bg-red-500 mobile-link-btn text-white hidden">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+    <!-- FIN MENU MOBILE -->
+
+
     <!-- CONTENU PRINCIPAL -->
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
+        
         <h1 class="text-4xl font-extrabold text-brand-dark mb-10 mt-4 text-center">
             Notre Offre de Services et Contenus (Livre)
         </h1>
 
         <!-- Grille de Services -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            
-            <!-- Service 1: Conseil Financier -->
+
+            <!-- Service 1: Conseil Financier (FREE) -->
             <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent hover:shadow-2xl transition duration-300">
                 <div class="text-accent text-4xl mb-4">💰</div>
                 <h3 class="text-2xl font-bold text-gray-800 mb-3">Conseil en Gestion & Financement</h3>
@@ -86,7 +179,7 @@
                 <a href="contact.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">En savoir plus →</a>
             </div>
 
-            <!-- Service 2: Conformité OHADA -->
+            <!-- Service 2: Conformité OHADA (FREE) -->
             <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent hover:shadow-2xl transition duration-300">
                 <div class="text-accent text-4xl mb-4">📜</div>
                 <h3 class="text-2xl font-bold text-gray-800 mb-3">Conformité Réglementaire OHADA</h3>
@@ -101,22 +194,41 @@
                 <a href="contact.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Demander un Audit →</a>
             </div>
 
-            <!-- Service 3: Contenu Éducatif (Le Livre) -->
-            <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent hover:shadow-2xl transition duration-300">
-                <div class="text-accent text-4xl mb-4">📚</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Accès Exclusif au "Livre Blanc"</h3>
-                <p class="text-gray-600 mb-4 font-bold">
-                    Toute notre documentation, études de cas et guides pratiques sur la comptabilité et la fiscalité en Afrique de l'Ouest.
-                </p>
-                <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
-                    <li>Guides complets (PDF, Ebook).</li>
-                    <li>Analyses de jurisprudence OHADA.</li>
-                    <li>Modèles et formulaires financiers.</li>
-                </ul>
-                <a href="#" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Lire le Chapitre 1 →</a>
+            <!-- Service 3: Contenu Éducatif (Le Livre) - PREMIUM (TOOGLE) -->
+            <div id="service-premium-card" class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-500 hover:shadow-2xl transition duration-300 relative overflow-hidden">
+                <h3 class="text-2xl font-bold text-gray-800 mb-3 flex items-center">
+                    <span class="text-red-500 text-3xl mr-3">⭐</span> Accès Exclusif au "Livre Blanc"
+                </h3>
+
+                <!-- Contenu DÉVERROUILLÉ (Affiché si connecté) -->
+                <div id="premium-content-unlocked">
+                    <p class="text-gray-600 mb-4 font-bold">
+                        Toute notre documentation, études de cas et guides pratiques sur la comptabilité et la fiscalité en Afrique de l'Ouest.
+                    </p>
+                    <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
+                        <li>Guides complets (PDF, Ebook).</li>
+                        <li>Analyses de jurisprudence OHADA.</li>
+                        <li>Modèles et formulaires financiers.</li>
+                    </ul>
+                    <a href="#" class="mt-4 inline-block bg-brand-dark text-white font-semibold py-2 px-4 rounded-full hover:bg-red-700 transition duration-200 shadow-md">
+                        Lire le Chapitre 1 →
+                    </a>
+                </div>
+
+                <!-- Contenu VERROUILLÉ (Affiché si déconnecté) -->
+                <div id="premium-content-locked" class="absolute inset-0 bg-white bg-opacity-95 backdrop-blur-sm flex flex-col items-center justify-center p-6 rounded-xl border-t-4 border-red-500">
+                    <div class="text-red-500 text-5xl mb-3">🔒</div>
+                    <p class="text-lg font-bold text-gray-800 mb-4 text-center">Contenu Membre</p>
+                    <p class="text-sm text-gray-600 mb-6 text-center px-2">
+                        Veuillez vous connecter pour déverrouiller ce Livre Blanc exclusif.
+                    </p>
+                    <a href="login.html" class="bg-accent text-white font-bold py-2 px-5 rounded-full hover-accent transition duration-300 shadow-lg">
+                        Se Connecter / S'inscrire
+                    </a>
+                </div>
             </div>
-            
-             <!-- Service 4: Support Technique -->
+
+            <!-- Service 4: Support Technique (FREE) -->
             <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent hover:shadow-2xl transition duration-300">
                 <div class="text-accent text-4xl mb-4">🛠️</div>
                 <h3 class="text-2xl font-bold text-gray-800 mb-3">Support Technique Dédié</h3>
@@ -132,17 +244,6 @@
             </div>
         </div>
 
-        <!-- Message d'Authentification (caché par défaut) -->
-        <div id="auth-check-message" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
-            <div class="bg-white p-8 rounded-xl shadow-2xl text-center max-w-sm">
-                <p class="text-2xl font-bold text-red-600 mb-4">Accès Restreint</p>
-                <p class="text-gray-700 mb-6">Ce contenu premium est réservé aux membres connectés.</p>
-                <a href="login.html" class="bg-accent text-white font-bold py-3 px-6 rounded-full hover-accent transition duration-300 shadow-lg">
-                    Se Connecter Maintenant
-                </a>
-            </div>
-        </div>
-
     </main>
 
     <!-- PIED DE PAGE -->
@@ -151,13 +252,12 @@
     </footer>
 
     <!-- LOGIQUE JAVASCRIPT ET VÉRIFICATION D'ACCÈS -->
-    <script type="module" src="script.js"></script>
     <script type="module">
         // Import des modules Firebase nécessaires
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-        
-        // Configuration Firebase (Doit correspondre à script.js)
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+
+        // Configuration Firebase (Identique à index.html)
         const firebaseConfig = {
             apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
             authDomain: "mindcompta-cbb69.firebaseapp.com",
@@ -167,63 +267,113 @@
             appId: "1:470368630296:web:510de914f335b27b3d356d",
             measurementId: "G-SKSVSV0H70"
         };
-        
+
         let auth;
         if (firebaseConfig.apiKey) {
-            const app = initializeApp(firebaseConfig);
+            let app;
+            if (!getApps().length) {
+                app = initializeApp(firebaseConfig);
+            } else {
+                app = getApp();
+            }
             auth = getAuth(app);
-            
-            // Écouteur pour vérifier l'état de l'authentification
-            onAuthStateChanged(auth, (user) => {
-                const checkMessage = document.getElementById('auth-check-message');
-                const navLoginBtn = document.getElementById('nav-login-btn');
-                const navLogoutBtn = document.getElementById('nav-logout-btn');
-                const navAdminBtn = document.getElementById('nav-admin-btn');
-                const mobileLoginBtn = document.getElementById('mobile-login-btn');
-                const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
-                const mobileAdminBtn = document.getElementById('mobile-admin-btn');
+            console.log("Firebase Auth Initialized.");
 
-                // 1. Gérer l'affichage des boutons de navigation
-                if (user && !user.isAnonymous) {
-                    // Utilisateur connecté (authentifié)
-                    if (navLoginBtn) navLoginBtn.classList.add('hidden');
-                    if (navLogoutBtn) navLogoutBtn.classList.remove('hidden');
-                    if (navAdminBtn) navAdminBtn.classList.remove('hidden');
-                    if (mobileLoginBtn) mobileLoginBtn.classList.add('hidden');
-                    if (mobileLogoutBtn) mobileLogoutBtn.classList.remove('hidden');
-                    if (mobileAdminBtn) mobileAdminBtn.classList.remove('hidden');
-
-                    // Masquer le message d'accès restreint
-                    if (checkMessage) checkMessage.classList.add('hidden');
-
-                } else {
-                    // Utilisateur déconnecté ou anonyme
-                    if (navLoginBtn) navLoginBtn.classList.remove('hidden');
-                    if (navLogoutBtn) navLogoutBtn.classList.add('hidden');
-                    if (navAdminBtn) navAdminBtn.classList.add('hidden');
-                    if (mobileLoginBtn) mobileLoginBtn.classList.remove('hidden');
-                    if (mobileLogoutBtn) mobileLogoutBtn.classList.add('hidden');
-                    if (mobileAdminBtn) mobileAdminBtn.classList.add('hidden');
-
-                    // Afficher le message d'accès restreint
-                    if (checkMessage) checkMessage.classList.remove('hidden');
+            // Fonction de Déconnexion globale
+            window.handleSignOut = async () => {
+                try {
+                    await signOut(auth);
+                    window.location.href = 'index.html'; 
+                } catch (error) {
+                    console.error("Erreur de déconnexion:", error);
                 }
-            });
+            };
+
+            // Attache les écouteurs pour les boutons de déconnexion
+            document.getElementById('nav-logout-btn')?.addEventListener('click', window.handleSignOut);
+            document.getElementById('mobile-logout-btn')?.addEventListener('click', window.handleSignOut);
 
         } else {
-            console.error("Firebase non configuré.");
+            console.error("Firebase non configuré. Les fonctionnalités d'authentification sont désactivées.");
         }
 
-        // Gérer le menu mobile (répété ici car c'est une page standalone)
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuButton = document.getElementById('menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            if (menuButton && mobileMenu) {
-                menuButton.addEventListener('click', () => {
-                    mobileMenu.classList.toggle('hidden');
-                });
+        // --- GESTION DU MENU MOBILE ---
+        const mobileMenu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('mobile-menu-overlay');
+        const menuButton = document.getElementById('menu-button');
+        const closeMenuButton = document.getElementById('close-menu-button');
+
+        /** Bascule l'état ouvert/fermé du menu mobile */
+        function toggleMobileMenu(isOpen) {
+            const isOpening = isOpen === undefined ? !mobileMenu.classList.contains('open') : isOpen;
+
+            if (isOpening) {
+                mobileMenu.classList.add('open');
+                overlay.classList.add('open');
+                document.body.style.overflow = 'hidden'; 
+            } else {
+                mobileMenu.classList.remove('open');
+                overlay.classList.remove('open');
+                document.body.style.overflow = '';
             }
-        });
+        }
+
+        // Écouteurs d'événements pour l'ouverture/fermeture du menu
+        menuButton?.addEventListener('click', () => toggleMobileMenu(true));
+        closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
+        overlay?.addEventListener('click', () => toggleMobileMenu(false));
+
+        // --- GESTION DE L'AUTHENTIFICATION ET DE L'ACCÈS AU CONTENU PREMIUM ---
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                const premiumUnlocked = document.getElementById('premium-content-unlocked');
+                const premiumLocked = document.getElementById('premium-content-locked');
+                
+                const elements = {
+                    loginDesktop: document.getElementById('nav-login-btn'),
+                    logoutDesktop: document.getElementById('nav-logout-btn'),
+                    adminDesktop: document.getElementById('nav-admin-btn'),
+                    loginMobile: document.getElementById('mobile-login-btn'),
+                    logoutMobile: document.getElementById('mobile-logout-btn'),
+                    adminMobile: document.getElementById('mobile-admin-btn'),
+                };
+
+                const isUserLoggedIn = user && !user.isAnonymous;
+
+                // 1. Fonction utilitaire pour basculer la visibilité
+                const setVisibility = (element, isVisible) => {
+                    if (element) {
+                        element.classList.toggle('hidden', !isVisible);
+                    }
+                };
+
+                // 2. Gérer les boutons de connexion/déconnexion du menu
+                setVisibility(elements.loginDesktop, !isUserLoggedIn);
+                setVisibility(elements.logoutDesktop, isUserLoggedIn);
+                setVisibility(elements.adminDesktop, isUserLoggedIn);
+                setVisibility(elements.loginMobile, !isUserLoggedIn);
+                setVisibility(elements.logoutMobile, isUserLoggedIn);
+                setVisibility(elements.adminMobile, isUserLoggedIn);
+
+                // 3. Gérer l'accès à la carte PREMIUM (Service 3)
+                if (isUserLoggedIn) {
+                    // Utilisateur connecté : Montrer le contenu déverrouillé, masquer le verrou
+                    if (premiumUnlocked) premiumUnlocked.classList.remove('hidden');
+                    if (premiumLocked) premiumLocked.classList.add('hidden');
+                } else {
+                    // Utilisateur déconnecté : Masquer le contenu déverrouillé, montrer le verrou
+                    if (premiumUnlocked) premiumUnlocked.classList.add('hidden');
+                    if (premiumLocked) premiumLocked.classList.remove('hidden');
+                }
+            });
+        } else {
+             // Si Firebase non configuré, s'assurer que l'écran verrouillé est affiché par défaut
+             document.getElementById('premium-content-unlocked')?.classList.add('hidden');
+             document.getElementById('premium-content-locked')?.classList.remove('hidden');
+        }
+
+        // Réaffirmer le titre de la page
+        document.title = "MindCompta - Services (Livre)";
     </script>
 </body>
 </html>
