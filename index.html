@@ -24,6 +24,7 @@
         .bg-accent { background-color: var(--accent); }
         .hover-accent:hover { background-color: #D97706; } 
         .bg-vibrant-green { background-color: var(--vibrant-green); }
+        .hover-vibrant-green:hover { background-color: #047857; } /* Darker Emerald (Emerald-700) */
 
         /* Navigation Link Styles */
         .nav-link {
@@ -105,7 +106,7 @@
                     <!-- Action Buttons and User Info (Managed by JS) -->
                     <div id="auth-actions-desktop" class="flex items-center space-x-3">
                         <!-- Login/Username/Logout/Admin buttons will be injected here -->
-                        
+
                         <!-- Static Login button placeholder (will be shown by default before JS runs) -->
                         <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
                             Se Connecter
@@ -136,7 +137,7 @@
             <a href="services.html" class="mobile-link">Services (Livre)</a>
             <a href="about.html" class="mobile-link">À Propos</a>
             <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
-            
+
             <!-- Auth Actions Mobile will be injected here -->
             <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
                 <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
@@ -145,7 +146,7 @@
     </nav>
     <!-- END MOBILE MENU -->
 
-    <!-- HERO SECTION (Fixed Banner - Replaces Carousel) -->
+    <!-- HERO SECTION -->
     <section class="w-full max-w-6xl mx-auto mt-6 px-4">
         <div class="relative bg-brand-dark rounded-2xl h-96 flex items-center justify-center p-6 sm:p-10 shadow-2xl overflow-hidden">
             <!-- Background Visuals -->
@@ -163,7 +164,7 @@
                 <p class="text-lg sm:text-xl font-light max-w-2xl mx-auto mb-8">
                     Maîtrisez les lois d'affaires de l'espace UEMOA et sécurisez vos transactions avec l'expertise MindCompta.
                 </p>
-                <a href="services.html" class="inline-block bg-accent text-brand-dark font-bold py-3 px-8 rounded-full shadow-xl transition duration-300 transform hover:scale-105 hover:shadow-2xl">
+                <a href="services.html" id="hero-cta" class="inline-block bg-accent text-brand-dark font-bold py-3 px-8 rounded-full shadow-xl transition duration-300 transform hover:scale-105 hover:shadow-2xl">
                     Découvrir Nos Services
                 </a>
             </div>
@@ -201,7 +202,7 @@
         </div>
     </section>
 
-    <!-- CALL TO ACTION SECTION FOR PREMIUM BOOK -->
+    <!-- CALL TO ACTION SECTION FOR PREMIUM BOOK (Dynamically updated by JS) -->
     <section class="bg-brand-dark text-white py-16">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-accent">
@@ -210,7 +211,7 @@
             <p class="text-xl mb-8 opacity-90">
                 Accédez à notre "Livre Blanc" exclusif, une mine d'informations sur la fiscalité et la comptabilité en zone OHADA.
             </p>
-            <a href="login.html" class="bg-red-500 text-white font-bold py-3 px-8 rounded-full shadow-xl hover:bg-red-600 transition duration-300 transform hover:scale-105 inline-block">
+            <a href="login.html" id="book-cta" class="bg-red-500 text-white font-bold py-3 px-8 rounded-full shadow-xl hover:bg-red-600 transition duration-300 transform hover:scale-105 inline-block">
                 Se Connecter et Accéder
             </a>
         </div>
@@ -225,75 +226,106 @@
     <script type="module">
         // Page de redirection en cas de déconnexion ou d'accès non autorisé
         const REDIRECTION_PAGE = 'login.html'; 
+        const ADMIN_ROLE = 'Admin';
 
         // --- GESTION DE LA SESSION ---
-        
+
         /** Gère la déconnexion de l'utilisateur. */
         function handleLogout() {
             // Suppression des informations de session du stockage local
             localStorage.removeItem('userName');
             localStorage.removeItem('userRole');
             // Redirection vers la page de connexion
-            window.location.href = REDIRECTION_PAGE;
+            window.location.href = 'index.html'; // Redirige vers l'accueil pour recharger l'état déconnecté
         }
 
         /**
          * Vérifie l'état de la session et met à jour l'interface utilisateur.
-         * Si l'utilisateur n'est pas connecté, il est redirigé vers la page de connexion.
          */
         function checkSessionAndRenderHeader() {
             const userName = localStorage.getItem('userName');
             const userRole = localStorage.getItem('userRole');
-            
+
             const desktopActions = document.getElementById('auth-actions-desktop');
             const mobileActions = document.getElementById('auth-actions-mobile');
             
-            // Si pas de nom d'utilisateur, redirige vers la connexion
-            if (!userName) {
-                // Pour cette page (index.html), nous n'effectuons pas de redirection
-                // si la session n'est pas établie. Le bouton 'Se Connecter' reste visible.
-                // Si cette page était un "tableau de bord" privé, une redirection serait ici.
+            // Récupération des CTAs
+            const heroCta = document.getElementById('hero-cta');
+            const bookCta = document.getElementById('book-cta');
+
+            // --- Utilisateur Connecté ---
+            if (userName) {
+                const isUserAdmin = userRole === ADMIN_ROLE;
+
+                // 1. Desktop Actions (Cache "Se Connecter" et affiche le profil/déconnexion)
+                const adminButtonHtml = isUserAdmin 
+                    ? `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
+                    : '';
                 
-                // Assurons-nous que seul le bouton de connexion est visible
+                desktopActions.innerHTML = `
+                    ${adminButtonHtml}
+                    <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
+                        <span class="hidden sm:inline">Bienvenue,</span> ${userName}
+                    </span>
+                    <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
+                        Déconnexion
+                    </button>
+                `;
+
+                // 2. Mobile Actions
+                mobileActions.innerHTML = `
+                    ${isUserAdmin ? 
+                        `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
+                        : ''}
+                    <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
+                    <p class="text-white text-md font-semibold mb-3">${userName}</p>
+                    <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
+                `;
+
+                // 3. Attacher les écouteurs de déconnexion
+                document.getElementById('logout-desktop-btn')?.addEventListener('click', handleLogout);
+                document.getElementById('logout-mobile-btn')?.addEventListener('click', handleLogout);
+                
+                // 4. Mettre à jour les CTAs
+                if (heroCta) {
+                    heroCta.textContent = "Commencer Votre Conseil";
+                    heroCta.href = "services.html";
+                }
+                if (bookCta) {
+                    bookCta.textContent = "Accéder au Livre Blanc (Services)";
+                    bookCta.href = "services.html";
+                    // Change le style du bouton pour indiquer un accès réussi
+                    bookCta.classList.remove('bg-red-500', 'hover:bg-red-600');
+                    bookCta.classList.add('bg-vibrant-green', 'hover-vibrant-green'); 
+                }
+
+            } else {
+                // --- Utilisateur Déconnecté ---
+                
+                // 1. Desktop Actions (Affiche uniquement "Se Connecter")
                 desktopActions.innerHTML = `
                     <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
                         Se Connecter
                     </a>
                 `;
+
+                // 2. Mobile Actions
                 mobileActions.innerHTML = `
                     <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
                 `;
-                return;
+
+                // 3. Mettre à jour les CTAs (pointent vers login ou services non-gated)
+                if (heroCta) {
+                    heroCta.textContent = "Découvrir Nos Services";
+                    heroCta.href = "services.html"; 
+                }
+                if (bookCta) {
+                    bookCta.textContent = "Se Connecter et Accéder";
+                    bookCta.href = "login.html";
+                    bookCta.classList.add('bg-red-500', 'hover:bg-red-600');
+                    bookCta.classList.remove('bg-vibrant-green', 'hover-vibrant-green'); 
+                }
             }
-            
-            // --- Utilisateur Connecté ---
-            
-            // 1. Affichage du nom d'utilisateur et du bouton de déconnexion (Desktop)
-            desktopActions.innerHTML = `
-                ${userRole === 'Admin' ? 
-                    `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
-                    : ''}
-                <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
-                    <span class="hidden sm:inline">Bienvenue,</span> ${userName}
-                </span>
-                <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
-                    Déconnexion
-                </button>
-            `;
-
-            // 2. Affichage du nom d'utilisateur et du bouton de déconnexion (Mobile)
-            mobileActions.innerHTML = `
-                ${userRole === 'Admin' ? 
-                    `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3">Admin</a>`
-                    : ''}
-                <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
-                <p class="text-white text-md font-semibold mb-3">${userName}</p>
-                <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
-            `;
-
-            // 3. Attacher les écouteurs d'événements de déconnexion aux éléments dynamiques
-            document.getElementById('logout-desktop-btn')?.addEventListener('click', handleLogout);
-            document.getElementById('logout-mobile-btn')?.addEventListener('click', handleLogout);
         }
 
         // --- GESTIONNAIRE DU MENU MOBILE (Off-Canvas) ---
@@ -319,10 +351,10 @@
         elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
         elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
         elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
-        
+
         // --- Exécution principale ---
         document.addEventListener('DOMContentLoaded', checkSessionAndRenderHeader);
-        
+
     </script>
 </body>
 </html>
