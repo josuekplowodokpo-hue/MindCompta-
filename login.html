@@ -3,66 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCompta - Connexion</title>
+    <title>MindCompta - Connexion & Inscription</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- LIAISON VERS LE FICHIER CSS EXTERNE PARTAGÉ -->
-    <link rel="stylesheet" href="style.css"> 
+    
+    <style>
+        /* Import the Inter font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        /* Brand Colors (Standardized) */
+        :root {
+            --brand-dark: #1E3A8A; /* Deep Blue (Indigo-900) */
+            --accent: #F59E0B; /* Vivid Orange / Gold (Amber-500) */
+            --vibrant-green: #10B981; /* Bright Green (Emerald-500) */
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom Tailwind classes for colors */
+        .bg-brand-dark { background-color: var(--brand-dark); }
+        .text-brand-dark { color: var(--brand-dark); }
+        .bg-accent { background-color: var(--accent); }
+        .hover-accent:hover { background-color: #D97706; } 
+
+        /* Navigation Link Styles - Desktop */
+        .nav-link {
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .nav-link:hover {
+            background-color: #345b85;
+        }
+        .active-link-desktop {
+            background-color: var(--accent);
+            font-weight: 600;
+            color: var(--brand-dark) !important;
+        }
+
+        /* Mobile Menu Styles (Off-Canvas) */
+        #mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 50; 
+        }
+        #mobile-menu.open {
+            transform: translateX(0);
+        }
+        /* Overlay */
+        #mobile-menu-overlay {
+            display: none; 
+            z-index: 40;
+        }
+        #mobile-menu-overlay.open {
+            display: block;
+        }
+        .mobile-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .mobile-link.active-link-mobile {
+            background-color: var(--accent);
+            color: var(--brand-dark);
+            font-weight: 700;
+        }
+        .mobile-link-btn {
+             display: block;
+             width: 100%;
+             text-align: center;
+        }
+
+        /* Custom style for the Signup section background */
+        .bg-brand-light {
+            background-color: #4A63A5; /* Lighter shade of brand dark */
+        }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col font-sans">
 
-    <!-- EN-TÊTE ET NAVIGATION -->
+    <!-- HEADER AND NAVIGATION -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
-                <div class="flex items-center">
+                
+                <!-- LOGO/BRAND (CLICKABLE) -->
+                <a href="index.html" class="flex items-center group">
                     <img src="logo.jpg" 
-                         alt="MindCompta Logo" 
-                         class="h-10 w-auto rounded-full mr-3 border-2 border-white">
-                    <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
-                </div>
-                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-6">
+                         alt="[Image du Logo MindCompta]" 
+                         onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
+                         class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
+                    <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
+                </a>
+
+                <!-- NAVIGATION DESKTOP -->
+                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
                     <a href="index.html" class="nav-link">Accueil</a>
                     <a href="services.html" class="nav-link">Services (Livre)</a>
                     <a href="about.html" class="nav-link">À Propos</a>
-                    <a href="calculator.html" class="nav-link">Calculatrice</a>
-                    <!-- Lien Admin (visible si connecté) -->
-                    <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-lg hidden">Admin</a> 
-
-                    <!-- Par défaut, afficher Se Connecter, cacher Déconnexion -->
-                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white active-link">
-                        Se Connecter
-                    </a>
-                    <button onclick="handleSignOut()" id="nav-logout-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white hidden">
-                        Déconnexion
-                    </button>
+                    <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
+                    
+                    <!-- Boutons et liens gérés par JS -->
+                    <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-full hidden text-white hover:bg-red-500">Admin</a> 
+                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 active-link-desktop text-brand-dark">Se Connecter</a>
+                    <button id="nav-logout-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white hidden">Déconnexion</button>
                 </nav>
+                
+                <!-- BOUTON MENU MOBILE -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
                 </button>
             </div>
-            <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
-                <a href="index.html" class="mobile-link">Accueil</a>
-                <a href="services.html" class="mobile-link">Services (Livre)</a>
-                <a href="about.html" class="mobile-link">À Propos</a>
-                <a href="calculator.html" class="mobile-link">Calculatrice</a>
-                <!-- Lien Admin Mobile (visible si connecté) -->
-                <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-400 text-center font-semibold text-white py-3 hidden">Admin</a>
-
-                <!-- Par défaut, afficher Se Connecter, cacher Déconnexion -->
-                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3 active-link">Se Connecter</a>
-                <button onclick="handleSignOut()" id="mobile-logout-btn" class="mobile-link bg-red-500 text-center font-semibold hover:bg-red-600 text-white py-3 hidden w-full">Déconnexion</button>
-            </nav>
         </div>
     </header>
 
-    <!-- CONTENU PRINCIPAL -->
+    <!-- MENU MOBILE OFF-CANVAS -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
+        <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none">
+            &times;
+        </button>
+        <div class="pt-12 space-y-3">
+            <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
+            
+            <a href="index.html" class="mobile-link">Accueil</a>
+            <a href="services.html" class="mobile-link">Services (Livre)</a>
+            <a href="about.html" class="mobile-link">À Propos</a>
+            <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
+            
+            <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 hidden">Admin</a>
+
+            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3">
+                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn active-link-mobile text-brand-dark">Se Connecter</a>
+                <button id="mobile-logout-btn" class="mobile-link bg-red-500 mobile-link-btn text-white hidden">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+    <!-- FIN MENU MOBILE -->
+
+    <!-- CONTENU PRINCIPAL (FORMULAIRES) -->
     <main class="flex-grow flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden md:max-w-xl">
             <div class="md:flex">
                 <!-- Section Connexion -->
+                <!-- Par défaut : w-full sur mobile, md:w-1/2 sur desktop -->
                 <div id="login-section" class="w-full md:w-1/2 p-8 transition-all duration-500">
                     <h2 class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
-                    
+
                     <form id="login-form" class="space-y-4">
                         <div>
                             <label for="login-email" class="block text-sm font-medium text-gray-700">Adresse Email</label>
@@ -72,15 +164,19 @@
                             <label for="login-password" class="block text-sm font-medium text-gray-700">Mot de Passe</label>
                             <input type="password" id="login-password" name="password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
                         </div>
-                        
-                        <!-- Message d'erreur/succès -->
-                        <div id="login-message" class="text-center p-2 rounded-lg text-sm hidden"></div>
 
-                        <button type="submit" class="w-full bg-accent text-white font-semibold py-2 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01]">
+                        <!-- Message d'erreur/succès -->
+                        <div id="login-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4" role="alert"></div>
+
+                        <button type="submit" class="w-full bg-accent text-white font-semibold py-3 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01] mt-6">
                             Se Connecter
                         </button>
                     </form>
-                    
+
+                    <div id="login-status" class="mt-4 p-2 text-sm text-center font-semibold hidden rounded-lg bg-gray-100 text-brand-dark border-b-2 border-accent">
+                        Connecté en tant que: <span id="logged-in-email" class="text-accent"></span>
+                    </div>
+
                     <div class="mt-6 text-center">
                         <p class="text-sm text-gray-600">
                             Pas encore de compte ? 
@@ -92,32 +188,27 @@
                 </div>
 
                 <!-- Section Inscription -->
-                <div id="signup-section" class="w-full md:w-1/2 p-8 bg-brand-light transition-all duration-500 md:block hidden">
+                <div id="signup-section" class="w-full md:w-1/2 p-8 bg-brand-light transition-all duration-500 hidden md:block">
                     <h2 class="text-3xl font-bold text-white mb-6 text-center">Inscription</h2>
-                    
+
                     <form id="signup-form" class="space-y-4">
                         <div>
-                            <!-- Amélioration de la visibilité: text-white et font-semibold -->
                             <label for="signup-name" class="block text-sm font-semibold text-white">Nom et Prénom</label>
                             <input type="text" id="signup-name" name="name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
                         </div>
                         <div>
-                            <!-- Amélioration de la visibilité: text-white et font-semibold -->
                             <label for="signup-email" class="block text-sm font-semibold text-white">Adresse Email</label>
                             <input type="email" id="signup-email" name="email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
                         </div>
                         <div>
-                            <!-- Amélioration de la visibilité: text-white et font-semibold -->
                             <label for="signup-password" class="block text-sm font-semibold text-white">Mot de Passe (min. 6 caractères)</label>
                             <input type="password" id="signup-password" name="password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
                         </div>
-                        
-                        <!-- Message d'erreur/succès -->
-                        <div id="signup-message" class="text-center p-2 rounded-lg text-sm hidden"></div>
-                        
-                        <!-- La NOTE ADMIN a été retirée de l'interface utilisateur, conformément à la demande -->
 
-                        <button type="submit" class="w-full bg-accent text-white font-semibold py-2 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01]">
+                        <!-- Message d'erreur/succès pour l'inscription -->
+                        <div id="signup-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4 text-white" role="alert"></div>
+
+                        <button type="submit" class="w-full bg-accent text-white font-semibold py-3 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01] mt-6">
                             Créer un Compte
                         </button>
                     </form>
@@ -140,94 +231,194 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT (Chargez le script comme un module) -->
-    <script type="module" src="script.js"></script>
-    <script type="module">
-        // Logique pour afficher/cacher les boutons de connexion/déconnexion et le lien Admin
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    <!-- LOGIQUE JAVASCRIPT SIMULÉE -->
+    <script>
+        // --- IDENTIFIANTS D'ADMINISTRATEUR CODÉS EN DUR ---
+        const ADMIN_EMAIL = 'admin@mindcompta.com';
+        const ADMIN_PASSWORD = 'admin123';
+        // --------------------------------------------------
 
-        // Configuration Firebase (dupliquée pour la robustesse des écouteurs d'état)
-        const firebaseConfig = {
-            apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
-            authDomain: "mindcompta-cbb69.firebaseapp.com",
-            projectId: "mindcompta-cbb69",
-            storageBucket: "mindcompta-cbb69.firebasestorage.app",
-            messagingSenderId: "470368630296",
-            appId: "1:470368630296:web:510de914f335b27b3d356d",
-            measurementId: "G-SKSVSV0H70"
+        const elements = {
+            loginSection: document.getElementById('login-section'),
+            signupSection: document.getElementById('signup-section'),
+            loginForm: document.getElementById('login-form'),
+            signupForm: document.getElementById('signup-form'),
+            loginMessage: document.getElementById('login-message'),
+            signupMessage: document.getElementById('signup-message'),
+            loginStatus: document.getElementById('login-status'),
+            loggedInEmail: document.getElementById('logged-in-email'),
+            // Navigation
+            navLoginBtn: document.getElementById('nav-login-btn'),
+            navLogoutBtn: document.getElementById('nav-logout-btn'),
+            navAdminBtn: document.getElementById('nav-admin-btn'),
+            mobileLoginBtn: document.getElementById('mobile-login-btn'),
+            mobileLogoutBtn: document.getElementById('mobile-logout-btn'),
+            mobileAdminBtn: document.getElementById('mobile-admin-btn'),
+            mobileMenu: document.getElementById('mobile-menu'),
+            overlay: document.getElementById('mobile-menu-overlay'),
+            menuButton: document.getElementById('menu-button'),
+            closeMenuButton: document.getElementById('close-menu-button'),
         };
-        
-        if (firebaseConfig.apiKey) {
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
 
-            // Gère l'affichage mobile du formulaire (bascule entre Login et Signup)
-            document.getElementById('show-signup-btn-desktop')?.addEventListener('click', () => {
-                document.getElementById('signup-section').classList.remove('hidden');
-                document.getElementById('login-section').classList.add('md:w-1/2', 'hidden');
-                document.getElementById('login-section').classList.remove('w-full');
-            });
+        // Fonction pour mettre à jour l'état de la barre de navigation
+        function updateAuthUI() {
+            const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+            const userEmail = localStorage.getItem('userEmail');
+            const userRole = localStorage.getItem('userRole');
 
-            document.getElementById('show-login-btn-mobile')?.addEventListener('click', () => {
-                document.getElementById('signup-section').classList.add('hidden');
-                document.getElementById('login-section').classList.add('w-full');
-                document.getElementById('login-section').classList.remove('md:w-1/2', 'hidden');
-            });
-
-            // Gère l'affichage du menu mobile
-            document.getElementById('menu-button')?.addEventListener('click', () => {
-                document.getElementById('mobile-menu')?.classList.toggle('hidden');
-            });
-
-
-            onAuthStateChanged(auth, (user) => {
-                const loginBtnDesktop = document.getElementById('nav-login-btn');
-                const logoutBtnDesktop = document.getElementById('nav-logout-btn');
-                const loginBtnMobile = document.getElementById('mobile-login-btn');
-                const logoutBtnMobile = document.getElementById('mobile-logout-btn');
-
-                const adminBtnDesktop = document.getElementById('nav-admin-btn');
-                const adminBtnMobile = document.getElementById('mobile-admin-btn');
-                
-                // Si l'utilisateur est connecté ET n'est PAS anonyme (connexion réelle)
-                if (user && !user.isAnonymous) {
-                    // Cacher Connexion, Afficher Déconnexion
-                    if (loginBtnDesktop) loginBtnDesktop.classList.add('hidden');
-                    if (logoutBtnDesktop) logoutBtnDesktop.classList.remove('hidden');
-                    if (loginBtnMobile) loginBtnMobile.classList.add('hidden');
-                    if (logoutBtnMobile) logoutBtnMobile.classList.remove('hidden');
-                    
-                    // Afficher Admin (le rôle sera vérifié sur la page admin.html)
-                    if (adminBtnDesktop) adminBtnDesktop.classList.remove('hidden');
-                    if (adminBtnMobile) adminBtnMobile.classList.remove('hidden');
-
-                } else {
-                    // Utilisateur déconnecté ou anonyme
-                    // Afficher Connexion, Cacher Déconnexion
-                    if (loginBtnDesktop) loginBtnDesktop.classList.remove('hidden');
-                    if (logoutBtnDesktop) logoutBtnDesktop.classList.add('hidden');
-                    if (loginBtnMobile) loginBtnMobile.classList.remove('hidden');
-                    if (logoutBtnMobile) logoutBtnMobile.classList.add('hidden');
-                    
-                    // Cacher Admin
-                    if (adminBtnDesktop) adminBtnDesktop.classList.add('hidden');
-                    if (adminBtnMobile) adminBtnMobile.classList.add('hidden');
-                }
-            });
-
-            // Fonction de Déconnexion globale (utilisée sur tous les boutons de déconnexion)
-            window.handleSignOut = async () => {
-                try {
-                    await signOut(auth);
-                    // Rediriger vers la page d'accueil ou de connexion
-                    window.location.href = 'index.html'; 
-                } catch (error) {
-                    console.error("Erreur de déconnexion:", error);
+            // 1. Gérer les boutons de connexion/déconnexion
+            const setVisibility = (element, isVisible) => {
+                if (element) {
+                    element.classList.toggle('hidden', !isVisible);
                 }
             };
+
+            setVisibility(elements.navLoginBtn, !isAuthenticated);
+            setVisibility(elements.navLogoutBtn, isAuthenticated);
+            setVisibility(elements.mobileLoginBtn, !isAuthenticated);
+            setVisibility(elements.mobileLogoutBtn, isAuthenticated);
+            
+            // 2. Gérer le lien Admin
+            const isAdmin = userRole === 'admin';
+            setVisibility(elements.navAdminBtn, isAdmin);
+            setVisibility(elements.mobileAdminBtn, isAdmin);
+
+            // 3. Gérer le statut de connexion sur la page elle-même
+            setVisibility(elements.loginStatus, isAuthenticated && !isAdmin);
+            if (isAuthenticated && !isAdmin && userEmail) {
+                elements.loggedInEmail.textContent = userEmail;
+            } else if (elements.loginStatus) {
+                elements.loginStatus.classList.add('hidden');
+            }
         }
+        
+        // Fonction de Déconnexion globale
+        window.handleSignOut = () => {
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            window.location.href = 'index.html'; 
+        };
+
+        // Attacher les écouteurs de déconnexion aux boutons du header
+        elements.navLogoutBtn?.addEventListener('click', window.handleSignOut);
+        elements.mobileLogoutBtn?.addEventListener('click', window.handleSignOut);
+
+
+        // --- LOGIQUE DE FORMULAIRE ---
+
+        // Affiche un message d'état
+        function showMessage(element, message, isSuccess) {
+            element.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'border-red-500', 'bg-vibrant-green/20', 'text-brand-dark', 'border-vibrant-green');
+            element.textContent = message;
+            if (isSuccess) {
+                element.classList.add('bg-vibrant-green/20', 'text-brand-dark', 'border-vibrant-green');
+            } else {
+                element.classList.add('bg-red-100', 'text-red-700', 'border-red-500');
+            }
+            if (element === elements.signupMessage) {
+                 element.classList.add('text-white');
+                 element.classList.remove('text-brand-dark');
+            }
+        }
+
+        // 1. GESTION DE L'INSCRIPTION (Simulée)
+        elements.signupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+
+            // Vider le formulaire et afficher le message
+            elements.signupForm.reset();
+            showMessage(elements.signupMessage, `Création de compte réussie pour ${name} (${email}). Vous pouvez maintenant vous connecter.`, true);
+        });
+
+
+        // 2. GESTION DE LA CONNEXION (Simulée)
+        elements.loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            // Effacer les messages précédents
+            elements.loginMessage.classList.add('hidden');
+            elements.loginStatus.classList.add('hidden');
+            
+            // ADMIN CHECK
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                localStorage.setItem('isAuthenticated', 'true');
+                localStorage.setItem('userRole', 'admin');
+                localStorage.setItem('userEmail', email);
+                
+                showMessage(elements.loginMessage, 'Connexion Administrateur réussie ! Redirection...', true);
+                
+                setTimeout(() => {
+                    window.location.href = 'admin.html';
+                }, 500);
+                return;
+            }
+
+            // SIMULATED USER LOGIN
+            // Nous considérons tout autre identifiant comme une connexion utilisateur réussie (simulée)
+            if (email.length > 0 && password.length >= 6) {
+                localStorage.setItem('isAuthenticated', 'true');
+                localStorage.setItem('userRole', 'user');
+                localStorage.setItem('userEmail', email); 
+                localStorage.setItem('userName', email.split('@')[0]); // Nom simulé
+
+                showMessage(elements.loginMessage, 'Connexion réussie (Simulée) !', true);
+                
+                // Mettre à jour l'UI après 500ms pour voir le message
+                setTimeout(() => {
+                    updateAuthUI();
+                }, 500);
+
+            } else {
+                // Échec de la connexion (champs vides ou mot de passe trop court)
+                showMessage(elements.loginMessage, 'Erreur: Identifiants invalides ou mot de passe trop court.', false);
+            }
+        });
+
+
+        // --- GESTION DU MENU MOBILE ET BASES UI ---
+
+        // Gère l'affichage mobile/desktop des formulaires (bascule entre Login et Signup)
+        document.getElementById('show-signup-btn-desktop')?.addEventListener('click', () => {
+            elements.signupSection.classList.remove('hidden');
+            elements.loginSection.classList.add('md:w-1/2', 'hidden');
+            elements.loginSection.classList.remove('w-full');
+        });
+
+        document.getElementById('show-login-btn-mobile')?.addEventListener('click', () => {
+            elements.signupSection.classList.add('hidden');
+            elements.loginSection.classList.add('w-full');
+            elements.loginSection.classList.remove('md:w-1/2', 'hidden');
+        });
+
+        // GESTIONNAIRE DU MENU MOBILE (Off-Canvas)
+      function toggleMobileMenu(isOpen) {
+            const isOpening = isOpen === undefined ? !elements.mobileMenu.classList.contains('open') : isOpen;
+
+            if (isOpening) {
+                elements.mobileMenu.classList.add('open');
+                elements.overlay.classList.add('open');
+                document.body.style.overflow = 'hidden'; 
+            } else {
+                elements.mobileMenu.classList.remove('open');
+                elements.overlay.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Écouteurs d'événements pour l'ouverture/fermeture du menu
+        elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
+        elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
+        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
+
+        // Initialisation : Mettre à jour l'UI au chargement de la page
+        document.addEventListener('DOMContentLoaded', updateAuthUI);
     </script>
 </body>
 </html>
-
