@@ -103,7 +103,7 @@
                     <a href="about.html" class="nav-link active-link-desktop">À Propos</a>
                     <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
 
-                    <!-- Authentication Actions Container (Filled by JS) -->
+                    <!-- Action Buttons and User Info (Managed by JS) -->
                     <div id="auth-actions-desktop" class="flex items-center space-x-3">
                         <!-- Default Login Button -->
                         <a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
@@ -228,120 +228,109 @@
     </footer>
 
     <!-- JAVASCRIPT LOGIC AND AUTHENTICATION (LOCAL STORAGE) -->
-    <script>
-        // --- CONSTANTES DE SESSION ET D'ADMINISTRATION ---
-        const SESSION_KEY = 'currentUser';
-        const ADMIN_USERNAME = 'admin-Josue'; 
-        const REDIRECTION_PAGE = 'login.html';
-        
-        // --- GESTION DE LA SESSION UTILISATEUR (SessionStorage) ---
+    <script type="module">
+        // Page de redirection en cas de déconnexion ou d'accès non autorisé
+        const REDIRECTION_PAGE = 'login.html'; 
+        const ADMIN_ROLE = 'Admin';
 
-        /** * Récupère l'utilisateur connecté depuis sessionStorage.
-         * @returns {object|null} L'objet utilisateur ou null si déconnecté.
-         */
-        function getCurrentUser() {
-            const userJson = sessionStorage.getItem(SESSION_KEY);
-            try {
-                return userJson ? JSON.parse(userJson) : null;
-            } catch (e) {
-                console.error("Erreur de parsing de l'utilisateur en session:", e);
-                return null;
-            }
-        }
+        // --- GESTION DE LA SESSION ---
 
         /** Gère la déconnexion de l'utilisateur. */
-        function handleSignOut() {
-            sessionStorage.removeItem(SESSION_KEY);
-            // Recharger la page pour mettre à jour l'état UI
+        function handleLogout() {
+            // Suppression des informations de session du stockage local
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            // Redirection vers la page d'accueil pour réinitialiser l'état
             window.location.href = 'index.html'; 
         }
 
-        // --- GESTION DU MENU MOBILE (Off-Canvas) ---
-        const mobileMenu = document.getElementById('mobile-menu');
-        const overlay = document.getElementById('mobile-menu-overlay');
-        const menuButton = document.getElementById('menu-button');
-        const closeMenuButton = document.getElementById('close-menu-button');
+        /**
+         * Vérifie l'état de la session et met à jour l'interface utilisateur.
+         */
+        function checkSessionAndRenderHeader() {
+            const userName = localStorage.getItem('userName');
+            const userRole = localStorage.getItem('userRole');
 
-        /** Toggles the open/closed state of the mobile menu */
-        function toggleMobileMenu(isOpen) {
-            const isOpening = isOpen === undefined ? !mobileMenu.classList.contains('open') : isOpen;
-
-            if (isOpening) {
-                mobileMenu.classList.add('open');
-                overlay.classList.add('open');
-                document.body.style.overflow = 'hidden'; 
-            } else {
-                mobileMenu.classList.remove('open');
-                overlay.classList.remove('open');
-                document.body.style.overflow = '';
-            }
-        }
-
-        // Event listeners for menu open/close
-        menuButton?.addEventListener('click', () => toggleMobileMenu(true));
-        closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
-        overlay?.addEventListener('click', () => toggleMobileMenu(false));
-
-
-        // --- AUTHENTICATION STATE HANDLER ---
-
-        /** Met à jour l'interface utilisateur en fonction de l'état de connexion. */
-        function updateAuthUI(user) {
             const desktopActions = document.getElementById('auth-actions-desktop');
             const mobileActions = document.getElementById('auth-actions-mobile');
-            const isUserLoggedIn = user !== null;
-            const isUserAdmin = isUserLoggedIn && user.username === ADMIN_USERNAME;
-            const userNameDisplay = isUserLoggedIn ? (user.username || "Utilisateur") : "";
 
-            // --- Logique pour utilisateur DÉCONNECTÉ ---
-            if (!isUserLoggedIn) {
-                const loginHtml = `
-                    <a href="${REDIRECTION_PAGE}" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+            // --- Utilisateur Connecté ---
+            if (userName) {
+                const isUserAdmin = userRole === ADMIN_ROLE;
+
+                // 1. Desktop Actions (Cache "Se Connecter" et affiche le profil/déconnexion)
+                const adminButtonHtml = isUserAdmin 
+                    ? `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
+                    : '';
+                
+                desktopActions.innerHTML = `
+                    ${adminButtonHtml}
+                    <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
+                        <span class="hidden sm:inline">Bienvenue,</span> ${userName}
+                    </span>
+                    <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
+                        Déconnexion
+                    </button>
+                `;
+
+                // 2. Mobile Actions
+                mobileActions.innerHTML = `
+                    ${isUserAdmin ? 
+                        `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
+                        : ''}
+                    <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
+                    <p class="text-white text-md font-semibold mb-3">${userName}</p>
+                    <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
+                `;
+
+                // 3. Attacher les écouteurs de déconnexion
+                document.getElementById('logout-desktop-btn')?.addEventListener('click', handleLogout);
+                document.getElementById('logout-mobile-btn')?.addEventListener('click', handleLogout);
+                
+            } else {
+                // --- Utilisateur Déconnecté ---
+                
+                // 1. Desktop Actions (Affiche uniquement "Se Connecter")
+                desktopActions.innerHTML = `
+                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
                         Se Connecter
                     </a>
                 `;
-                desktopActions.innerHTML = loginHtml;
-                mobileActions.innerHTML = `<a href="${REDIRECTION_PAGE}" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>`;
-                return;
+
+                // 2. Mobile Actions
+                mobileActions.innerHTML = `
+                    <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
+                `;
             }
-
-            // --- Logique pour utilisateur CONNECTÉ ---
-            
-            const adminButtonHtml = isUserAdmin 
-                ? `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
-                : '';
-            
-            // 1. Desktop
-            desktopActions.innerHTML = `
-                ${adminButtonHtml}
-                <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600 hidden sm:inline">
-                    Bienvenue, ${userNameDisplay}
-                </span>
-                <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
-                    Déconnexion
-                </button>
-            `;
-
-            // 2. Mobile
-            mobileActions.innerHTML = `
-                ${isUserAdmin ? 
-                    `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
-                    : ''}
-                <p class="text-accent text-lg font-bold mb-2">Connecté</p>
-                <p class="text-white text-md font-semibold mb-3">${userNameDisplay}</p>
-                <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
-            `;
-
-            // 3. Attacher les écouteurs de déconnexion
-            document.getElementById('logout-desktop-btn')?.addEventListener('click', handleSignOut);
-            document.getElementById('logout-mobile-btn')?.addEventListener('click', handleSignOut);
         }
 
-        // --- EXÉCUTION AU CHARGEMENT DE LA PAGE ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const currentUser = getCurrentUser();
-            updateAuthUI(currentUser);
-        });
+        // --- GESTIONNAIRE DU MENU MOBILE (Off-Canvas) ---
+        const elements = {
+            mobileMenu: document.getElementById('mobile-menu'),
+            overlay: document.getElementById('mobile-menu-overlay'),
+            menuButton: document.getElementById('menu-button'),
+            closeMenuButton: document.getElementById('close-menu-button'),
+        };
+
+        function toggleMobileMenu(isOpen) {
+            const isOpening = isOpen === undefined ? !elements.mobileMenu.classList.contains('open') : isOpen;
+            if (isOpening) {
+                elements.mobileMenu.classList.add('open');
+                elements.overlay.classList.add('open');
+                document.body.style.overflow = 'hidden'; 
+            } else {
+                elements.mobileMenu.classList.remove('open');
+                elements.overlay.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+        }
+        elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
+        elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
+        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
+
+        // --- Exécution principale ---
+        document.addEventListener('DOMContentLoaded', checkSessionAndRenderHeader);
+
     </script>
 </body>
 </html>
