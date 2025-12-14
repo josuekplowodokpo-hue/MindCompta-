@@ -244,17 +244,42 @@
         setLogLevel('debug');
         
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        let firebaseConfig = {};
+        
+        // Tentative de chargement de la configuration
+        try {
+            // Vérifie si la variable est définie et non vide
+            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                // Tente de parser la chaîne JSON
+                firebaseConfig = JSON.parse(__firebase_config);
+            }
+        } catch (e) {
+            console.error("Erreur lors du parsing de __firebase_config. La configuration n'est pas un JSON valide.", e);
+        }
 
         let auth;
         let db;
+        let firebaseInitialized = false;
 
-        if (Object.keys(firebaseConfig).length > 0) {
-            const app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
+        // VÉRIFICATION CRITIQUE DE L'INITIALISATION
+        if (Object.keys(firebaseConfig).length > 0 && firebaseConfig.apiKey) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                firebaseInitialized = true;
+                console.log("Firebase initialisé avec succès.");
+            } catch (e) {
+                console.error("Erreur lors de l'initialisation de Firebase:", e);
+            }
         } else {
-            console.error("La configuration Firebase est manquante. Les fonctions d'Auth et Firestore ne fonctionneront pas.");
+            console.error("ATTENTION: La configuration Firebase est manquante ou invalide. Les fonctions d'Auth et Firestore seront désactivées.");
+            
+            // Si la config est manquante, affiche un message d'erreur aux utilisateurs
+            setTimeout(() => {
+                showMessage(elements.signupMessage, "Erreur: La configuration Firebase est manquante. Impossible de créer un compte.", false);
+                showMessage(elements.loginMessage, "Erreur: La configuration Firebase est manquante. Impossible de se connecter.", false);
+            }, 100);
         }
         
         // --- Éléments du DOM ---
@@ -298,13 +323,20 @@
                  if (isSuccess) element.classList.add('border-vibrant-green');
                  else element.classList.add('border-red-500');
             }
+            element.classList.remove('hidden');
         }
         
         function setButtonLoadingState(button, isLoading, originalText) {
-            button.disabled = isLoading;
+            button.disabled = isLoading || !firebaseInitialized;
             button.textContent = isLoading ? 'Chargement...' : originalText;
-            button.classList.toggle('opacity-50', isLoading);
-            button.classList.toggle('cursor-not-allowed', isLoading);
+            button.classList.toggle('opacity-50', isLoading || !firebaseInitialized);
+            button.classList.toggle('cursor-not-allowed', isLoading || !firebaseInitialized);
+        }
+
+        // Si Firebase n'est pas initialisé, désactiver les boutons
+        if (!firebaseInitialized) {
+            setButtonLoadingState(elements.signupButton, false, 'Créer un Compte');
+            setButtonLoadingState(elements.loginButton, false, 'Se Connecter');
         }
 
 
@@ -317,7 +349,7 @@
         async function saveUserProfile(userId, userName, userEmail, role = 'user') {
             if (!db || !userId) {
                 console.error("Firestore non initialisé ou UID utilisateur manquant.");
-                return;
+                throw new Error("Base de données indisponible.");
             }
 
             const profileDocPath = `/artifacts/${appId}/users/${userId}/users_data/profile`;
@@ -336,6 +368,7 @@
                 console.log("Profil utilisateur sauvegardé avec succès dans Firestore pour UID:", userId);
             } catch (e) {
                 console.error("Erreur critique lors de la sauvegarde du profil Firestore:", e);
+                // Renvoie une erreur pour que le bloc catch de l'inscription la gère.
                 throw new Error("Erreur de base de données. Veuillez vérifier les règles de sécurité.");
             }
         }
@@ -343,6 +376,12 @@
         // 1. GESTION DE L'INSCRIPTION (createUserWithEmailAndPassword + setDoc)
         elements.signupForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            if (!firebaseInitialized) {
+                showMessage(elements.signupMessage, "Erreur: Service Firebase non initialisé. Vérifiez la configuration.", false);
+                return;
+            }
+
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
             const name = document.getElementById('signup-name').value;
@@ -377,7 +416,12 @@
                         errorMessage = "Mot de passe trop faible (min. 6 caractères).";
                         break;
                     default:
-                        errorMessage = `Erreur d'inscription: ${error.message}`;
+                        // Si c'est une erreur de BDD (lancée par saveUserProfile)
+                        if (error.message.includes("Base de données") || error.message.includes("règles de sécurité")) {
+                             errorMessage = "Inscription réussie, mais échec de la sauvegarde du profil. Vérifiez les règles Firestore.";
+                        } else {
+                             errorMessage = `Erreur d'inscription: ${error.message}`;
+                        }
                 }
                 showMessage(elements.signupMessage, errorMessage, false);
                 console.error("Erreur d'inscription Firebase:", error);
@@ -390,6 +434,12 @@
         // 2. GESTION DE LA CONNEXION (signInWithEmailAndPassword)
         elements.loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            if (!firebaseInitialized) {
+                showMessage(elements.loginMessage, "Erreur: Service Firebase non initialisé. Vérifiez la configuration.", false);
+                return;
+            }
+
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             
@@ -478,12 +528,14 @@
         elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
         
         // Redirection si l'utilisateur est déjà connecté (pour éviter qu'il reste sur la page login)
-        onAuthStateChanged(auth, (user) => {
-            if (user && !user.isAnonymous) {
-                // Rediriger vers la page principale si déjà connecté
-                window.location.href = 'index.html';
-            }
-        });
+        if (firebaseInitialized) {
+            onAuthStateChanged(auth, (user) => {
+                if (user && !user.isAnonymous) {
+                    // Rediriger vers la page principale si déjà connecté
+                    window.location.href = 'index.html';
+                }
+            });
+        }
 
     </script>
 </body>
