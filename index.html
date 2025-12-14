@@ -4,10 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Accueil</title>
-    <meta name="google-adsense-account" content="ca-pub-7972578599056246">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- LIAISON VERS LE FICHIER CSS EXTERNE PARTAGÉ -->
-    <link rel="stylesheet" href="style.css"> 
+    
+    <style>
+        /* Importer la police Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        /* Couleurs de la marque et définition de la police */
+        :root {
+            --brand-dark: #1E3A8A; /* Bleu Profond */
+            --accent: #F59E0B; /* Orange Vif / Or */
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Classes Tailwind personnalisées pour les couleurs */
+        .bg-brand-dark { background-color: var(--brand-dark); }
+        .text-brand-dark { color: var(--brand-dark); }
+        .hover-accent:hover { background-color: #D97706; }
+        
+        /* Styles de liens de navigation Desktop */
+        .nav-link {
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .nav-link:hover {
+            background-color: #345b85;
+        }
+        /* Lien actif pour Desktop */
+        .active-link {
+            background-color: var(--accent);
+            font-weight: 600;
+            color: var(--brand-dark) !important;
+        }
+
+        /* --- STYLE DU MENU MOBILE (Off-Canvas) --- */
+        #mobile-menu {
+            /* État initial : poussé hors écran à droite */
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            /* Utilisation d'un z-index élevé */
+            z-index: 50; 
+        }
+        #mobile-menu.open {
+            /* État final : visible à l'écran */
+            transform: translateX(0);
+        }
+        /* Superposition pour l'accessibilité et la fermeture */
+        #mobile-menu-overlay {
+            display: none; 
+            z-index: 40;
+        }
+        #mobile-menu-overlay.open {
+            display: block;
+        }
+
+        /* Styles de liens de navigation Mobile */
+        .mobile-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .mobile-link:hover {
+            background-color: #345b85;
+        }
+        .mobile-link.active-link {
+            background-color: var(--accent);
+            color: var(--brand-dark);
+            font-weight: 700;
+        }
+        .mobile-link-btn {
+             display: block;
+             width: 100%;
+             text-align: center;
+        }
+
+        /* --- CAROUSEL D'IMAGES DÉFILANT --- */
+        .image-scroll-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .image-scroll-content {
+            display: inline-block;
+            /* La vitesse d'animation peut être ajustée ici */
+            animation: scroll-left 40s linear infinite;
+        }
+        .image-scroll-content:hover {
+            animation-play-state: paused;
+        }
+        .image-scroll-content img {
+            width: 300px;
+            height: 150px;
+            object-fit: cover;
+            margin-right: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
@@ -15,52 +119,82 @@
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
-                <div class="flex items-center">
+                
+                <!-- LOGO/MARQUE (CLIQUABLE VERS INDEX.HTML) -->
+                <a href="index.html" class="flex items-center group">
                     <img src="logo.jpg" 
                          alt="MindCompta Logo" 
-                         class="h-10 w-auto rounded-full mr-3 border-2 border-white">
-                    <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
-                </div>
-                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-6">
+                         onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
+                         class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
+                    <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
+                </a>
+
+                <!-- NAVIGATION DESKTOP -->
+                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
                     <a href="index.html" class="nav-link active-link">Accueil</a>
                     <a href="services.html" class="nav-link">Services (Livre)</a>
                     <a href="about.html" class="nav-link">À Propos</a>
                     <a href="calculator.html" class="nav-link">Calculatrice</a>
+                    
                     <!-- Lien Admin (visible si connecté) -->
-                    <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-lg hidden">Admin</a> 
+                    <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-full hidden text-white hover:bg-red-500">Admin</a> 
 
-                    <!-- Par défaut, afficher Se Connecter, cacher Déconnexion -->
+                    <!-- Boutons d'Action -->
                     <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
                         Se Connecter
                     </a>
-                    <button onclick="handleSignOut()" id="nav-logout-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white hidden">
+                    <button id="nav-logout-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white hidden">
                         Déconnexion
                     </button>
                 </nav>
+                
+                <!-- BOUTON MENU MOBILE -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
                 </button>
             </div>
-            <nav id="mobile-menu" class="hidden mt-4 pt-4 border-t border-gray-700 sm:hidden space-y-2">
-                <a href="index.html" class="mobile-link bg-accent font-semibold text-white py-3 active-link">Accueil</a>
-                <a href="services.html" class="mobile-link">Services (Livre)</a>
-                <a href="about.html" class="mobile-link">À Propos</a>
-                <a href="calculator.html" class="mobile-link">Calculatrice</a>
-                <!-- Lien Admin Mobile (visible si connecté) -->
-                <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-400 text-center font-semibold text-white py-3 hidden">Admin</a>
-
-                <!-- Par défaut, afficher Se Connecter, cacher Déconnexion -->
-                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent text-center font-semibold hover-accent text-white py-3">Se Connecter</a>
-                <button onclick="handleSignOut()" id="mobile-logout-btn" class="mobile-link bg-red-500 text-center font-semibold hover:bg-red-600 text-white py-3 hidden w-full">Déconnexion</button>
-            </nav>
         </div>
     </header>
 
+    <!-- MENU MOBILE OFF-CANVAS -->
+    <!-- Superposition (Overlay) -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+    
+    <!-- Menu coulissant -->
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
+        <!-- Bouton de fermeture -->
+        <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none">
+            &times;
+        </button>
+        <div class="pt-12 space-y-3">
+            <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
+            
+            <!-- Liens de navigation -->
+            <a href="index.html" class="mobile-link active-link">Accueil</a>
+            <a href="services.html" class="mobile-link">Services (Livre)</a>
+            <a href="about.html" class="mobile-link">À Propos</a>
+            <a href="calculator.html" class="mobile-link">Calculatrice</a>
+            
+            <!-- Lien Admin Mobile (visible si connecté) -->
+            <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 hidden">Admin</a>
+
+            <!-- Boutons d'Action Mobile -->
+            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3">
+                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
+                <button id="mobile-logout-btn" class="mobile-link bg-red-500 mobile-link-btn text-white hidden">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+    <!-- FIN MENU MOBILE -->
+
+
     <!-- SECTION : CAROUSEL D'IMAGES DÉFILANT -->
-    <div class="w-full py-4 bg-white border-b border-gray-200 mb-8">
+    <div class="w-full py-4 bg-white border-b border-gray-200 mb-8 overflow-hidden">
         <div class="image-scroll-container">
             <div class="image-scroll-content">
-                <!-- Ensemble 1 (Original - 7 images) - UTILISATION DES IMAGES FOURNIES -->
+                <!-- Les images utilisent des URL de substitution en cas d'échec de chargement -->
                 <img src="analyse.jpg" alt="Analyse financière" onerror="this.src='https://placehold.co/300x150/0d47a1/ffffff?text=Analyse+Financière'">
                 <img src="compta.jpg" alt="Comptabilité OHADA" onerror="this.src='https://placehold.co/300x150/42a5f5/000000?text=Comptabilité+OHADA'">
                 <img src="rapport.jpg" alt="Rapport d'Audit" onerror="this.src='https://placehold.co/300x150/0d47a1/ffffff?text=Rapport+d\'Audit'">
@@ -68,8 +202,8 @@
                 <img src="fiscale.jpg" alt="Stratégie Fiscale" onerror="this.src='https://placehold.co/300x150/0d47a1/ffffff?text=Stratégie+Fiscale'">
                 <img src="conseil.jpg" alt="Conseil Gestion" onerror="this.src='https://placehold.co/300x150/42a5f5/000000?text=Conseil+Gestion'">
                 <img src="Afrique.jpg" alt="Économie Africaine" onerror="this.src='https://placehold.co/300x150/0d47a1/ffffff?text=Économie+Africaine'">
-            
-                <!-- Ensemble 2 (Duplicata pour la boucle infinie - 7 images) -->
+
+                <!-- Duplicata pour la boucle infinie -->
                 <img src="analyse.jpg" alt="Analyse financière" onerror="this.src='https://placehold.co/300x150/0d47a1/ffffff?text=Analyse+Financière'">
                 <img src="compta.jpg" alt="Comptabilité OHADA" onerror="this.src='https://placehold.co/300x150/42a5f5/000000?text=Comptabilité+OHADA'">
                 <img src="rapport.jpg" alt="Rapport d'Audit" onerror="this.src='https://placehold.co/300x150/0d47a1/ffffff?text=Rapport+d\'Audit'">
@@ -85,7 +219,7 @@
 
     <!-- CONTENU PRINCIPAL -->
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
-        
+
         <!-- Section Héro -->
         <section class="text-center py-16 bg-white rounded-xl shadow-xl mb-12 border-t-4 border-brand-dark">
             <h1 class="text-5xl font-extrabold text-brand-dark mb-4 leading-tight">
@@ -132,13 +266,13 @@
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Mobile-Friendly</h3>
                     <p class="text-gray-500 text-sm">Une conception entièrement responsive, parfaite sur mobile et tablette.</p>
                 </div>
-                 <!-- Carte 5 (Ajout pour remplir l'espace) -->
+                 <!-- Carte 5 -->
                  <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 transform hover:shadow-2xl transition duration-300">
                     <div class="text-accent text-4xl mb-4">🛡️</div>
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Sécurité des Données</h3>
                     <p class="text-gray-500 text-sm">Vos données de calcul restent privées et sécurisées.</p>
                 </div>
-                 <!-- Carte 6 (Ajout pour remplir l'espace) -->
+                 <!-- Carte 6 -->
                  <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 transform hover:shadow-2xl transition duration-300">
                     <div class="text-accent text-4xl mb-4">🎓</div>
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Formation Continue</h3>
@@ -154,14 +288,13 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT (Chargez le script comme un module) -->
-    <script type="module" src="script.js"></script>
+    <!-- LOGIQUE JAVASCRIPT ET AUTHENTIFICATION FIREBASE -->
     <script type="module">
-        // Logique pour afficher/cacher les boutons de connexion/déconnexion et le lien Admin
+        // Importations Firebase
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 
-        // Configuration Firebase (dupliquée pour la robustesse des écouteurs d'état)
+        // Configuration Firebase (Doit être un JSON)
         const firebaseConfig = {
             apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
             authDomain: "mindcompta-cbb69.firebaseapp.com",
@@ -172,63 +305,111 @@
             measurementId: "G-SKSVSV0H70"
         };
         
+        // Initialisation de Firebase
+        let auth;
         if (firebaseConfig.apiKey) {
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
+            let app;
+            if (!getApps().length) {
+                app = initializeApp(firebaseConfig);
+            } else {
+                app = getApp();
+            }
+            auth = getAuth(app);
+            console.log("Firebase Auth Initialized.");
+        } else {
+            console.warn("Firebase API Key missing. Auth features disabled.");
+        }
 
-            // Fonction de Déconnexion globale (utilisée sur tous les boutons de déconnexion)
+
+        // --- FONCTIONNALITÉ DU MENU MOBILE ---
+        const mobileMenu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('mobile-menu-overlay');
+        const menuButton = document.getElementById('menu-button');
+        const closeMenuButton = document.getElementById('close-menu-button');
+
+        /** Bascule l'état ouvert/fermé du menu mobile */
+        function toggleMobileMenu(isOpen) {
+            // Détermine l'état souhaité
+            const isOpening = isOpen === undefined ? !mobileMenu.classList.contains('open') : isOpen;
+
+            if (isOpening) {
+                mobileMenu.classList.add('open');
+                overlay.classList.add('open');
+                // Verrouille le défilement du corps (important pour le mobile)
+                document.body.style.overflow = 'hidden'; 
+            } else {
+                mobileMenu.classList.remove('open');
+                overlay.classList.remove('open');
+                document.body.style.overflow = ''; // Rétablit le défilement
+            }
+        }
+
+        // Écouteurs d'événements pour l'ouverture/fermeture du menu
+        menuButton?.addEventListener('click', () => {
+            console.log("Clic Menu Button.");
+            toggleMobileMenu(true);
+        });
+        closeMenuButton?.addEventListener('click', () => {
+            console.log("Clic Close Button.");
+            toggleMobileMenu(false);
+        });
+        overlay?.addEventListener('click', () => {
+            console.log("Clic Overlay.");
+            toggleMobileMenu(false);
+        });
+        
+        // --- LOGIQUE D'AUTHENTIFICATION ---
+        if (auth) {
+            // Fonction de Déconnexion globale
             window.handleSignOut = async () => {
                 try {
+                    console.log("Tentative de déconnexion...");
                     await signOut(auth);
-                    // Rediriger vers la page d'accueil
+                    // Rediriger vers la page d'accueil après la déconnexion
                     window.location.href = 'index.html'; 
                 } catch (error) {
                     console.error("Erreur de déconnexion:", error);
+                    // Afficher un message d'erreur si nécessaire
                 }
             };
 
-            // Gère l'affichage du menu mobile
-            document.getElementById('menu-button')?.addEventListener('click', () => {
-                document.getElementById('mobile-menu')?.classList.toggle('hidden');
-            });
+            // Attache les écouteurs pour les boutons de déconnexion
+            document.getElementById('nav-logout-btn')?.addEventListener('click', window.handleSignOut);
+            document.getElementById('mobile-logout-btn')?.addEventListener('click', window.handleSignOut);
 
 
+            // Gère l'affichage des boutons de connexion/déconnexion et du lien Admin
             onAuthStateChanged(auth, (user) => {
-                const loginBtnDesktop = document.getElementById('nav-login-btn');
-                const logoutBtnDesktop = document.getElementById('nav-logout-btn');
-                const loginBtnMobile = document.getElementById('mobile-login-btn');
-                const logoutBtnMobile = document.getElementById('mobile-logout-btn');
+                console.log("État d'authentification changé. Utilisateur:", user ? user.uid : "Déconnecté");
+                const elements = {
+                    loginDesktop: document.getElementById('nav-login-btn'),
+                    logoutDesktop: document.getElementById('nav-logout-btn'),
+                    adminDesktop: document.getElementById('nav-admin-btn'),
+                    loginMobile: document.getElementById('mobile-login-btn'),
+                    logoutMobile: document.getElementById('mobile-logout-btn'),
+                    adminMobile: document.getElementById('mobile-admin-btn'),
+                };
 
-                const adminBtnDesktop = document.getElementById('nav-admin-btn');
-                const adminBtnMobile = document.getElementById('mobile-admin-btn');
-                
-                // Si l'utilisateur est connecté ET n'est PAS anonyme (connexion réelle)
-                if (user && !user.isAnonymous) {
-                    // Connexion/Déconnexion
-                    if (loginBtnDesktop) loginBtnDesktop.classList.add('hidden');
-                    if (logoutBtnDesktop) logoutBtnDesktop.classList.remove('hidden');
-                    if (loginBtnMobile) loginBtnMobile.classList.add('hidden');
-                    if (logoutBtnMobile) logoutBtnMobile.classList.remove('hidden');
-                    
-                    // Admin
-                    if (adminBtnDesktop) adminBtnDesktop.classList.remove('hidden');
-                    if (adminBtnMobile) adminBtnMobile.classList.remove('hidden');
+                const isUserLoggedIn = user && !user.isAnonymous;
 
-                } else {
-                    // Utilisateur déconnecté ou anonyme
-                    // Connexion/Déconnexion
-                    if (loginBtnDesktop) loginBtnDesktop.classList.remove('hidden');
-                    if (logoutBtnDesktop) logoutBtnDesktop.classList.add('hidden');
-                    if (loginBtnMobile) loginBtnMobile.classList.remove('hidden');
-                    if (logoutBtnMobile) logoutBtnMobile.classList.add('hidden');
-                    
-                    // Admin
-                    if (adminBtnDesktop) adminBtnDesktop.classList.add('hidden');
-                    if (adminBtnMobile) adminBtnMobile.classList.add('hidden');
-                }
+                // Fonction utilitaire pour basculerla visibilité
+                const setVisibility = (element, isVisible) => {
+                    if (element) {
+                        element.classList.toggle('hidden', !isVisible);
+                    }
+                };
+
+                // Gère les boutons de connexion/déconnexion
+                setVisibility(elements.loginDesktop, !isUserLoggedIn);
+                setVisibility(elements.logoutDesktop, isUserLoggedIn);
+                setVisibility(elements.loginMobile, !isUserLoggedIn);
+                setVisibility(elements.logoutMobile, isUserLoggedIn);
+
+                // Gère la visibilité du lien Admin
+                setVisibility(elements.adminDesktop, isUserLoggedIn);
+                setVisibility(elements.adminMobile, isUserLoggedIn);
             });
         }
     </script>
 </body>
 </html>
-
