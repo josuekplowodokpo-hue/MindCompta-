@@ -103,12 +103,11 @@
                 <!-- NAVIGATION DESKTOP -->
                 <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
                     <a href="index.html" class="nav-link">Accueil</a>
-                    <!-- Les liens de navigation Services, À Propos, etc. sont laissés pour la structure future -->
                     <a href="services.html" class="nav-link">Services (Livre)</a>
                     <a href="about.html" class="nav-link">À Propos</a>
                     <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
                     
-                    <!-- Ici, on est sur la page de connexion, donc pas de déconnexion/admin affiché -->
+                    <!-- Le bouton "Se Connecter" est actif sur cette page -->
                     <a href="login_firebase.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 active-link-desktop text-brand-dark">Se Connecter</a>
                 </nav>
 
@@ -223,7 +222,7 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- Firebase SDKs -->
+    <!-- LOGIQUE JAVASCRIPT ET FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
@@ -239,8 +238,9 @@
             setLogLevel
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Firebase Setup ---
+        // --- Configuration Firebase ---
         
+        // Active les logs de débogage pour voir les communications Firestore/Auth
         setLogLevel('debug');
         
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -254,10 +254,10 @@
             auth = getAuth(app);
             db = getFirestore(app);
         } else {
-            console.error("Firebase config is missing.");
+            console.error("La configuration Firebase est manquante. Les fonctions d'Auth et Firestore ne fonctionneront pas.");
         }
         
-        // --- DOM Elements ---
+        // --- Éléments du DOM ---
         const elements = {
             loginSection: document.getElementById('login-section'),
             signupSection: document.getElementById('signup-section'),
@@ -268,7 +268,7 @@
             loginButton: document.getElementById('login-button'),
             signupButton: document.getElementById('signup-button'),
             formContainer: document.getElementById('form-container'),
-            // Navigation Mobile
+            // Gestion du menu mobile (laissé pour la structure)
             mobileMenu: document.getElementById('mobile-menu'),
             overlay: document.getElementById('mobile-menu-overlay'),
             menuButton: document.getElementById('menu-button'),
@@ -278,7 +278,7 @@
         };
 
 
-        // --- Utility Functions ---
+        // --- Fonctions Utilitaires ---
 
         // Affiche un message d'état
         function showMessage(element, message, isSuccess) {
@@ -291,7 +291,7 @@
                 element.classList.add('bg-red-100', 'text-red-700', 'border-red-500');
             }
             
-            // Adjust text color for the signup section background
+            // Ajuster la couleur du texte pour la section d'inscription (fond sombre)
             if (element === elements.signupMessage) {
                  element.classList.add('text-white');
                  element.classList.remove('text-brand-dark');
@@ -308,20 +308,18 @@
         }
 
 
-        // --- CORE FIREBASE LOGIC ---
+        // --- LOGIQUE FIREBASE AUTH & FIRESTORE ---
 
         /**
-         * Sauvegarde le profil de l'utilisateur (nom, email, rôle) dans Firestore
-         * Le chemin suit la structure sécurisée: /artifacts/{appId}/users/{userId}/users_data/profile
-         * @param {string} userId - L'UID de l'utilisateur nouvellement créé
-         * @param {string} userName - Le nom complet de l'utilisateur
-         * @param {string} userEmail - L'email de l'utilisateur
-         * @param {string} role - Le rôle ('user' par défaut)
+         * Sauvegarde le profil de l'utilisateur dans Firestore.
+         * Chemin: /artifacts/{appId}/users/{userId}/users_data/profile
          */
         async function saveUserProfile(userId, userName, userEmail, role = 'user') {
-            if (!db || !userId) return;
+            if (!db || !userId) {
+                console.error("Firestore non initialisé ou UID utilisateur manquant.");
+                return;
+            }
 
-            // Chemin du document: /artifacts/{appId}/users/{userId}/users_data/profile
             const profileDocPath = `/artifacts/${appId}/users/${userId}/users_data/profile`;
             const userDocRef = doc(db, profileDocPath);
             
@@ -329,21 +327,20 @@
                 userName: userName,
                 email: userEmail,
                 role: role,
-                createdAt: new Date()
+                createdAt: new Date().toISOString()
             };
 
             try {
-                // Utilise setDoc avec l'UID comme ID du document pour un accès facile
+                // setDoc créera le document s'il n'existe pas.
                 await setDoc(userDocRef, userData);
-                console.log("Profil utilisateur sauvegardé avec succès dans Firestore.");
+                console.log("Profil utilisateur sauvegardé avec succès dans Firestore pour UID:", userId);
             } catch (e) {
-                console.error("Erreur lors de la sauvegarde du profil:", e);
-                // Note: L'utilisateur est créé dans Auth, mais le profil Firestore a échoué.
-                // Cela sera géré lors de la connexion.
+                console.error("Erreur critique lors de la sauvegarde du profil Firestore:", e);
+                throw new Error("Erreur de base de données. Veuillez vérifier les règles de sécurité.");
             }
         }
 
-        // 1. GESTION DE L'INSCRIPTION (Firebase)
+        // 1. GESTION DE L'INSCRIPTION (createUserWithEmailAndPassword + setDoc)
         elements.signupForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = document.getElementById('signup-email').value;
@@ -358,14 +355,13 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
-                // Étape 2: Sauvegarder le profil dans Firestore
+                // Étape 2: Sauvegarder le profil dans Firestore (cela crée la première collection)
                 await saveUserProfile(user.uid, name, email);
 
-                // Succès et redirection
                 showMessage(elements.signupMessage, `Compte créé avec succès pour ${name} ! Redirection...`, true);
 
                 setTimeout(() => {
-                    window.location.href = 'index.html'; // Redirection vers le tableau de bord
+                    window.location.href = 'index.html'; 
                 }, 1000);
 
             } catch (error) {
@@ -378,7 +374,7 @@
                         errorMessage = "Adresse email invalide.";
                         break;
                     case 'auth/weak-password':
-                        errorMessage = "Mot de passe trop faible (doit contenir au moins 6 caractères).";
+                        errorMessage = "Mot de passe trop faible (min. 6 caractères).";
                         break;
                     default:
                         errorMessage = `Erreur d'inscription: ${error.message}`;
@@ -391,7 +387,7 @@
         });
 
 
-        // 2. GESTION DE LA CONNEXION (Firebase)
+        // 2. GESTION DE LA CONNEXION (signInWithEmailAndPassword)
         elements.loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -401,18 +397,94 @@
             elements.loginMessage.classList.add('hidden');
 
             try {
-                // Tenter la connexion
+                // Tenter la connexion avec Firebase Auth
                 await signInWithEmailAndPassword(auth, email, password);
 
-                // Succès (onAuthStateChanged dans index.html prendra le relais)
                 showMessage(elements.loginMessage, 'Connexion réussie ! Redirection...', true);
 
                 setTimeout(() => {
-                    window.location.href = 'index.html'; // Redirection vers le tableau de bord
+                    window.location.href = 'index.html'; // Redirection
                 }, 1000);
 
             } catch (error) {
                 let errorMessage;
                 switch (error.code) {
                     case 'auth/invalid-credential':
-               
+                    case 'auth/wrong-password':
+                    case 'auth/user-not-found':
+                        errorMessage = "Email ou mot de passe incorrect.";
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = "Adresse email invalide.";
+                        break;
+                    default:
+                        errorMessage = `Erreur de connexion: ${error.message}`;
+                }
+                showMessage(elements.loginMessage, errorMessage, false);
+                console.error("Erreur de connexion Firebase:", error);
+            } finally {
+                 setButtonLoadingState(elements.loginButton, false, 'Se Connecter');
+            }
+        });
+
+        // --- GESTION DU LAYOUT RESPONSIVE (Basculement Connexion/Inscription) ---
+
+        function updateFormLayout(showSignup) {
+            // Affichage Desktop (md:)
+            if (window.innerWidth >= 768) { 
+                elements.loginSection.classList.toggle('md:w-full', !showSignup);
+                elements.loginSection.classList.toggle('md:w-1/2', showSignup);
+                
+                elements.signupSection.classList.toggle('hidden', !showSignup);
+                elements.signupSection.classList.toggle('md:block', showSignup);
+                
+                elements.loginSection.classList.toggle('hidden', showSignup);
+                elements.loginSection.classList.toggle('block', !showSignup);
+                
+                elements.formContainer.classList.toggle('md:flex-row-reverse', showSignup); 
+            } else { 
+                // Affichage Mobile (w-full)
+                elements.loginSection.classList.toggle('hidden', showSignup);
+                elements.signupSection.classList.toggle('hidden', !showSignup);
+            }
+        }
+        
+        // Initial state: show login
+        updateFormLayout(false);
+        // Écouteurs de basculement
+        elements.showSignupBtnDesktop?.addEventListener('click', () => updateFormLayout(true));
+        elements.showLoginBtnMobile?.addEventListener('click', () => updateFormLayout(false));
+        // Gère le redimensionnement pour maintenir la bonne vue
+        window.addEventListener('resize', () => updateFormLayout(elements.signupSection.classList.contains('md:block') || !elements.loginSection.classList.contains('hidden')));
+
+
+        // GESTIONNAIRE DU MENU MOBILE (Off-Canvas)
+      function toggleMobileMenu(isOpen) {
+            const isOpening = isOpen === undefined ? !elements.mobileMenu.classList.contains('open') : isOpen;
+
+            if (isOpening) {
+                elements.mobileMenu.classList.add('open');
+                elements.overlay.classList.add('open');
+                document.body.style.overflow = 'hidden'; 
+            } else {
+                elements.mobileMenu.classList.remove('open');
+                elements.overlay.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+        }
+
+        elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
+        elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
+        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
+        
+        // Redirection si l'utilisateur est déjà connecté (pour éviter qu'il reste sur la page login)
+        onAuthStateChanged(auth, (user) => {
+            if (user && !user.isAnonymous) {
+                // Rediriger vers la page principale si déjà connecté
+                window.location.href = 'index.html';
+            }
+        });
+
+    </script>
+</body>
+</html>
