@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Services (Livre)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <style>
         /* Importer la police Inter */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -90,7 +90,7 @@
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
-                
+
                 <!-- LOGO/MARQUE (CLIQUABLE VERS INDEX.HTML) -->
                 <a href="index.html" class="flex items-center group">
                     <img src="logo.jpg" 
@@ -103,22 +103,19 @@
                 <!-- NAVIGATION DESKTOP -->
                 <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
                     <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="services.html" class="nav-link active-link-desktop">Services (Livre)</a>
+                    <a href="services.html" class="nav-link active-link-desktop text-brand-dark">Services (Livre)</a>
                     <a href="about.html" class="nav-link">À Propos</a>
-                    <a href="youtube.html" class="nav-link">Vidéos YouTube</a> <!-- LIEN MIS À JOUR -->
-                    
-                    <!-- Lien Admin (visible si connecté) -->
-                    <a href="admin.html" id="nav-admin-btn" class="nav-link bg-red-400 py-2 px-4 rounded-full hidden text-white hover:bg-red-500">Admin</a> 
+                    <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
 
-                    <!-- Boutons d'Action -->
-                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                        Se Connecter
-                    </a>
-                    <button id="nav-logout-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white hidden">
-                        Déconnexion
-                    </button>
+                    <!-- Conteneur pour les actions d'authentification (géré par JS) -->
+                    <div id="auth-actions-desktop" class="flex items-center space-x-3">
+                        <!-- Rempli par JavaScript -->
+                        <a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+                            Se Connecter
+                        </a>
+                    </div>
                 </nav>
-                
+
                 <!-- BOUTON MENU MOBILE -->
                 <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -137,17 +134,16 @@
         </button>
         <div class="pt-12 space-y-3">
             <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
-            
-            <a href="index.html" class="mobile-link">Accueil</a>
-            <a href="services.html" class="mobile-link active-link-mobile">Services (Livre)</a>
-            <a href="about.html" class="mobile-link">À Propos</a>
-            <a href="youtube.html" class="mobile-link">Vidéos YouTube</a> <!-- LIEN MIS À JOUR -->
-            
-            <a href="admin.html" id="mobile-admin-btn" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 hidden">Admin</a>
 
-            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3">
-                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
-                <button id="mobile-logout-btn" class="mobile-link bg-red-500 mobile-link-btn text-white hidden">Déconnexion</button>
+            <a href="index.html" class="mobile-link">Accueil</a>
+            <a href="services.html" class="mobile-link active-link-mobile text-brand-dark">Services (Livre)</a>
+            <a href="about.html" class="mobile-link">À Propos</a>
+            <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
+
+            <!-- Conteneur pour les actions d'authentification mobiles (géré par JS) -->
+            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
+                <!-- Rempli par JavaScript -->
+                <a href="login.html" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
             </div>
         </div>
     </nav>
@@ -156,7 +152,7 @@
 
     <!-- CONTENU PRINCIPAL -->
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
-        
+
         <h1 class="text-4xl font-extrabold text-brand-dark mb-10 mt-4 text-center">
             Notre Offre de Services et Contenus (Livre)
         </h1>
@@ -194,33 +190,44 @@
                 <a href="contact.html" class="mt-4 inline-block text-brand-dark font-semibold hover:text-accent transition duration-200">Demander un Audit →</a>
             </div>
 
-            <!-- Service 3: Contenu Éducatif (Le Livre) - PREMIUM (TOOGLE) -->
+            <!-- Service 3: Contenu Éducatif (Le Livre / Bibliothèque) - PREMIUM -->
             <div id="service-premium-card" class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-500 hover:shadow-2xl transition duration-300 relative overflow-hidden">
                 <h3 class="text-2xl font-bold text-gray-800 mb-3 flex items-center">
-                    <span class="text-red-500 text-3xl mr-3">⭐</span> Accès Exclusif au "Livre Blanc"
+                    <span class="text-red-500 text-3xl mr-3">📚</span> Bibliothèque Exclusif
                 </h3>
 
                 <!-- Contenu DÉVERROUILLÉ (Affiché si connecté) -->
-                <div id="premium-content-unlocked" class="hidden">
-                    <p class="text-gray-600 mb-4 font-bold">
-                        Toute notre documentation, études de cas et guides pratiques sur la comptabilité et la fiscalité en Afrique de l'Ouest.
+                <div id="premium-content-unlocked" class="hidden space-y-4">
+                    <p class="text-gray-600 font-bold">
+                        Accédez à la collection complète d'ouvrages et de guides :
                     </p>
-                    <ul class="text-sm text-gray-700 space-y-2 list-disc list-inside">
-                        <li>Guides complets (PDF, Ebook).</li>
-                        <li>Analyses de jurisprudence OHADA.</li>
-                        <li>Modèles et formulaires financiers.</li>
-                    </ul>
-                    <a href="#" class="mt-4 inline-block bg-brand-dark text-white font-semibold py-2 px-4 rounded-full hover:bg-red-700 transition duration-200 shadow-md">
-                        Lire le Chapitre 1 →
-                    </a>
+                    
+                    <!-- FORMULAIRE D'ADMINISTRATION (Pour ajouter un livre) -->
+                    <form id="admin-add-form" class="hidden bg-red-50 p-4 rounded-lg border border-red-200">
+                        <h4 class="text-lg font-semibold text-red-600 mb-2">Espace Admin (Ajouter)</h4>
+                        <input type="text" id="book-title" placeholder="Titre du livre (Ex: Guide Fiscal 2025)" required
+                               class="w-full p-2 mb-2 border rounded-md focus:ring-red-500 focus:border-red-500">
+                        <input type="url" id="book-url" placeholder="Lien de téléchargement (URL)" required
+                               class="w-full p-2 mb-3 border rounded-md focus:ring-red-500 focus:border-red-500">
+                        <button type="submit" class="w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition">
+                            Ajouter le Livre
+                        </button>
+                    </form>
+
+                    <!-- LISTE DES LIVRES CHARGÉS PAR LocalStorage -->
+                    <div id="library-list" class="space-y-3 pt-2">
+                        <p class="text-center text-sm text-gray-400">Chargement de la bibliothèque...</p>
+                        <!-- Les livres seront insérés ici -->
+                    </div>
+                    
                 </div>
 
                 <!-- Contenu VERROUILLÉ (Affiché si déconnecté) -->
                 <div id="premium-content-locked" class="absolute inset-0 bg-white bg-opacity-95 backdrop-blur-sm flex flex-col items-center justify-center p-6 rounded-xl border-t-4 border-red-500">
                     <div class="text-red-500 text-5xl mb-3">🔒</div>
-                    <p class="text-lg font-bold text-gray-800 mb-4 text-center">Contenu Membre</p>
+                    <p class="text-lg font-bold text-gray-800 mb-4 text-center">Bibliothèque Verrouillée</p>
                     <p class="text-sm text-gray-600 mb-6 text-center px-2">
-                        Veuillez vous connecter pour déverrouiller ce Livre Blanc exclusif.
+                        Veuillez vous connecter pour accéder à tous les livres et guides de la bibliothèque.
                     </p>
                     <a href="login.html" class="bg-accent text-white font-bold py-2 px-5 rounded-full hover-accent transition duration-300 shadow-lg">
                         Se Connecter / S'inscrire
@@ -251,62 +258,44 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT ET VÉRIFICATION D'ACCÈS -->
-    <script type="module">
-        // Import des modules Firebase nécessaires
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    <!-- LOGIQUE JAVASCRIPT ET GESTION DE LA SESSION/BIBLIOTHÈQUE -->
+    <script>
+        // --- CONSTANTES DE SESSION ET D'ADMINISTRATION ---
+        const SESSION_KEY = 'currentUser';
+        const LIBRARY_STORAGE_KEY = 'mindcompta_library_books';
+        const ADMIN_USERNAME = 'admin-Josue'; 
+        const REDIRECTION_PAGE = 'login.html';
+        
+        // --- GESTION DE LA SESSION UTILISATEUR (LocalStorage/SessionStorage) ---
 
-        // Configuration Firebase (Identique à index.html)
-        const firebaseConfig = {
-            apiKey: "AIzaSyBu9BAZbgYKQ_C_qHgAgU31uclG-sLEh0c",
-            authDomain: "mindcompta-cbb69.firebaseapp.com",
-            projectId: "mindcompta-cbb69",
-            storageBucket: "mindcompta-cbb69.firebasestorage.app",
-            messagingSenderId: "470368630296",
-            appId: "1:470368630296:web:510de914f335b27b3d356d",
-            measurementId: "G-SKSVSV0H70"
-        };
-
-        let auth;
-        if (firebaseConfig.apiKey) {
-            let app;
-            if (!getApps().length) {
-                app = initializeApp(firebaseConfig);
-            } else {
-                app = getApp();
+        /** * Récupère l'utilisateur connecté depuis sessionStorage.
+         * @returns {object|null} L'objet utilisateur ou null si déconnecté.
+         */
+        function getCurrentUser() {
+            const userJson = sessionStorage.getItem(SESSION_KEY);
+            try {
+                return userJson ? JSON.parse(userJson) : null;
+            } catch (e) {
+                console.error("Erreur de parsing de l'utilisateur en session:", e);
+                return null;
             }
-            auth = getAuth(app);
-            console.log("Firebase Auth Initialized.");
-
-            // Fonction de Déconnexion globale
-            window.handleSignOut = async () => {
-                try {
-                    await signOut(auth);
-                    window.location.href = 'index.html'; 
-                } catch (error) {
-                    console.error("Erreur de déconnexion:", error);
-                }
-            };
-
-            // Attache les écouteurs pour les boutons de déconnexion
-            document.getElementById('nav-logout-btn')?.addEventListener('click', window.handleSignOut);
-            document.getElementById('mobile-logout-btn')?.addEventListener('click', window.handleSignOut);
-
-        } else {
-            console.error("Firebase non configuré. Les fonctionnalités d'authentification sont désactivées.");
         }
 
-        // --- GESTION DU MENU MOBILE ---
+        /** Gère la déconnexion de l'utilisateur. */
+        function handleSignOut() {
+            sessionStorage.removeItem(SESSION_KEY);
+            // Recharger la page pour mettre à jour l'état UI
+            window.location.href = 'index.html'; 
+        }
+
+        // --- GESTION DU MENU MOBILE (Off-Canvas) ---
         const mobileMenu = document.getElementById('mobile-menu');
         const overlay = document.getElementById('mobile-menu-overlay');
         const menuButton = document.getElementById('menu-button');
         const closeMenuButton = document.getElementById('close-menu-button');
 
-        /** Bascule l'état ouvert/fermé du menu mobile */
         function toggleMobileMenu(isOpen) {
             const isOpening = isOpen === undefined ? !mobileMenu.classList.contains('open') : isOpen;
-
             if (isOpening) {
                 mobileMenu.classList.add('open');
                 overlay.classList.add('open');
@@ -318,63 +307,187 @@
             }
         }
 
-        // Écouteurs d'événements pour l'ouverture/fermeture du menu
         menuButton?.addEventListener('click', () => toggleMobileMenu(true));
         closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
         overlay?.addEventListener('click', () => toggleMobileMenu(false));
+        
+        // --- LOGIQUE AUTHENTIFICATION/HEADER/ACCÈS PREMIUM ---
 
-        // --- GESTION DE L'AUTHENTIFICATION ET DE L'ACCÈS AU CONTENU PREMIUM ---
-        if (auth) {
-            onAuthStateChanged(auth, (user) => {
-                const premiumUnlocked = document.getElementById('premium-content-unlocked');
-                const premiumLocked = document.getElementById('premium-content-locked');
-                
-                const elements = {
-                    loginDesktop: document.getElementById('nav-login-btn'),
-                    logoutDesktop: document.getElementById('nav-logout-btn'),
-                    adminDesktop: document.getElementById('nav-admin-btn'),
-                    loginMobile: document.getElementById('mobile-login-btn'),
-                    logoutMobile: document.getElementById('mobile-logout-btn'),
-                    adminMobile: document.getElementById('mobile-admin-btn'),
-                };
+        /** Met à jour le header pour refléter l'état de connexion. */
+        function updateHeaderUI(user) {
+            const isUserLoggedIn = user !== null;
+            const desktopActions = document.getElementById('auth-actions-desktop');
+            const mobileActions = document.getElementById('auth-actions-mobile');
+            
+            // Si l'utilisateur est déconnecté
+            if (!isUserLoggedIn) {
+                const loginHtml = `
+                    <a href="${REDIRECTION_PAGE}" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+                        Se Connecter
+                    </a>
+                `;
+                desktopActions.innerHTML = loginHtml;
+                mobileActions.innerHTML = `<a href="${REDIRECTION_PAGE}" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>`;
+                return;
+            }
 
-                const isUserLoggedIn = user && !user.isAnonymous;
+            // Utilisateur connecté
+            const isUserAdmin = user.username === ADMIN_USERNAME;
+            const userNameDisplay = user.username || "Utilisateur";
 
-                // 1. Fonction utilitaire pour basculer la visibilité
-                const setVisibility = (element, isVisible) => {
-                    if (element) {
-                        element.classList.toggle('hidden', !isVisible);
-                    }
-                };
+            const adminButtonHtml = isUserAdmin 
+                ? `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
+                : '';
+            
+            // 1. Desktop
+            desktopActions.innerHTML = `
+                ${adminButtonHtml}
+                <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600 hidden sm:inline">
+                    Bienvenue, ${userNameDisplay}
+                </span>
+                <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
+                    Déconnexion
+                </button>
+            `;
 
-                // 2. Gérer les boutons de connexion/déconnexion du menu
-                setVisibility(elements.loginDesktop, !isUserLoggedIn);
-                setVisibility(elements.logoutDesktop, isUserLoggedIn);
-                setVisibility(elements.adminDesktop, isUserLoggedIn);
-                setVisibility(elements.loginMobile, !isUserLoggedIn);
-                setVisibility(elements.logoutMobile, isUserLoggedIn);
-                setVisibility(elements.adminMobile, isUserLoggedIn);
+            // 2. Mobile
+            mobileActions.innerHTML = `
+                ${isUserAdmin ? 
+                    `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
+                    : ''}
+                <p class="text-accent text-lg font-bold mb-2">Connecté</p>
+                <p class="text-white text-md font-semibold mb-3">${userNameDisplay}</p>
+                <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
+            `;
 
-                // 3. Gérer l'accès à la carte PREMIUM (Service 3)
-                if (isUserLoggedIn) {
-                    // Utilisateur connecté : Montrer le contenu déverrouillé, masquer le verrou
-                    if (premiumUnlocked) premiumUnlocked.classList.remove('hidden');
-                    if (premiumLocked) premiumLocked.classList.add('hidden');
-                } else {
-                    // Utilisateur déconnecté : Masquer le contenu déverrouillé, montrer le verrou
-                    if (premiumUnlocked) premiumUnlocked.classList.add('hidden');
-                    if (premiumLocked) premiumLocked.classList.remove('hidden');
-                }
-            });
-        } else {
-             // Si Firebase non configuré, s'assurer que l'écran verrouillé est affiché par défaut
-             document.getElementById('premium-content-unlocked')?.classList.add('hidden');
-             document.getElementById('premium-content-locked')?.classList.remove('hidden');
+            // 3. Attacher les écouteurs de déconnexion
+            document.getElementById('logout-desktop-btn')?.addEventListener('click', handleSignOut);
+            document.getElementById('logout-mobile-btn')?.addEventListener('click', handleSignOut);
         }
 
-        // Réaffirmer le titre de la page
-        document.title = "MindCompta - Services (Livre)";
+        /** Gère la visibilité de l'accès Premium et charge la bibliothèque. */
+        function updatePremiumAccess(user) {
+            const premiumUnlocked = document.getElementById('premium-content-unlocked');
+            const premiumLocked = document.getElementById('premium-content-locked');
+            
+            if (user) {
+                // Utilisateur connecté
+                premiumUnlocked?.classList.remove('hidden');
+                premiumLocked?.classList.add('hidden');
+                setupLibrary(user.username);
+            } else {
+                // Utilisateur déconnecté
+                premiumUnlocked?.classList.add('hidden');
+                premiumLocked?.classList.remove('hidden');
+            }
+        }
+
+
+        // --- GESTION DE LA BIBLIOTHÈQUE (LocalStorage) ---
+        
+        /** Charge la liste des livres depuis localStorage. */
+        function loadBooksFromStorage() {
+            const booksJson = localStorage.getItem(LIBRARY_STORAGE_KEY);
+            if (booksJson) {
+                try {
+                    return JSON.parse(booksJson);
+                } catch (e) {
+                    console.error("Erreur de parsing des livres:", e);
+                    return [];
+                }
+            }
+            // Initialiser avec quelques livres par défaut si c'est la première fois
+            return [
+                { id: Date.now() + 1, title: "OHADA : Acte Uniforme Droit Commercial", url: "https://example.com/ohada-droit-commercial" },
+                { id: Date.now() + 2, title: "Guide Fiscal des PME en Afrique de l'Ouest", url: "https://example.com/guide-pme-fiscalite" },
+                { id: Date.now() + 3, title: "Méthodes d'Évaluation d'Entreprise", url: "https://example.com/evaluation-entreprise-methods" }
+            ];
+        }
+
+        /** Sauvegarde la liste des livres dans localStorage. */
+        function saveBooksToStorage(books) {
+            localStorage.setItem(LIBRARY_STORAGE_KEY, JSON.stringify(books));
+        }
+
+        /** Affiche la liste des livres dans l'interface utilisateur. */
+        function renderLibrary(books) {
+            const listContainer = document.getElementById('library-list');
+            listContainer.innerHTML = ''; 
+
+            if (books.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-500 italic">Aucun livre n\'a été ajouté à la bibliothèque pour l\'instant.</p>';
+                return;
+            }
+
+            // Tri par titre pour une meilleure lisibilité
+            books.sort((a, b) => a.title.localeCompare(b.title));
+
+            books.forEach(book => {
+                const bookElement = document.createElement('div');
+                bookElement.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg shadow-sm border-l-4 border-brand-dark';
+                bookElement.innerHTML = `
+                    <span class="text-sm font-medium text-gray-700 truncate">${book.title}</span>
+                    <a href="${book.url}" target="_blank" rel="noopener noreferrer" 
+                       class="bg-accent text-white text-xs font-semibold py-1 px-3 rounded-full hover-accent transition duration-300 ml-4">
+                        Télécharger
+                    </a>
+                `;
+                listContainer.appendChild(bookElement);
+            });
+        }
+        
+        /** Initialise le chargement de la bibliothèque et la gestion du formulaire Admin. */
+        function setupLibrary(currentUsername) {
+            const adminForm = document.getElementById('admin-add-form');
+            let books = loadBooksFromStorage();
+            renderLibrary(books); // Affichage initial
+            
+            // Afficher le formulaire d'ajout si l'utilisateur est l'Admin
+            if (currentUsername === ADMIN_USERNAME) {
+                adminForm.classList.remove('hidden');
+                
+                // Gérer la soumission du formulaire
+                adminForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const title = document.getElementById('book-title').value.trim();
+                    const url = document.getElementById('book-url').value.trim();
+                    
+                    if (title && url) {
+                        const newBook = {
+                            id: Date.now(), // ID unique simple
+                            title: title,
+                            url: url,
+                            addedBy: currentUsername,
+                            createdAt: new Date().toISOString()
+                        };
+
+                        books.push(newBook);
+                        saveBooksToStorage(books);
+                        renderLibrary(books); // Réaffichage avec le nouveau livre
+                        
+                        // Réinitialiser le formulaire
+                        adminForm.reset();
+                    }
+                });
+            } else {
+                adminForm.classList.add('hidden');
+            }
+        }
+
+        // --- EXÉCUTION AU CHARGEMENT DE LA PAGE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = getCurrentUser();
+            
+            updateHeaderUI(currentUser);
+            updatePremiumAccess(currentUser);
+
+            if (currentUser && currentUser.username) {
+                console.log(`Utilisateur connecté: ${currentUser.username}`);
+            } else {
+                console.log("Aucun utilisateur n'est connecté.");
+            }
+        });
+
     </script>
 </body>
 </html>
-
