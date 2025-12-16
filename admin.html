@@ -105,6 +105,9 @@
                     <!-- Action Buttons and User Info (Managed by JS) -->
                     <div id="auth-actions-desktop" class="flex items-center space-x-3">
                         <!-- Content managed by JS (checkSessionAndRenderHeader) -->
+                        <a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+                            Chargement...
+                        </a>
                     </div>
                 </nav>
 
@@ -134,7 +137,7 @@
 
             <!-- Authentication Actions Container (Filled by JS) -->
             <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
-                <!-- Content managed by JS (checkSessionAndRenderHeader) -->
+                <a href="login.html" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Chargement...</a>
             </div>
         </div>
     </nav>
@@ -148,15 +151,15 @@
 
         <!-- Conteneur d'état de chargement/erreur -->
         <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-lg shadow-md transition duration-300" role="alert">
-            Vérification des droits d'accès...
+            Vérification des droits d'accès et initialisation Firebase...
         </div>
 
         <div class="mb-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg shadow-inner">
             <p class="font-bold">⚠️ Note de Sécurité Importante :</p>
-            <p class="text-sm">Par principe de sécurité, les mots de passe ne sont jamais stockés dans le navigateur ni affichés dans le tableau de bord Admin. Les informations ci-dessous sont des exemples statiques des utilisateurs enregistrés.</p>
+            <p class="text-sm">Les informations affichées sont gérées par Firestore. Pour des raisons de sécurité, aucune fonctionnalité d'édition ou de suppression n'est disponible directement dans ce front-end. Les mots de passe ne sont jamais affichés.</p>
         </div>
-        
-        <!-- TABLEAU DES UTILISATEURS SIMULÉS -->
+
+        <!-- TABLEAU DES UTILISATEURS FIRESTORE -->
         <div class="bg-white rounded-xl shadow-xl overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -169,9 +172,9 @@
                     </tr>
                 </thead>
                 <tbody id="user-list" class="bg-white divide-y divide-gray-200">
-                    <!-- Les lignes seront insérées par JavaScript -->
+                    <!-- Les lignes seront insérées par JavaScript (Firestore) -->
                     <tr>
-                        <td colspan="5" class="py-12 text-center text-gray-400">Chargement des données utilisateurs...</td>
+                        <td colspan="5" class="py-12 text-center text-gray-400">Chargement des données utilisateurs depuis Firestore...</td>
                     </tr>
                 </tbody>
             </table>
@@ -183,76 +186,99 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT GLOBALE & GESTION DU MENU MOBILE -->
-    <script>
-        // Page de redirection en cas de déconnexion ou d'accès non autorisé
+    <!-- LOGIQUE JAVASCRIPT GLOBALE & FIREBASE -->
+    <script type="module">
+        // --- IMPORTS FIREBASE ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signOut, 
+            onAuthStateChanged, 
+            signInWithCustomToken, 
+            signInAnonymously 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            onSnapshot,
+            query
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CONSTANTES ET CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
+            authDomain: "mindcompta-a61ef.firebaseapp.com",
+            projectId: "mindcompta-a61ef",
+            storageBucket: "mindcompta-a61ef.firebasestorage.app",
+            messagingSenderId: "578389020450",
+            appId: "1:578389020450:web:edf9dd48e394cff7601f7b",
+            measurementId: "G-CDS9XYT35Y"
+        };
+        
         const REDIRECTION_PAGE = 'login.html'; 
-        const ADMIN_ROLE = 'admin';
+        const ADMIN_EMAIL = 'admin@mindcompta.com'; // L'utilisateur Admin attendu
+        
+        let auth, db;
+        // Utilisation de la variable globale __app_id pour le chemin Firestore
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-        // --- Données Statiques des Utilisateurs (Simulant la base de données) ---
-        const USERS_DATA = [
-            { name: "Admin Principal", email: "admin@mindcompta.com", role: "Admin", status: "EN LIGNE", lastLogin: "14/12/2025 à 17:40" },
-            { name: "Chantal Finance", email: "chantal@mindcompta.com", role: "Comptable", status: "EN LIGNE", lastLogin: "14/12/2025 à 17:35" },
-            { name: "Pierre Comptable", email: "pierre@mindcompta.com", role: "Comptable", status: "HORS LIGNE", lastLogin: "13/12/2025 à 10:15" },
-            { name: "Jeanne Expert", email: "jeanne@mindcompta.com", role: "Expert", status: "EN LIGNE", lastLogin: "14/12/2025 à 17:38" },
-            { name: "Blessing Junior", email: "blessing@mindcompta.com", role: "Junior", status: "HORS LIGNE", lastLogin: "10/12/2025 à 09:00" },
-        ];
+        // --- REFERENCES DOM ---
+        const statusMessage = document.getElementById('status-message');
+        const userListElement = document.getElementById('user-list');
 
+        // --- Fonctions Utilitaires ---
+
+        /** * Formate un horodatage Firestore en chaîne de date lisible.
+         * @param {Object} timestamp - L'objet timestamp Firestore (s, n) ou null.
+         * @returns {string} Date et heure formatées.
+         */
+        function formatFirestoreTimestamp(timestamp) {
+            if (!timestamp || !timestamp.seconds) {
+                return 'N/A';
+            }
+            try {
+                // Multiplier par 1000 pour convertir les secondes en millisecondes
+                const date = new Date(timestamp.seconds * 1000);
+                return date.toLocaleString('fr-FR', {
+                    day: '2-digit', month: '2-digit', year: 'numeric', 
+                    hour: '2-digit', minute: '2-digit'
+                }).replace(',', ' à');
+            } catch (e) {
+                console.error("Erreur de formatage du timestamp:", e);
+                return 'Date invalide';
+            }
+        }
+        
+        // --- GESTION DE L'AUTHENTIFICATION ET DE L'ACCÈS ---
 
         /** Gère la déconnexion de l'utilisateur. */
-        window.handleLogout = () => {
-            localStorage.removeItem('isAuthenticated');
-            localStorage.removeItem('userEmail');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userRole');
-            window.location.href = REDIRECTION_PAGE; 
+        window.handleLogout = async () => {
+            try {
+                await signOut(auth);
+                // La redirection sera gérée par l'écouteur onAuthStateChanged
+            } catch (error) {
+                console.error("Erreur lors de la déconnexion:", error);
+                window.location.href = REDIRECTION_PAGE; // Fallback
+            }
         };
 
         /**
-         * Affiche la liste des utilisateurs à partir des données statiques.
+         * Met à jour le header et les boutons d'action basés sur l'état de connexion.
+         * @param {Object} user - L'objet utilisateur Firebase, ou null.
          */
-        function renderUsersTable() {
-            const userListElement = document.getElementById('user-list');
-            userListElement.innerHTML = ''; // Nettoyer la liste existante
-
-            USERS_DATA.forEach(user => {
-                const isOnline = user.status === 'EN LIGNE';
-                const statusColor = isOnline 
-                    ? 'bg-vibrant-green text-white' 
-                    : 'bg-gray-400 text-white';
-
-                const row = document.createElement('tr');
-                row.classList.add('hover:bg-gray-50', 'transition', 'duration-150');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-brand-dark">${user.name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.email}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${user.role}</td>
-                    
-                    <!-- STATUT -->
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">
-                            ${user.status}
-                        </span>
-                    </td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">${user.lastLogin}</td>
-                `;
-                userListElement.appendChild(row);
-            });
-        }
-
-
-        /**
-         * Vérifie l'état de la session et met à jour l'interface utilisateur.
-         */
-        function checkSessionAndRenderHeader() {
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
+        function checkSessionAndRenderHeader(user) {
             const desktopActions = document.getElementById('auth-actions-desktop');
             const mobileActions = document.getElementById('auth-actions-mobile');
 
-            // --- Utilisateur Connecté ---
-            if (userName) {
+            // Vérifie si l'utilisateur est connecté et si son email correspond à l'admin
+            const isAuthenticatedAdmin = user && user.email === ADMIN_EMAIL;
+            
+            if (isAuthenticatedAdmin) {
+                const userName = user.email.split('@')[0];
+                
+                // --- Utilisateur Connecté et Admin ---
+                statusMessage.classList.add('hidden'); // Cache le message de statut si l'accès est OK
+
                 // 1. Desktop Actions 
                 desktopActions.innerHTML = `
                     <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
@@ -265,8 +291,9 @@
 
                 // 2. Mobile Actions
                 mobileActions.innerHTML = `
+                    <a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>
                     <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
-                    <p class="text-white text-md font-semibold mb-3">${userName} (${userRole || 'Utilisateur'})</p>
+                    <p class="text-white text-md font-semibold mb-3">${userName} (Admin)</p>
                     <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
                 `;
 
@@ -274,43 +301,146 @@
                 document.getElementById('logout-desktop-btn')?.addEventListener('click', window.handleLogout);
                 document.getElementById('logout-mobile-btn')?.addEventListener('click', window.handleLogout);
                 
-            } else {
-                // --- Utilisateur Déconnecté ---
-                
-                // 1. Desktop Actions (Affiche uniquement "Se Connecter")
-                desktopActions.innerHTML = `
-                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                        Se Connecter
-                    </a>
-                `;
+                // Lancer le chargement des données
+                fetchUsersData();
 
-                // 2. Mobile Actions
-                mobileActions.innerHTML = `
-                    <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
-                `;
+            } else {
+                // --- Accès Refusé ---
+                const reason = user && user.email ? `L'utilisateur connecté (${user.email}) n'est pas l'administrateur.` : 'Session non trouvée.';
+                
+                statusMessage.textContent = `Accès refusé. ${reason} Redirection vers la connexion...`;
+                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800', 'hidden');
+                statusMessage.classList.add('bg-red-100', 'text-red-800');
+                
+                setTimeout(() => {
+                    window.location.href = REDIRECTION_PAGE;
+                }, 1000);
+                
+                // Rendu des actions par défaut (Connexion)
+                desktopActions.innerHTML = `<a href="${REDIRECTION_PAGE}" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">Se Connecter</a>`;
+                mobileActions.innerHTML = `<a href="${REDIRECTION_PAGE}" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>`;
             }
         }
 
+        // --- GESTION DE FIRESTORE (Affichage des Utilisateurs) ---
 
-        // --- GESTION DE L'ACCÈS ADMIN ---
-        function checkAdminAccess() {
-            const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-            const userRole = localStorage.getItem('userRole');
-            const statusMessage = document.getElementById('status-message');
+        /**
+         * Récupère la liste des profils utilisateur depuis Firestore et met à jour le tableau en temps réel.
+         */
+        function fetchUsersData() {
+            // Path: /artifacts/{appId}/public/data/user_profiles
+            const userProfilesPath = `/artifacts/${appId}/public/data/user_profiles`;
+            const usersRef = collection(db, userProfilesPath);
+            // Crée une requête simple pour la collection
+            const usersQuery = query(usersRef);
 
-            // Utilise toLowerCase() pour rendre la vérification insensible à la casse
-            if (!isAuthenticated || userRole?.toLowerCase() !== ADMIN_ROLE) {
-                statusMessage.textContent = "Accès refusé. Redirection vers la page de connexion...";
-                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800');
-                statusMessage.classList.add('bg-red-100', 'text-red-800');
-                setTimeout(() => {
-                    window.location.href = REDIRECTION_PAGE;
-                }, 1000); 
-                return false;
+            console.log(`Écoute de la collection d'utilisateurs: ${userProfilesPath}`);
+            
+            // onSnapshot pour les mises à jour en temps réel
+            onSnapshot(usersQuery, (snapshot) => {
+                const userProfiles = [];
+                snapshot.forEach(doc => {
+                    userProfiles.push({ id: doc.id, ...doc.data() });
+                });
+                
+                renderUsersTable(userProfiles);
+
+            }, (error) => {
+                console.error("Erreur lors de la récupération des profils utilisateurs:", error);
+                userListElement.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-12 text-center text-red-500 font-bold">
+                            Erreur de chargement des profils : ${error.message}
+                            <br>Vérifiez les règles de sécurité Firestore pour l'accès public.
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+        
+        /**
+         * Affiche la liste des utilisateurs dans le tableau HTML.
+         * @param {Array} profiles - Liste des profils utilisateur Firestore.
+         */
+        function renderUsersTable(profiles) {
+            userListElement.innerHTML = ''; // Nettoyer la liste existante
+            
+            if (profiles.length === 0) {
+                 userListElement.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-8 text-center text-gray-500">
+                            Aucun profil utilisateur trouvé dans la base de données. 
+                            (Assurez-vous que l'application cliente enregistre les profils dans: ${`/artifacts/${appId}/public/data/user_profiles`})
+                        </td>
+                    </tr>
+                `;
+                return;
             }
-            // Si l'accès est autorisé, on cache le message d'état
-            statusMessage.classList.add('hidden');
-            return true;
+
+            profiles.forEach(user => {
+                // Détermine le statut (hypothétique) et la couleur
+                const userEmail = user.email || '';
+                const roleText = user.role || 'Client';
+                const isOnline = user.status === 'EN LIGNE' || user.status === 'ONLINE'; 
+                const isActualAdmin = userEmail === ADMIN_EMAIL;
+                
+                const statusColor = isActualAdmin ? 'bg-red-500 text-white' : (isOnline ? 'bg-vibrant-green text-white' : 'bg-gray-400 text-white');
+                const displayName = user.displayName || (userEmail ? userEmail.split('@')[0] : 'Inconnu');
+
+                const row = document.createElement('tr');
+                row.classList.add('hover:bg-gray-50', 'transition', 'duration-150');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-brand-dark">${displayName}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${userEmail}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${roleText}</td>
+                    
+                    <!-- STATUT -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">
+                            ${isActualAdmin ? 'ADMIN' : (user.status || 'HORS LIGNE')}
+                        </span>
+                    </td>
+
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">
+                        ${formatFirestoreTimestamp(user.lastLogin)}
+                    </td>
+                `;
+                userListElement.appendChild(row);
+            });
+        }
+        
+        // --- INITIALISATION PRINCIPALE ---
+        function initializeFirebase() {
+            try {
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+  
+                db = getFirestore(app);
+
+                // Tentative de connexion silencieuse
+                if (initialAuthToken) {
+                    signInWithCustomToken(auth, initialAuthToken).catch(err => {
+                        console.warn("Échec de la connexion par jeton initial:", err.message);
+                    });
+                } else {
+                    signInAnonymously(auth).catch(err => {
+                        console.warn("Échec de la connexion anonyme:", err.message);
+                    });
+                }
+
+                // Écouteur d'état d'authentification pour gérer l'accès et la redirection
+                onAuthStateChanged(auth, (user) => {
+                    checkSessionAndRenderHeader(user);
+                });
+
+            } catch (error) {
+                console.error("Échec de l'initialisation Firebase:", error);
+                statusMessage.textContent = `Erreur critique d'initialisation : ${error.message}`;
+                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800', 'hidden');
+                statusMessage.classList.add('bg-red-100', 'text-red-800');
+            }
         }
 
         // --- GESTIONNAIRE DU MENU MOBILE (Off-Canvas) ---
@@ -339,15 +469,8 @@
 
 
         // Exécution au chargement
-        document.addEventListener('DOMContentLoaded', () => {
-             const hasAccess = checkAdminAccess();
-             
-             if (hasAccess) {
-                 checkSessionAndRenderHeader();
-                 renderUsersTable(); // Afficher les utilisateurs si l'accès est autorisé
-             }
-        });
+        document.addEventListener('DOMContentLoaded', initializeFirebase);
+
     </script>
 </body>
 </html>
-
