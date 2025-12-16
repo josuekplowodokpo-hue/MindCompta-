@@ -90,7 +90,7 @@
                 <!-- LOGO/BRAND (CLICKABLE) -->
                 <a href="index.html" class="flex items-center group">
                     <img src="logo.jpg" 
-                         alt="[Logo MindCompta]" 
+                         alt="[Image du Logo MindCompta]" 
                          onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
                          class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
                     <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
@@ -227,8 +227,17 @@
         import { getAuth, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // setLogLevel('debug'); // Décommenter pour le débogage
-
+        // Configuration Firebase fournie par l'utilisateur
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
+            authDomain: "mindcompta-a61ef.firebaseapp.com",
+            projectId: "mindcompta-a61ef",
+            storageBucket: "mindcompta-a61ef.firebasestorage.app",
+            messagingSenderId: "578389020450",
+            appId: "1:578389020450:web:edf9dd48e394cff7601f7b",
+            measurementId: "G-CDS9XYT35Y"
+        };
+        
         const ADMIN_EMAIL = 'admin@mindcompta.com';
         const LOGIN_PAGE = 'login.html';
         const SERVICES_PAGE = 'services.html';
@@ -239,15 +248,8 @@
         function initializeFirebase() {
             try {
                 // Variables globales fournies par l'environnement
-                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
                 const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-                if (!firebaseConfig) {
-                    console.error("Configuration Firebase manquante. La navigation d'authentification ne fonctionnera pas.");
-                    renderDisconnectedUI();
-                    return;
-                }
-                
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
 
@@ -279,7 +281,7 @@
         // --- Écouteur d'État d'Authentification et rendu UI ---
         function setupAuthStateListener(auth) {
             onAuthStateChanged(auth, (user) => {
-                if (user) {
+                if (user && user.email) {
                     renderConnectedUI(user);
                 } else {
                     renderDisconnectedUI();
@@ -411,6 +413,7 @@
         }
         elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
         elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
+        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
         elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
 
         // --- Exécution principale ---
