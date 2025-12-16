@@ -145,8 +145,17 @@
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // setLogLevel('debug'); // Décommenter pour le débogage
-
+        // Configuration Firebase fournie par l'utilisateur
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
+            authDomain: "mindcompta-a61ef.firebaseapp.com",
+            projectId: "mindcompta-a61ef",
+            storageBucket: "mindcompta-a61ef.firebasestorage.app",
+            messagingSenderId: "578389020450",
+            appId: "1:578389020450:web:edf9dd48e394cff7601f7b",
+            measurementId: "G-CDS9XYT35Y"
+        };
+        
         const REDIRECTION_PAGE = 'index.html';
         let auth;
         let isSignInMode = true; // État initial: Connexion
@@ -281,20 +290,14 @@
         // --- Initialisation Firebase et Listeners ---
         function initializeFirebase() {
             try {
-                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
                 const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                
-                if (!firebaseConfig) {
-                    showMessage("Configuration Firebase manquante.", false);
-                    return;
-                }
                 
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 
                 // Vérifie l'état de l'utilisateur au chargement de la page (pour redirection)
                 onAuthStateChanged(auth, (user) => {
-                    if (user) {
+                    if (user && user.email) { // Vérifie aussi l'email pour exclure les connexions anonymes
                         console.log("Utilisateur déjà connecté, redirection vers l'accueil...");
                         window.location.href = REDIRECTION_PAGE;
                     }
