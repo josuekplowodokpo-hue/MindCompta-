@@ -103,13 +103,11 @@
                     <a href="about.html" class="nav-link">À Propos</a>
                     <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
 
-                    <!-- Action Buttons and User Info (Managed by JS) -->
+                    <!-- Action Buttons and User Info -->
                     <div id="auth-actions-desktop" class="flex items-center space-x-3">
-                        <!-- Login/Username/Logout/Admin buttons will be injected here -->
-
-                        <!-- Static Login button placeholder (will be shown by default before JS runs) -->
+                        <!-- Placeholder par défaut (avant que Firebase n'initialise) -->
                         <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                            Se Connecter
+                            Chargement...
                         </a>
                     </div>
                 </nav>
@@ -138,9 +136,9 @@
             <a href="about.html" class="mobile-link">À Propos</a>
             <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
 
-            <!-- Auth Actions Mobile will be injected here -->
+            <!-- Auth Actions Mobile -->
             <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
-                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
+                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Chargement...</a>
             </div>
         </div>
     </nav>
@@ -164,7 +162,7 @@
                 <p class="text-lg sm:text-xl font-light max-w-2xl mx-auto mb-8">
                     Maîtrisez les lois d'affaires de l'espace UEMOA et sécurisez vos transactions avec l'expertise MindCompta.
                 </p>
-                <a href="services.html" id="hero-cta" class="inline-block bg-accent text-brand-dark font-bold py-3 px-8 rounded-full shadow-xl transition duration-300 transform hover:scale-105 hover:shadow-2xl">
+                <a href="login.html" id="hero-cta" class="inline-block bg-accent text-brand-dark font-bold py-3 px-8 rounded-full shadow-xl transition duration-300 transform hover:scale-105 hover:shadow-2xl">
                     Découvrir Nos Services
                 </a>
             </div>
@@ -222,109 +220,172 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- JAVASCRIPT LOGIC AND AUTHENTICATION (LOCAL STORAGE) -->
+    <!-- JAVASCRIPT LOGIC AND FIREBASE AUTHENTICATION -->
     <script type="module">
-        // Page de redirection en cas de déconnexion ou d'accès non autorisé
-        const REDIRECTION_PAGE = 'login.html'; 
-        const ADMIN_ROLE = 'Admin';
+        // --- IMPORTS FIREBASE AUTH ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // setLogLevel('debug'); // Décommenter pour le débogage
 
-        // --- GESTION DE LA SESSION ---
+        const ADMIN_EMAIL = 'admin@mindcompta.com';
+        const LOGIN_PAGE = 'login.html';
+        const SERVICES_PAGE = 'services.html';
+        const ADMIN_PAGE = 'admin.html';
+        let auth;
+        
+        // --- Initialisation Firebase ---
+        function initializeFirebase() {
+            try {
+                // Variables globales fournies par l'environnement
+                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        /** Gère la déconnexion de l'utilisateur. */
-        function handleLogout() {
-            // Suppression des informations de session du stockage local
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userRole');
-            // Redirection vers la page de connexion
-            window.location.href = 'index.html'; // Redirige vers l'accueil pour recharger l'état déconnecté
+                if (!firebaseConfig) {
+                    console.error("Configuration Firebase manquante. La navigation d'authentification ne fonctionnera pas.");
+                    renderDisconnectedUI();
+                    return;
+                }
+                
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+
+                // Tentative d'authentification
+                authenticateUser(auth, initialAuthToken);
+
+            } catch (error) {
+                console.error("Échec de l'initialisation Firebase:", error);
+                renderDisconnectedUI();
+            }
+        }
+        
+        async function authenticateUser(auth, initialAuthToken) {
+            try {
+                if (initialAuthToken) {
+                    // Utiliser le jeton personnalisé fourni par l'environnement
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    // Si aucun jeton n'est fourni, se connecter anonymement
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.warn("Échec de l'authentification automatique (jeton expiré ou autre). Poursuite en mode déconnecté.", error);
+            }
+             // L'écouteur onAuthStateChanged prendra le relais pour la mise à jour de l'UI
+             setupAuthStateListener(auth);
         }
 
-        /**
-         * Vérifie l'état de la session et met à jour l'interface utilisateur.
-         */
-        function checkSessionAndRenderHeader() {
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
+        // --- Écouteur d'État d'Authentification et rendu UI ---
+        function setupAuthStateListener(auth) {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    renderConnectedUI(user);
+                } else {
+                    renderDisconnectedUI();
+                }
+            });
+        }
+        
+        // --- Déconnexion ---
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                console.log("Déconnexion réussie.");
+                // onAuthStateChanged mettra à jour l'UI automatiquement
+            } catch (error) {
+                console.error("Erreur lors de la déconnexion:", error);
+            }
+        }
 
+
+        // --- Fonctions de Rendu UI ---
+
+        /** * Rend l'interface utilisateur pour un utilisateur connecté.
+         * @param {Object} user - L'objet utilisateur Firebase.
+         */
+        function renderConnectedUI(user) {
+            // Utilise l'email (avant le @) pour le nom d'affichage
+            const userName = user.email ? user.email.split('@')[0] : 'Utilisateur';
+            const isUserAdmin = user.email === ADMIN_EMAIL;
+            
             const desktopActions = document.getElementById('auth-actions-desktop');
             const mobileActions = document.getElementById('auth-actions-mobile');
-            
-            // Récupération des CTAs
             const heroCta = document.getElementById('hero-cta');
             const bookCta = document.getElementById('book-cta');
 
-            // --- Utilisateur Connecté ---
-            if (userName) {
-                const isUserAdmin = userRole === ADMIN_ROLE;
+            // 1. Desktop Actions (Cache "Se Connecter" et affiche le profil/déconnexion)
+            const adminButtonHtml = isUserAdmin 
+                ? `<a href="${ADMIN_PAGE}" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
+                : '';
 
-                // 1. Desktop Actions (Cache "Se Connecter" et affiche le profil/déconnexion)
-                const adminButtonHtml = isUserAdmin 
-                    ? `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
-                    : '';
-                
-                desktopActions.innerHTML = `
-                    ${adminButtonHtml}
-                    <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
-                        <span class="hidden sm:inline">Bienvenue,</span> ${userName}
-                    </span>
-                    <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
-                        Déconnexion
-                    </button>
-                `;
+            desktopActions.innerHTML = `
+                ${adminButtonHtml}
+                <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
+                    <span class="hidden sm:inline">Bienvenue,</span> ${userName}
+                </span>
+                <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
+                    Déconnexion
+                </button>
+            `;
 
-                // 2. Mobile Actions
-                mobileActions.innerHTML = `
-                    ${isUserAdmin ? 
-                        `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
-                        : ''}
-                    <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
-                    <p class="text-white text-md font-semibold mb-3">${userName}</p>
-                    <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
-                `;
+            // 2. Mobile Actions
+            mobileActions.innerHTML = `
+                ${isUserAdmin ? 
+                    `<a href="${ADMIN_PAGE}" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
+                    : ''}
+                <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
+                <p class="text-white text-md font-semibold mb-3">${userName}</p>
+                <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
+            `;
 
-                // 3. Attacher les écouteurs de déconnexion
-                document.getElementById('logout-desktop-btn')?.addEventListener('click', handleLogout);
-                document.getElementById('logout-mobile-btn')?.addEventListener('click', handleLogout);
-                
-                // 4. Mettre à jour les CTAs
-                if (heroCta) {
-                    heroCta.textContent = "Commencer Votre Conseil";
-                    heroCta.href = "services.html";
-                }
-                if (bookCta) {
-                    bookCta.textContent = "Accéder au Livre Blanc (Services)";
-                    bookCta.href = "services.html";
-                    // Change le style du bouton pour indiquer un accès réussi
-                    bookCta.classList.remove('bg-red-500', 'hover:bg-red-600');
-                    bookCta.classList.add('bg-vibrant-green', 'hover-vibrant-green'); 
-                }
+            // 3. Attacher les écouteurs de déconnexion
+            document.getElementById('logout-desktop-btn')?.addEventListener('click', handleLogout);
+            document.getElementById('logout-mobile-btn')?.addEventListener('click', handleLogout);
 
-            } else {
-                // --- Utilisateur Déconnecté ---
-                
-                // 1. Desktop Actions (Affiche uniquement "Se Connecter")
-                desktopActions.innerHTML = `
-                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                        Se Connecter
-                    </a>
-                `;
+            // 4. Mettre à jour les CTAs
+            if (heroCta) {
+                heroCta.textContent = "Commencer Votre Conseil";
+                heroCta.href = SERVICES_PAGE;
+            }
+            if (bookCta) {
+                bookCta.textContent = "Accéder au Livre Blanc (Services)";
+                bookCta.href = SERVICES_PAGE;
+                // Change le style du bouton pour indiquer un accès réussi
+                bookCta.classList.remove('bg-red-500', 'hover:bg-red-600');
+                bookCta.classList.add('bg-vibrant-green', 'hover-vibrant-green'); 
+            }
+        }
 
-                // 2. Mobile Actions
-                mobileActions.innerHTML = `
-                    <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
-                `;
+        /** Rend l'interface utilisateur pour un utilisateur déconnecté. */
+        function renderDisconnectedUI() {
+            const desktopActions = document.getElementById('auth-actions-desktop');
+            const mobileActions = document.getElementById('auth-actions-mobile');
+            const heroCta = document.getElementById('hero-cta');
+            const bookCta = document.getElementById('book-cta');
 
-                // 3. Mettre à jour les CTAs (pointent vers login ou services non-gated)
-                if (heroCta) {
-                    heroCta.textContent = "Découvrir Nos Services";
-                    heroCta.href = "services.html"; 
-                }
-                if (bookCta) {
-                    bookCta.textContent = "Se Connecter et Accéder";
-                    bookCta.href = "login.html";
-                    bookCta.classList.add('bg-red-500', 'hover:bg-red-600');
-                    bookCta.classList.remove('bg-vibrant-green', 'hover-vibrant-green'); 
-                }
+            // 1. Desktop Actions (Affiche uniquement "Se Connecter")
+            desktopActions.innerHTML = `
+                <a href="${LOGIN_PAGE}" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
+                    Se Connecter
+                </a>
+            `;
+
+            // 2. Mobile Actions
+            mobileActions.innerHTML = `
+                <a href="${LOGIN_PAGE}" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
+            `;
+
+            // 3. Mettre à jour les CTAs
+            if (heroCta) {
+                heroCta.textContent = "Découvrir Nos Services";
+                heroCta.href = SERVICES_PAGE; // Le service est accessible, mais le Livre est bloqué
+            }
+            if (bookCta) {
+                bookCta.textContent = "Se Connecter et Accéder";
+                bookCta.href = LOGIN_PAGE;
+                bookCta.classList.add('bg-red-500', 'hover:bg-red-600');
+                bookCta.classList.remove('bg-vibrant-green', 'hover-vibrant-green'); 
             }
         }
 
@@ -353,9 +414,7 @@
         elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
 
         // --- Exécution principale ---
-        document.addEventListener('DOMContentLoaded', checkSessionAndRenderHeader);
-
+        document.addEventListener('DOMContentLoaded', initializeFirebase);
     </script>
 </body>
 </html>
-
