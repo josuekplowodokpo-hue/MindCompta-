@@ -24,12 +24,12 @@
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
         .hover-accent:hover { background-color: #D97706; } 
-        
+
         /* Styles de Navigation */
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: background-color 0.2s; }
         .nav-link:hover { background-color: #345b85; }
         .active-link-desktop { background-color: var(--accent); font-weight: 600; color: var(--brand-dark) !important; }
-        
+
         /* Styles de Menu Mobile */
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
@@ -37,12 +37,12 @@
         #mobile-menu-overlay.open { display: block; }
         .mobile-link { display: block; padding: 0.75rem 1rem; color: white; font-weight: 500; border-radius: 0.5rem; transition: background-color 0.2s; }
         .mobile-link.active-link-mobile { background-color: var(--accent); color: var(--brand-dark); font-weight: 700; }
-        
+
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col font-sans">
 
-    <!-- EN-TÊTE ET NAVIGATION -->
+    <!-- EN-TÊTE ET NAVIGATION (NON MODIFIÉ) -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center">
@@ -72,7 +72,7 @@
         </div>
     </header>
 
-    <!-- MENU MOBILE -->
+    <!-- MENU MOBILE (NON MODIFIÉ) -->
     <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
     <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
         <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none"> &times; </button>
@@ -91,9 +91,8 @@
 
     <!-- CONTENU PRINCIPAL (FORMULAIRE UNIQUE) -->
     <main class="flex-grow flex items-center justify-center p-4">
-        <!-- Conteneur centré simple -->
         <div class="w-full max-w-sm bg-white rounded-xl shadow-2xl p-8"> 
-            
+
             <h2 class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
 
             <form id="login-form" class="space-y-4">
@@ -106,13 +105,14 @@
                     <input type="password" id="login-password" name="password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
                 </div>
 
+                <!-- Zone d'affichage des messages Firebase -->
                 <div id="login-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4" role="alert"></div>
 
                 <button type="submit" id="login-button" class="w-full bg-accent text-white font-semibold py-3 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01] mt-6">
                     Se Connecter
                 </button>
             </form>
-            
+
         </div>
     </main>
 
@@ -121,69 +121,124 @@
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT SIMPLIFIÉE -->
+    <!-- LOGIQUE JAVASCRIPT FIREBASE -->
     <script type="module">
-
-        // Données d'utilisateur codées en dur (SECRETS)
-        const HARDCODED_USERS = [
-            { email: 'admin@mindcompta.com', password: 'Admin2007', userName: 'Josué-admin', role: 'Admin' },
-            { email: 'josukplowodokpo@gmail.com', password: '20072007', userName: 'Josué', role: 'User' },
-            { email: 'anoeblessing9@gmail.com', password: 'Blessing@2007', userName: 'Blessing', role: 'User' }
-        ];
+        // --- IMPORTS FIREBASE AUTH ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const REDIRECTION_PAGE = 'index.html';
+        let auth;
+        const loginForm = document.getElementById('login-form');
+        const loginMessage = document.getElementById('login-message');
+        const loginButton = document.getElementById('login-button');
 
         // --- Fonctions Utilitaires ---
-        
-        function showMessage(element, message, isSuccess) {
-            element.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'border-red-500', 'bg-green-100', 'text-green-700', 'border-green-500');
-            element.textContent = message;
-            
+
+        // Fonction pour afficher les messages d'erreur/succès
+        function showMessage(message, isSuccess) {
+            loginMessage.textContent = message;
+            loginMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'border-red-500', 'bg-green-100', 'text-green-700', 'border-green-500');
+
             if (isSuccess) {
-                element.classList.add('bg-green-100', 'text-green-700', 'border-green-500');
+                loginMessage.classList.add('bg-green-100', 'text-green-700', 'border-green-500');
             } else {
-                element.classList.add('bg-red-100', 'text-red-700', 'border-red-500');
-            }
-            element.classList.remove('hidden');
-        }
-
-        function redirectToDashboardIfLoggedIn() {
-            if (localStorage.getItem('userName')) {
-                // Redirige immédiatement si l'utilisateur est déjà connecté
-                window.location.href = REDIRECTION_PAGE;
+                loginMessage.classList.add('bg-red-100', 'text-red-700', 'border-red-500');
             }
         }
 
-        // --- LOGIQUE DE CONNEXION ---
-        document.getElementById('login-form').addEventListener('submit', function(e) {
+        // Traduction des codes d'erreur Firebase
+        function getAuthErrorMessage(errorCode) {
+            switch (errorCode) {
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                    return "Email ou mot de passe incorrect.";
+                case 'auth/invalid-email':
+                    return "Le format de l'adresse email est invalide.";
+                case 'auth/user-disabled':
+                    return "Ce compte utilisateur a été désactivé.";
+                case 'auth/too-many-requests':
+                    return "Trop de tentatives. Veuillez réessayer plus tard.";
+                default:
+                    console.error("Erreur Firebase non gérée:", errorCode);
+                    return "Une erreur de connexion inattendue s'est produite. Veuillez réessayer.";
+            }
+        }
+
+        // --- Initialisation Firebase ---
+        function initializeFirebase() {
+            try {
+                // IMPORTANT: Utilisation des variables globales de l'environnement
+                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+                
+                if (!firebaseConfig) {
+                    showMessage("Configuration Firebase manquante.", false);
+                    return;
+                }
+                
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+
+                // Initialisation de la vérification de l'état d'authentification
+                setupAuthStateListener();
+
+            } catch (error) {
+                console.error("Échec de l'initialisation Firebase:", error);
+                showMessage(`Échec de l'initialisation: ${error.message}`, false);
+            }
+        }
+
+        // --- Écouteur d'État d'Authentification (Redirection) ---
+        function setupAuthStateListener() {
+            // Vérifie l'état de l'utilisateur au chargement de la page
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // Si l'utilisateur est déjà connecté, rediriger immédiatement
+                    console.log("Utilisateur déjà connecté, redirection...");
+                    window.location.href = REDIRECTION_PAGE;
+                }
+                // Si non connecté, on reste sur la page de login.
+            });
+        }
+
+
+        // --- LOGIQUE DE CONNEXION (Formulaire) ---
+        loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
-            const loginMessage = document.getElementById('login-message');
             
-            loginMessage.classList.add('hidden'); // Cacher les messages précédents
+            loginMessage.classList.add('hidden');
+            loginButton.disabled = true;
+            loginButton.textContent = "Connexion en cours...";
 
-            const user = HARDCODED_USERS.find(u => u.email === email && u.password === password);
+            try {
+                // Tente de connecter l'utilisateur avec Email/Mot de Passe
+                await signInWithEmailAndPassword(auth, email, password);
 
-            if (user) {
                 // Connexion réussie
-                localStorage.setItem('userName', user.userName);
-                localStorage.setItem('userRole', user.role); 
-
-                showMessage(loginMessage, `Connexion réussie pour ${user.userName} ! Redirection...`, true);
+                showMessage(`Connexion réussie ! Redirection...`, true);
 
                 setTimeout(() => {
+                    // onAuthStateChanged va détecter la connexion et déclencher la redirection,
+                    // mais nous forçons une petite pause pour l'effet visuel.
                     window.location.href = REDIRECTION_PAGE;
                 }, 800);
 
-            } else {
+            } catch (error) {
                 // Échec de la connexion
-                showMessage(loginMessage, "Email ou mot de passe incorrect.", false);
+                const errorMessage = getAuthErrorMessage(error.code);
+                showMessage(errorMessage, false);
+                console.error("Erreur de connexion:", error.code, error.message);
+                
+            } finally {
+                loginButton.disabled = false;
+                loginButton.textContent = "Se Connecter";
             }
         });
-        
-        // GESTIONNAIRE DU MENU MOBILE (Off-Canvas)
+
+        // GESTIONNAIRE DU MENU MOBILE (NON MODIFIÉ)
         const elements = {
             mobileMenu: document.getElementById('mobile-menu'),
             overlay: document.getElementById('mobile-menu-overlay'),
@@ -206,10 +261,10 @@
         elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
         elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
         elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
-        
-        // Vérifie si déjà connecté au chargement de la page
-        redirectToDashboardIfLoggedIn();
-        
+
+        // Démarrer l'initialisation de Firebase
+        initializeFirebase();
+
     </script>
 </body>
 </html>
