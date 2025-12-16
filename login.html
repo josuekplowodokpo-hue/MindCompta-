@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCompta - Connexion Simplifiée</title>
+    <title>MindCompta - Authentification</title>
     <!-- Chargement de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -93,26 +93,36 @@
     <main class="flex-grow flex items-center justify-center p-4">
         <div class="w-full max-w-sm bg-white rounded-xl shadow-2xl p-8"> 
 
-            <h2 class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
+            <h2 id="form-title" class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
 
-            <form id="login-form" class="space-y-4">
+            <form id="auth-form" class="space-y-4">
                 <div>
-                    <label for="login-email" class="block text-sm font-medium text-gray-700">Adresse Email</label>
-                    <input type="email" id="login-email" name="email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
+                    <label for="auth-email" class="block text-sm font-medium text-gray-700">Adresse Email</label>
+                    <input type="email" id="auth-email" name="email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
                 </div>
                 <div>
-                    <label for="login-password" class="block text-sm font-medium text-gray-700">Mot de Passe</label>
-                    <input type="password" id="login-password" name="password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
+                    <label for="auth-password" class="block text-sm font-medium text-gray-700">Mot de Passe</label>
+                    <input type="password" id="auth-password" name="password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
+                    <p id="password-hint" class="text-xs text-gray-500 mt-1 hidden">Minimum 6 caractères.</p>
                 </div>
 
                 <!-- Zone d'affichage des messages Firebase -->
-                <div id="login-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4" role="alert"></div>
+                <div id="auth-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4" role="alert"></div>
 
-                <button type="submit" id="login-button" class="w-full bg-accent text-white font-semibold py-3 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01] mt-6">
+                <button type="submit" id="auth-button" class="w-full bg-accent text-white font-semibold py-3 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01] mt-6">
                     Se Connecter
                 </button>
             </form>
-
+            
+            <!-- Bascule Connexion/Inscription -->
+            <div class="mt-6 text-center text-sm">
+                <p id="switch-text" class="text-gray-600">
+                    Pas encore de compte ? 
+                    <button id="switch-button" class="text-brand-dark font-semibold hover:text-accent focus:outline-none">
+                        Créer un compte
+                    </button>
+                </p>
+            </div>
         </div>
     </main>
 
@@ -125,34 +135,60 @@
     <script type="module">
         // --- IMPORTS FIREBASE AUTH ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            onAuthStateChanged,
+            signInWithCustomToken,
+            signInAnonymously
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // setLogLevel('debug'); // Décommenter pour le débogage
 
         const REDIRECTION_PAGE = 'index.html';
         let auth;
-        const loginForm = document.getElementById('login-form');
-        const loginMessage = document.getElementById('login-message');
-        const loginButton = document.getElementById('login-button');
+        let isSignInMode = true; // État initial: Connexion
+
+        // Références DOM
+        const formTitle = document.getElementById('form-title');
+        const authForm = document.getElementById('auth-form');
+        const authMessage = document.getElementById('auth-message');
+        const authButton = document.getElementById('auth-button');
+        const switchText = document.getElementById('switch-text');
+        const switchButton = document.getElementById('switch-button');
+        const passwordHint = document.getElementById('password-hint');
 
         // --- Fonctions Utilitaires ---
 
         // Fonction pour afficher les messages d'erreur/succès
         function showMessage(message, isSuccess) {
-            loginMessage.textContent = message;
-            loginMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'border-red-500', 'bg-green-100', 'text-green-700', 'border-green-500');
+            authMessage.textContent = message;
+            authMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'border-red-500', 'bg-green-100', 'text-green-700', 'border-green-500');
 
             if (isSuccess) {
-                loginMessage.classList.add('bg-green-100', 'text-green-700', 'border-green-500');
+                authMessage.classList.add('bg-green-100', 'text-green-700', 'border-green-500');
             } else {
-                loginMessage.classList.add('bg-red-100', 'text-red-700', 'border-red-500');
+                authMessage.classList.add('bg-red-100', 'text-red-700', 'border-red-500');
             }
         }
 
         // Traduction des codes d'erreur Firebase
         function getAuthErrorMessage(errorCode) {
             switch (errorCode) {
+                // Erreurs Connexion
                 case 'auth/user-not-found':
                 case 'auth/wrong-password':
                     return "Email ou mot de passe incorrect.";
+                
+                // Erreurs Inscription
+                case 'auth/email-already-in-use':
+                    return "Cette adresse email est déjà utilisée par un autre compte.";
+                case 'auth/weak-password':
+                    return "Le mot de passe doit contenir au moins 6 caractères.";
+                
+                // Erreurs Générales
                 case 'auth/invalid-email':
                     return "Le format de l'adresse email est invalide.";
                 case 'auth/user-disabled':
@@ -161,15 +197,92 @@
                     return "Trop de tentatives. Veuillez réessayer plus tard.";
                 default:
                     console.error("Erreur Firebase non gérée:", errorCode);
-                    return "Une erreur de connexion inattendue s'est produite. Veuillez réessayer.";
+                    return "Une erreur inattendue s'est produite. Veuillez réessayer.";
             }
         }
 
-        // --- Initialisation Firebase ---
+        // --- GESTION DU MODE UI (Connexion / Inscription) ---
+        function updateUIMode() {
+            authMessage.classList.add('hidden'); // Cacher les messages précédents
+
+            if (isSignInMode) {
+                // Mode Connexion
+                formTitle.textContent = "Connexion";
+                authButton.textContent = "Se Connecter";
+                switchText.innerHTML = `
+                    Pas encore de compte ? 
+                    <button id="switch-button" class="text-brand-dark font-semibold hover:text-accent focus:outline-none">
+                        Créer un compte
+                    </button>
+                `;
+                passwordHint.classList.add('hidden');
+            } else {
+                // Mode Inscription
+                formTitle.textContent = "Création de Compte";
+                authButton.textContent = "S'inscrire";
+                switchText.innerHTML = `
+                    Déjà un compte ? 
+                    <button id="switch-button" class="text-brand-dark font-semibold hover:text-accent focus:outline-none">
+                        Se connecter
+                    </button>
+                `;
+                passwordHint.classList.remove('hidden');
+            }
+            // Rattacher l'événement au nouveau bouton
+            document.getElementById('switch-button')?.addEventListener('click', toggleUIMode);
+        }
+
+        function toggleUIMode() {
+            isSignInMode = !isSignInMode;
+            updateUIMode();
+        }
+        
+        // --- LOGIQUE D'AUTHENTIFICATION ---
+        
+        /** Gère la soumission du formulaire */
+        authForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+            
+            authMessage.classList.add('hidden');
+            authButton.disabled = true;
+            authButton.textContent = isSignInMode ? "Connexion en cours..." : "Inscription en cours...";
+
+            try {
+                if (isSignInMode) {
+                    // Tente de connecter l'utilisateur
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showMessage(`Connexion réussie ! Redirection...`, true);
+                } else {
+                    // Tente de créer un nouveau compte
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    showMessage(`Compte créé avec succès pour ${email} ! Redirection...`, true);
+                }
+
+                setTimeout(() => {
+                    // Redirection après succès (onAuthStateChanged confirmera l'état)
+                    window.location.href = REDIRECTION_PAGE;
+                }, 800);
+
+            } catch (error) {
+                // Échec de l'opération
+                const errorMessage = getAuthErrorMessage(error.code);
+                showMessage(errorMessage, false);
+                console.error("Erreur d'authentification:", error.code, error.message);
+                
+            } finally {
+                authButton.disabled = false;
+                authButton.textContent = isSignInMode ? "Se Connecter" : "S'inscrire";
+            }
+        });
+
+        // --- Initialisation Firebase et Listeners ---
         function initializeFirebase() {
             try {
-                // IMPORTANT: Utilisation des variables globales de l'environnement
                 const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
                 
                 if (!firebaseConfig) {
                     showMessage("Configuration Firebase manquante.", false);
@@ -178,67 +291,34 @@
                 
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
+                
+                // Vérifie l'état de l'utilisateur au chargement de la page (pour redirection)
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        console.log("Utilisateur déjà connecté, redirection vers l'accueil...");
+                        window.location.href = REDIRECTION_PAGE;
+                    }
+                });
 
-                // Initialisation de la vérification de l'état d'authentification
-                setupAuthStateListener();
+                // Authentification automatique (anonyme ou via jeton)
+                if (initialAuthToken) {
+                    signInWithCustomToken(auth, initialAuthToken).catch(err => {
+                        console.warn("Échec de la connexion par jeton initial:", err.message);
+                    });
+                } else {
+                    signInAnonymously(auth).catch(err => {
+                        console.warn("Échec de la connexion anonyme:", err.message);
+                    });
+                }
 
             } catch (error) {
                 console.error("Échec de l'initialisation Firebase:", error);
                 showMessage(`Échec de l'initialisation: ${error.message}`, false);
             }
+            updateUIMode(); // Rendre l'UI initiale après l'initialisation
         }
 
-        // --- Écouteur d'État d'Authentification (Redirection) ---
-        function setupAuthStateListener() {
-            // Vérifie l'état de l'utilisateur au chargement de la page
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    // Si l'utilisateur est déjà connecté, rediriger immédiatement
-                    console.log("Utilisateur déjà connecté, redirection...");
-                    window.location.href = REDIRECTION_PAGE;
-                }
-                // Si non connecté, on reste sur la page de login.
-            });
-        }
-
-
-        // --- LOGIQUE DE CONNEXION (Formulaire) ---
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-            
-            loginMessage.classList.add('hidden');
-            loginButton.disabled = true;
-            loginButton.textContent = "Connexion en cours...";
-
-            try {
-                // Tente de connecter l'utilisateur avec Email/Mot de Passe
-                await signInWithEmailAndPassword(auth, email, password);
-
-                // Connexion réussie
-                showMessage(`Connexion réussie ! Redirection...`, true);
-
-                setTimeout(() => {
-                    // onAuthStateChanged va détecter la connexion et déclencher la redirection,
-                    // mais nous forçons une petite pause pour l'effet visuel.
-                    window.location.href = REDIRECTION_PAGE;
-                }, 800);
-
-            } catch (error) {
-                // Échec de la connexion
-                const errorMessage = getAuthErrorMessage(error.code);
-                showMessage(errorMessage, false);
-                console.error("Erreur de connexion:", error.code, error.message);
-                
-            } finally {
-                loginButton.disabled = false;
-                loginButton.textContent = "Se Connecter";
-            }
-        });
-
-        // GESTIONNAIRE DU MENU MOBILE (NON MODIFIÉ)
+        // GESTIONNAIRE DU MENU MOBILE (Off-Canvas, NON MODIFIÉ)
         const elements = {
             mobileMenu: document.getElementById('mobile-menu'),
             overlay: document.getElementById('mobile-menu-overlay'),
@@ -261,9 +341,10 @@
         elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
         elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
         elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
-
-        // Démarrer l'initialisation de Firebase
-        initializeFirebase();
+        
+        // --- Exécution principale ---
+        document.addEventListener('DOMContentLoaded', initializeFirebase);
+        switchButton.addEventListener('click', toggleUIMode);
 
     </script>
 </body>
