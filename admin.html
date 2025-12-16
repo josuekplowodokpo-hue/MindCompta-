@@ -149,7 +149,7 @@
             Tableau de Bord Administrateur
         </h1>
 
-        <!-- Conteneur d'état de chargement/erreur -->
+        <!-- Conteneur d'état de chargement/erreur (utilisé aussi comme alerte) -->
         <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-lg shadow-md transition duration-300" role="alert">
             Vérification des droits d'accès et initialisation Firebase...
         </div>
@@ -174,7 +174,7 @@
                 <tbody id="user-list" class="bg-white divide-y divide-gray-200">
                     <!-- Les lignes seront insérées par JavaScript (Firestore) -->
                     <tr>
-                        <td colspan="5" class="py-12 text-center text-gray-400">Chargement des données utilisateurs depuis Firestore...</td>
+                        <td colspan="5" class="py-12 text-center text-gray-400">En attente de l'authentification pour charger les données utilisateurs...</td>
                     </tr>
                 </tbody>
             </table>
@@ -205,6 +205,7 @@
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- CONSTANTES ET CONFIGURATION ---
+        // ATTENTION: Ces clés sont rendues publiques et doivent être gérées avec des règles de sécurité Firestore strictes.
         const firebaseConfig = {
             apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
             authDomain: "mindcompta-a61ef.firebaseapp.com",
@@ -227,6 +228,26 @@
         const userListElement = document.getElementById('user-list');
 
         // --- Fonctions Utilitaires ---
+        
+        /**
+         * Affiche un message d'alerte ou de statut dans le conteneur dédié.
+         * @param {string} message - Le message à afficher.
+         * @param {string} type - 'success', 'warning' (défaut), 'error', 'info'.
+         */
+        function alertMessage(message, type = 'warning') {
+            statusMessage.textContent = message;
+            statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800', 'bg-green-100', 'text-green-800', 'bg-blue-100', 'text-blue-800');
+            
+            if (type === 'error') {
+                statusMessage.classList.add('bg-red-100', 'text-red-800');
+            } else if (type === 'success') {
+                statusMessage.classList.add('bg-green-100', 'text-green-800');
+            } else if (type === 'info') {
+                statusMessage.classList.add('bg-blue-100', 'text-blue-800');
+            } else { // warning
+                statusMessage.classList.add('bg-yellow-100', 'text-yellow-800');
+            }
+        }
 
         /** * Formate un horodatage Firestore en chaîne de date lisible.
          * @param {Object} timestamp - L'objet timestamp Firestore (s, n) ou null.
@@ -255,10 +276,10 @@
         window.handleLogout = async () => {
             try {
                 await signOut(auth);
-                // La redirection sera gérée par l'écouteur onAuthStateChanged
+                // La redirection vers login.html se fera automatiquement via onAuthStateChanged
             } catch (error) {
                 console.error("Erreur lors de la déconnexion:", error);
-                window.location.href = REDIRECTION_PAGE; // Fallback
+                alertMessage("Erreur lors de la déconnexion. Veuillez rafraîchir la page.", 'error');
             }
         };
 
@@ -269,20 +290,34 @@
         function checkSessionAndRenderHeader(user) {
             const desktopActions = document.getElementById('auth-actions-desktop');
             const mobileActions = document.getElementById('auth-actions-mobile');
-
-            // Vérifie si l'utilisateur est connecté et si son email correspond à l'admin
-            const isAuthenticatedAdmin = user && user.email === ADMIN_EMAIL;
             
-            if (isAuthenticatedAdmin) {
-                const userName = user.email.split('@')[0];
+            desktopActions.innerHTML = '';
+            mobileActions.innerHTML = '';
+
+            // --- Logique d'accès modifiée pour le débogage/test ---
+            // On vérifie d'abord si l'utilisateur est authentifié du tout.
+            const isAuthenticated = !!user;
+            const userEmail = user ? user.email : null;
+            const isAdmin = userEmail === ADMIN_EMAIL;
+
+            if (isAuthenticated) {
+                console.log(`[AUTH STATUS] Utilisateur connecté. UID: ${user.uid}, Email: ${userEmail}, IsAdmin: ${isAdmin}`);
                 
-                // --- Utilisateur Connecté et Admin ---
-                statusMessage.classList.add('hidden'); // Cache le message de statut si l'accès est OK
+                if (!isAdmin) {
+                    // Si l'utilisateur est connecté mais pas l'admin principal
+                    alertMessage(`⚠️ Avertissement : Vous êtes connecté en tant que ${userEmail || 'Utilisateur anonyme'}, ce n'est pas l'e-mail d'administrateur principal (${ADMIN_EMAIL}).`, 'error');
+                } else {
+                    // Si c'est bien l'admin
+                    statusMessage.classList.add('hidden'); // Cache le message de statut si l'accès est OK
+                }
+
+                const displayName = userEmail ? userEmail.split('@')[0] : 'Invité';
+                const roleText = isAdmin ? 'Admin' : 'Utilisateur';
 
                 // 1. Desktop Actions 
                 desktopActions.innerHTML = `
                     <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
-                        <span class="hidden sm:inline">Bienvenue,</span> ${userName}
+                        <span class="hidden sm:inline">Bienvenue,</span> ${displayName}
                     </span>
                     <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
                         Déconnexion
@@ -293,7 +328,7 @@
                 mobileActions.innerHTML = `
                     <a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>
                     <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
-                    <p class="text-white text-md font-semibold mb-3">${userName} (Admin)</p>
+                    <p class="text-white text-md font-semibold mb-3">${displayName} (${roleText})</p>
                     <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
                 `;
 
@@ -301,19 +336,20 @@
                 document.getElementById('logout-desktop-btn')?.addEventListener('click', window.handleLogout);
                 document.getElementById('logout-mobile-btn')?.addEventListener('click', window.handleLogout);
                 
-                // Lancer le chargement des données
+                // Lancer le chargement des données (car l'utilisateur est authentifié)
                 fetchUsersData();
 
             } else {
-                // --- Accès Refusé ---
-                const reason = user && user.email ? `L'utilisateur connecté (${user.email}) n'est pas l'administrateur.` : 'Session non trouvée.';
-                
-                statusMessage.textContent = `Accès refusé. ${reason} Redirection vers la connexion...`;
-                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800', 'hidden');
-                statusMessage.classList.add('bg-red-100', 'text-red-800');
-                
+                // --- Utilisateur Déconnecté ---
+                console.log("[AUTH STATUS] Aucun utilisateur connecté. Redirection vers login.html.");
+
+                alertMessage("Session non trouvée. Redirection vers la page de connexion...", 'warning');
+
+                // Redirige uniquement si le statut est bien "non authentifié" après un court délai
                 setTimeout(() => {
-                    window.location.href = REDIRECTION_PAGE;
+                    if (!auth.currentUser) {
+                        window.location.href = REDIRECTION_PAGE;
+                    }
                 }, 1000);
                 
                 // Rendu des actions par défaut (Connexion)
@@ -331,7 +367,6 @@
             // Path: /artifacts/{appId}/public/data/user_profiles
             const userProfilesPath = `/artifacts/${appId}/public/data/user_profiles`;
             const usersRef = collection(db, userProfilesPath);
-            // Crée une requête simple pour la collection
             const usersQuery = query(usersRef);
 
             console.log(`Écoute de la collection d'utilisateurs: ${userProfilesPath}`);
@@ -385,19 +420,19 @@
                 const isActualAdmin = userEmail === ADMIN_EMAIL;
                 
                 const statusColor = isActualAdmin ? 'bg-red-500 text-white' : (isOnline ? 'bg-vibrant-green text-white' : 'bg-gray-400 text-white');
-                const displayName = user.displayName || (userEmail ? userEmail.split('@')[0] : 'Inconnu');
+                const displayName = user.displayName || (userEmail ? userEmail.split('@')[0] : user.id || 'Inconnu');
 
                 const row = document.createElement('tr');
                 row.classList.add('hover:bg-gray-50', 'transition', 'duration-150');
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-brand-dark">${displayName}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${userEmail}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${userEmail || 'N/A'}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${roleText}</td>
                     
                     <!-- STATUT -->
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">
-                            ${isActualAdmin ? 'ADMIN' : (user.status || 'HORS LIGNE')}
+                            ${isActualAdmin ? 'ADMIN PRINCIPAL' : (user.status || 'HORS LIGNE')}
                         </span>
                     </td>
 
@@ -412,19 +447,21 @@
         // --- INITIALISATION PRINCIPALE ---
         function initializeFirebase() {
             try {
+                // IMPORTANT: Récupération des variables globales de l'environnement Canvas
+                const envFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
                 const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
                 
-                const app = initializeApp(firebaseConfig);
+                const app = initializeApp(envFirebaseConfig);
                 auth = getAuth(app);
-  
                 db = getFirestore(app);
 
                 // Tentative de connexion silencieuse
                 if (initialAuthToken) {
                     signInWithCustomToken(auth, initialAuthToken).catch(err => {
-                        console.warn("Échec de la connexion par jeton initial:", err.message);
+                        console.warn("Échec de la connexion par jeton initial (Cela peut être normal si aucun token n'est fourni):", err.message);
                     });
                 } else {
+                    // Cela ne suffit pas pour l'accès Admin, mais assure l'initialisation de l'état Auth
                     signInAnonymously(auth).catch(err => {
                         console.warn("Échec de la connexion anonyme:", err.message);
                     });
@@ -437,9 +474,7 @@
 
             } catch (error) {
                 console.error("Échec de l'initialisation Firebase:", error);
-                statusMessage.textContent = `Erreur critique d'initialisation : ${error.message}`;
-                statusMessage.classList.remove('bg-yellow-100', 'text-yellow-800', 'hidden');
-                statusMessage.classList.add('bg-red-100', 'text-red-800');
+                alertMessage(`Erreur critique d'initialisation : ${error.message}`, 'error');
             }
         }
 
@@ -470,7 +505,6 @@
 
         // Exécution au chargement
         document.addEventListener('DOMContentLoaded', initializeFirebase);
-
     </script>
 </body>
 </html>
