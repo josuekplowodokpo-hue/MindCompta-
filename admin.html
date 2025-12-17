@@ -188,335 +188,152 @@
 
     <!-- LOGIQUE JAVASCRIPT GLOBALE & FIREBASE -->
     <script type="module">
-        // --- IMPORTS FIREBASE ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signOut, 
-            onAuthStateChanged, 
-            signInWithCustomToken, 
-            signInAnonymously 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            onSnapshot,
-            query
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    // --- IMPORTS FIREBASE ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+        getAuth, 
+        signOut, 
+        onAuthStateChanged, 
+        signInWithCustomToken, 
+        signInAnonymously 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+        getFirestore, 
+        collection, 
+        onSnapshot,
+        query
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- CONSTANTES ET CONFIGURATION ---
-        // ATTENTION: Ces clés sont rendues publiques et doivent être gérées avec des règles de sécurité Firestore strictes.
-        const firebaseConfig = {
-            apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
-            authDomain: "mindcompta-a61ef.firebaseapp.com",
-            projectId: "mindcompta-a61ef",
-            storageBucket: "mindcompta-a61ef.firebasestorage.app",
-            messagingSenderId: "578389020450",
-            appId: "1:578389020450:web:edf9dd48e394cff7601f7b",
-            measurementId: "G-CDS9XYT35Y"
-        };
-        
-        const REDIRECTION_PAGE = 'login.html'; 
-        const ADMIN_EMAIL = 'admin@mindcompta.com'; // L'utilisateur Admin attendu
-        
-        let auth, db;
-        // Utilisation de la variable globale __app_id pour le chemin Firestore
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const firebaseConfig = {
+        apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
+        authDomain: "mindcompta-a61ef.firebaseapp.com",
+        projectId: "mindcompta-a61ef",
+        storageBucket: "mindcompta-a61ef.firebasestorage.app",
+        messagingSenderId: "578389020450",
+        appId: "1:578389020450:web:edf9dd48e394cff7601f7b",
+        measurementId: "G-CDS9XYT35Y"
+    };
 
-        // --- REFERENCES DOM ---
-        const statusMessage = document.getElementById('status-message');
-        const userListElement = document.getElementById('user-list');
+    const REDIRECTION_PAGE = 'login.html'; 
+    const ADMIN_EMAIL = 'admin@mindcompta.com'; 
 
-        // --- Fonctions Utilitaires ---
-        
-        /**
-         * Affiche un message d'alerte ou de statut dans le conteneur dédié.
-         * @param {string} message - Le message à afficher.
-         * @param {string} type - 'success', 'warning' (défaut), 'error', 'info'.
-         */
-        function alertMessage(message, type = 'warning') {
-            statusMessage.textContent = message;
-            statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800', 'bg-green-100', 'text-green-800', 'bg-blue-100', 'text-blue-800');
+    let auth, db;
+
+    const statusMessage = document.getElementById('status-message');
+    const userListElement = document.getElementById('user-list');
+
+    // --- Fonctions Utilitaires ---
+    function alertMessage(message, type = 'warning') {
+        statusMessage.textContent = message;
+        statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800', 'bg-green-100', 'text-green-800', 'bg-blue-100', 'text-blue-800');
+        if (type === 'error') statusMessage.classList.add('bg-red-100', 'text-red-800');
+        else if (type === 'success') statusMessage.classList.add('bg-green-100', 'text-green-800');
+        else statusMessage.classList.add('bg-yellow-100', 'text-yellow-800');
+    }
+
+    function formatFirestoreTimestamp(timestamp) {
+        if (!timestamp || !timestamp.seconds) return 'N/A';
+        const date = new Date(timestamp.seconds * 1000);
+        return date.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', ' à');
+    }
+
+    window.handleLogout = async () => {
+        try { await signOut(auth); } catch (error) { alertMessage("Erreur déconnexion", 'error'); }
+    };
+
+    function checkSessionAndRenderHeader(user) {
+        const desktopActions = document.getElementById('auth-actions-desktop');
+        const mobileActions = document.getElementById('auth-actions-mobile');
+        const isAuthenticated = !!user;
+        const userEmail = user ? user.email : null;
+        const isAdmin = userEmail === ADMIN_EMAIL;
+
+        if (isAuthenticated) {
+            if (!isAdmin) alertMessage(`Accès restreint : connecté en tant que ${userEmail}`, 'error');
+            else statusMessage.classList.add('hidden');
+
+            const displayName = userEmail ? userEmail.split('@')[0] : 'Invité';
+            desktopActions.innerHTML = `<span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">Bienvenue, ${displayName}</span>
+                <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg text-white">Déconnexion</button>`;
             
-            if (type === 'error') {
-                statusMessage.classList.add('bg-red-100', 'text-red-800');
-            } else if (type === 'success') {
-                statusMessage.classList.add('bg-green-100', 'text-green-800');
-            } else if (type === 'info') {
-                statusMessage.classList.add('bg-blue-100', 'text-blue-800');
-            } else { // warning
-                statusMessage.classList.add('bg-yellow-100', 'text-yellow-800');
-            }
+            mobileActions.innerHTML = `<button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>`;
+
+            document.getElementById('logout-desktop-btn')?.addEventListener('click', window.handleLogout);
+            document.getElementById('logout-mobile-btn')?.addEventListener('click', window.handleLogout);
+
+            fetchUsersData(); // Appel de la fonction de chargement
+        } else {
+            setTimeout(() => { if (!auth.currentUser) window.location.href = REDIRECTION_PAGE; }, 2000);
         }
+    }
 
-        /** * Formate un horodatage Firestore en chaîne de date lisible.
-         * @param {Object} timestamp - L'objet timestamp Firestore (s, n) ou null.
-         * @returns {string} Date et heure formatées.
-         */
-        function formatFirestoreTimestamp(timestamp) {
-            if (!timestamp || !timestamp.seconds) {
-                return 'N/A';
-            }
-            try {
-                // Multiplier par 1000 pour convertir les secondes en millisecondes
-                const date = new Date(timestamp.seconds * 1000);
-                return date.toLocaleString('fr-FR', {
-                    day: '2-digit', month: '2-digit', year: 'numeric', 
-                    hour: '2-digit', minute: '2-digit'
-                }).replace(',', ' à');
-            } catch (e) {
-                console.error("Erreur de formatage du timestamp:", e);
-                return 'Date invalide';
-            }
-        }
-        
-        // --- GESTION DE L'AUTHENTIFICATION ET DE L'ACCÈS ---
+    // --- CORRECTION DE LA FONCTION FETCH ---
+    function fetchUsersData() {
+        const userProfilesPath = "artifacts"; 
+        const usersRef = collection(db, userProfilesPath);
 
-        /** Gère la déconnexion de l'utilisateur. */
-        window.handleLogout = async () => {
-            try {
-                await signOut(auth);
-                // La redirection vers login.html se fera automatiquement via onAuthStateChanged
-            } catch (error) {
-                console.error("Erreur lors de la déconnexion:", error);
-                alertMessage("Erreur lors de la déconnexion. Veuillez rafraîchir la page.", 'error');
-            }
-        };
-
-        /**
-         * Met à jour le header et les boutons d'action basés sur l'état de connexion.
-         * @param {Object} user - L'objet utilisateur Firebase, ou null.
-         */
-        function checkSessionAndRenderHeader(user) {
-            const desktopActions = document.getElementById('auth-actions-desktop');
-            const mobileActions = document.getElementById('auth-actions-mobile');
-            
-            desktopActions.innerHTML = '';
-            mobileActions.innerHTML = '';
-
-            // --- Logique d'accès modifiée pour le débogage/test ---
-            // On vérifie d'abord si l'utilisateur est authentifié du tout.
-            const isAuthenticated = !!user;
-            const userEmail = user ? user.email : null;
-            const isAdmin = userEmail === ADMIN_EMAIL;
-
-            if (isAuthenticated) {
-                console.log(`[AUTH STATUS] Utilisateur connecté. UID: ${user.uid}, Email: ${userEmail}, IsAdmin: ${isAdmin}`);
-                
-                if (!isAdmin) {
-                    // Si l'utilisateur est connecté mais pas l'admin principal
-                    alertMessage(`⚠️ Avertissement : Vous êtes connecté en tant que ${userEmail || 'Utilisateur anonyme'}, ce n'est pas l'e-mail d'administrateur principal (${ADMIN_EMAIL}).`, 'error');
-                } else {
-                    // Si c'est bien l'admin
-                    statusMessage.classList.add('hidden'); // Cache le message de statut si l'accès est OK
-                }
-
-                const displayName = userEmail ? userEmail.split('@')[0] : 'Invité';
-                const roleText = isAdmin ? 'Admin' : 'Utilisateur';
-
-                // 1. Desktop Actions 
-                desktopActions.innerHTML = `
-                    <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
-                        <span class="hidden sm:inline">Bienvenue,</span> ${displayName}
-                    </span>
-                    <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
-                        Déconnexion
-                    </button>
-                `;
-
-                // 2. Mobile Actions
-                mobileActions.innerHTML = `
-                    <a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>
-                    <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
-                    <p class="text-white text-md font-semibold mb-3">${displayName} (${roleText})</p>
-                    <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
-                `;
-
-                // 3. Attacher les écouteurs de déconnexion
-                document.getElementById('logout-desktop-btn')?.addEventListener('click', window.handleLogout);
-                document.getElementById('logout-mobile-btn')?.addEventListener('click', window.handleLogout);
-                
-                // Lancer le chargement des données (car l'utilisateur est authentifié)
-                fetchUsersData();
-
-            } else {
-                // --- Utilisateur Déconnecté ---
-                console.log("[AUTH STATUS] Aucun utilisateur connecté. Redirection vers login.html.");
-
-                alertMessage("Session non trouvée. Redirection vers la page de connexion...", 'warning');
-
-                // Redirige uniquement si le statut est bien "non authentifié" après un court délai
-                setTimeout(() => {
-                    if (!auth.currentUser) {
-                        window.location.href = REDIRECTION_PAGE;
-                    }
-                }, 1000);
-                
-                // Rendu des actions par défaut (Connexion)
-                desktopActions.innerHTML = `<a href="${REDIRECTION_PAGE}" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">Se Connecter</a>`;
-                mobileActions.innerHTML = `<a href="${REDIRECTION_PAGE}" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>`;
-            }
-        }
-
-        // --- GESTION DE FIRESTORE (Affichage des Utilisateurs) ---
-
-        /**
-         * Récupère la liste des profils utilisateur depuis Firestore et met à jour le tableau en temps réel.
-         */
-        function fetchUsersData() {
-    // On pointe directement sur "artifacts" car c'est là que login.html écrit
-    const userProfilesPath = "artifacts"; 
-    const usersRef = collection(db, userProfilesPath);
-    const usersQuery = query(usersRef);
-
-    console.log(`Écoute de la collection: ${userProfilesPath}`);
-
-    onSnapshot(usersQuery, (snapshot) => {
-        const userProfiles = [];
-        snapshot.forEach(doc => {
-            userProfiles.push({ id: doc.id, ...doc.data() });
+        onSnapshot(usersRef, (snapshot) => {
+            const userProfiles = [];
+            snapshot.forEach(doc => {
+                userProfiles.push({ id: doc.id, ...doc.data() });
+            });
+            renderUsersTable(userProfiles);
+        }, (error) => {
+            console.error("Erreur Firestore:", error);
+            userListElement.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-red-500 font-bold">Erreur : ${error.message}</td></tr>`;
         });
-        renderUsersTable(userProfiles);
-    }, (error) => {
-        console.error("Erreur Firestore:", error);
-        alertMessage("Erreur : " + error.message, 'error');
-    });
-}
+    }
 
-            // onSnapshot pour les mises à jour en temps réel
-            onSnapshot(usersQuery, (snapshot) => {
-                const userProfiles = [];
-                snapshot.forEach(doc => {
-                    userProfiles.push({ id: doc.id, ...doc.data() });
-                });
-                
-                renderUsersTable(userProfiles);
-
-            }, (error) => {
-                console.error("Erreur lors de la récupération des profils utilisateurs:", error);
-                userListElement.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="py-12 text-center text-red-500 font-bold">
-                            Erreur de chargement des profils : ${error.message}
-                            <br>Vérifiez les règles de sécurité Firestore pour l'accès public.
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-        
-        /**
-         * Affiche la liste des utilisateurs dans le tableau HTML.
-         * @param {Array} profiles - Liste des profils utilisateur Firestore.
-         */
-        function renderUsersTable(profiles) {
-            userListElement.innerHTML = ''; // Nettoyer la liste existante
-            
-            if (profiles.length === 0) {
-                 userListElement.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="py-8 text-center text-gray-500">
-                            Aucun profil utilisateur trouvé dans la base de données. 
-                            (Assurez-vous que l'application cliente enregistre les profils dans: ${`/artifacts/${appId}/public/data/user_profiles`})
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            profiles.forEach(user => {
-                // Détermine le statut (hypothétique) et la couleur
-                const userEmail = user.email || '';
-                const roleText = user.role || 'Client';
-                const isOnline = user.status === 'EN LIGNE' || user.status === 'ONLINE'; 
-                const isActualAdmin = userEmail === ADMIN_EMAIL;
-                
-                const statusColor = isActualAdmin ? 'bg-red-500 text-white' : (isOnline ? 'bg-vibrant-green text-white' : 'bg-gray-400 text-white');
-                const displayName = user.displayName || (userEmail ? userEmail.split('@')[0] : user.id || 'Inconnu');
-
-                const row = document.createElement('tr');
-                row.classList.add('hover:bg-gray-50', 'transition', 'duration-150');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-brand-dark">${displayName}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${userEmail || 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${roleText}</td>
-                    
-                    <!-- STATUT -->
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">
-                            ${isActualAdmin ? 'ADMIN PRINCIPAL' : (user.status || 'HORS LIGNE')}
-                        </span>
-                    </td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">
-                        ${formatFirestoreTimestamp(user.lastLogin)}
-                    </td>
-                `;
-                userListElement.appendChild(row);
-            });
-        }
-        
-        // --- INITIALISATION PRINCIPALE ---
-        function initializeFirebase() {
-            try {
-                // IMPORTANT: Récupération des variables globales de l'environnement Canvas
-                const envFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
-                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                
-                const app = initializeApp(envFirebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-
-                // Tentative de connexion silencieuse
-                if (initialAuthToken) {
-                    signInWithCustomToken(auth, initialAuthToken).catch(err => {
-                        console.warn("Échec de la connexion par jeton initial (Cela peut être normal si aucun token n'est fourni):", err.message);
-                    });
-                } else {
-                    // Cela ne suffit pas pour l'accès Admin, mais assure l'initialisation de l'état Auth
-                    signInAnonymously(auth).catch(err => {
-                        console.warn("Échec de la connexion anonyme:", err.message);
-                    });
-                }
-
-                // Écouteur d'état d'authentification pour gérer l'accès et la redirection
-                onAuthStateChanged(auth, (user) => {
-                    checkSessionAndRenderHeader(user);
-                });
-
-            } catch (error) {
-                console.error("Échec de l'initialisation Firebase:", error);
-                alertMessage(`Erreur critique d'initialisation : ${error.message}`, 'error');
-            }
+    function renderUsersTable(profiles) {
+        userListElement.innerHTML = '';
+        if (profiles.length === 0) {
+             userListElement.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-gray-500">Aucun utilisateur trouvé dans la collection "artifacts".</td></tr>`;
+            return;
         }
 
-        // --- GESTIONNAIRE DU MENU MOBILE (Off-Canvas) ---
-        const elements = {
-            mobileMenu: document.getElementById('mobile-menu'),
-            overlay: document.getElementById('mobile-menu-overlay'),
-            menuButton: document.getElementById('menu-button'),
-            closeMenuButton: document.getElementById('close-menu-button'),
-        };
+        profiles.forEach(user => {
+            const userEmail = user.email || 'Inconnu';
+            const isOnline = user.status === 'EN LIGNE';
+            const statusColor = isOnline ? 'bg-emerald-500 text-white' : 'bg-gray-400 text-white';
 
-        function toggleMobileMenu(isOpen) {
-            const isOpening = isOpen === undefined ? !elements.mobileMenu.classList.contains('open') : isOpen;
-            if (isOpening) {
-                elements.mobileMenu.classList.add('open');
-                elements.overlay.classList.add('open');
-                document.body.style.overflow = 'hidden'; 
-            } else {
-                elements.mobileMenu.classList.remove('open');
-                elements.overlay.classList.remove('open');
-                document.body.style.overflow = '';
-            }
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-50 transition';
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-brand-dark">${user.displayName || userEmail.split('@')[0]}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${userEmail}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${user.role || 'Client'}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-3 py-1 text-xs font-semibold rounded-full ${statusColor}">${user.status || 'HORS LIGNE'}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${formatFirestoreTimestamp(user.lastLogin || user.createdAt)}</td>
+            `;
+            userListElement.appendChild(row);
+        });
+    }
+
+    function initializeFirebase() {
+        try {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            onAuthStateChanged(auth, checkSessionAndRenderHeader);
+        } catch (error) {
+            alertMessage(`Erreur d'initialisation : ${error.message}`, 'error');
         }
-        elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
-        elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
-        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
+    }
 
+    // Gestion Menu Mobile
+    const menuBtn = document.getElementById('menu-button');
+    const closeBtn = document.getElementById('close-menu-button');
+    const menu = document.getElementById('mobile-menu');
+    const overlay = document.getElementById('mobile-menu-overlay');
 
-        // Exécution au chargement
-        document.addEventListener('DOMContentLoaded', initializeFirebase);
-    </script>
+    [menuBtn, closeBtn, overlay].forEach(el => el?.addEventListener('click', () => {
+        menu.classList.toggle('open');
+        overlay.classList.toggle('open');
+    }));
+
+    document.addEventListener('DOMContentLoaded', initializeFirebase);
+</script>
 </body>
 </html>
