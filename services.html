@@ -10,7 +10,6 @@
     <meta property="og:image" content="https://josuekplowodokpo-hue.github.io/MindCompta-/logo.jpg">
     <meta property="og:url" content="https://josuekplowodokpo-hue.github.io/MindCompta-/services.html">
     <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -24,7 +23,6 @@
         .active-link { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
         .post-card { transition: all 0.3s ease; border-left: 6px solid var(--brand-dark); }
         .content-collapsed { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        .content-expanded { display: block; }
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
         #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
@@ -34,157 +32,139 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col pb-20">
-
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center group">
-                <img src="logo.jpg" alt="Logo" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
-                <span class="text-xl font-bold tracking-wider group-hover:text-accent">MindCompta</span>
+                <img src="logo.jpg" alt="Logo" class="h-10 w-auto rounded-full mr-3 border-2 border-white">
+                <span class="text-xl font-bold tracking-wider">MindCompta</span>
             </a>
             <nav class="hidden md:flex items-center space-x-2">
                 <a href="index.html" class="nav-link">Accueil</a>
                 <a href="services.html" class="nav-link active-link">Services</a>
-                <a href="about.html" class="nav-link">À Propos</a>
-                <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
                 <div id="auth-actions-desktop" class="flex items-center ml-4 border-l border-blue-800 pl-4"></div>
             </nav>
-            <button id="menu-button" class="md:hidden p-2 text-white">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
+            <button id="menu-button" class="md:hidden p-2 text-white"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
         </div>
     </header>
 
     <div id="mobile-menu-overlay"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark p-6 shadow-2xl flex flex-col">
-        <button id="close-menu" class="text-white text-4xl self-end mb-8">&times;</button>
-        <div class="flex flex-col space-y-3 text-white flex-grow">
-            <a href="index.html" class="p-3 hover:bg-blue-800 rounded-lg">Accueil</a>
-            <a href="services.html" class="p-3 bg-accent text-brand-dark rounded-lg font-bold">Services</a>
-            <a href="about.html" class="p-3 hover:bg-blue-800 rounded-lg">À Propos</a>
-            <a href="youtube.html" class="p-3 hover:bg-blue-800 rounded-lg">Vidéos YouTube</a>
-            <hr class="border-gray-700 my-4">
-            <div id="auth-actions-mobile" class="mt-auto"></div>
-        </div>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark p-6 shadow-2xl flex flex-col text-white">
+        <button id="close-menu" class="text-4xl self-end mb-8">&times;</button>
+        <div id="auth-actions-mobile" class="mb-4"></div>
+        <a href="index.html" class="p-3">Accueil</a>
+        <a href="services.html" class="p-3 bg-accent text-brand-dark rounded-lg font-bold">Services</a>
     </nav>
 
     <main class="w-full max-w-5xl mx-auto p-4 flex-grow">
-        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 mt-6">
-            <h1 class="text-4xl font-black text-brand-dark italic uppercase tracking-tight">Espace <span class="text-accent">Ressources</span></h1>
-            <p id="user-welcome" class="text-gray-500 font-medium text-sm"></p>
-        </div>
-
         <div id="admin-section" class="bg-white p-8 rounded-2xl shadow-xl mb-12 border-2 border-accent hidden">
-            <h2 class="text-2xl font-bold text-brand-dark mb-6 text-center underline uppercase">Publier un Article</h2>
+            <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase">Publier ou Modifier</h2>
             <form id="add-doc-form" class="space-y-4">
-                <input type="text" id="doc-title" required class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark font-semibold" placeholder="Titre de l'article...">
-                <input type="url" id="doc-image" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Lien de l'image (Optionnel)">
-                <textarea id="doc-content" required rows="6" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Contenu de l'article..."></textarea>
-                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-900 transition uppercase tracking-widest">Diffuser sur le flux</button>
+                <input type="hidden" id="edit-doc-id">
+                <input type="text" id="doc-title" required class="w-full border p-3 rounded-lg" placeholder="Titre...">
+                <input type="url" id="doc-image" class="w-full border p-3 rounded-lg" placeholder="Lien image...">
+                <textarea id="doc-content" required rows="4" class="w-full border p-3 rounded-lg" placeholder="Contenu..."></textarea>
+                <button type="submit" id="submit-btn" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg uppercase">Diffuser</button>
+                <button type="button" id="cancel-edit" class="w-full bg-gray-400 text-white font-bold py-2 rounded-lg hidden">Annuler la modification</button>
             </form>
         </div>
-        <div id="login-required" class="hidden text-center py-20 bg-white rounded-3xl shadow">
-            <h3 class="text-xl font-bold mb-4 text-brand-dark">Accès réservé aux membres</h3>
-            <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold uppercase">Se connecter</a>
-        </div>
-
+        <div id="login-required" class="hidden text-center py-20"><a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold">Se connecter</a></div>
         <div id="documents-list" class="grid grid-cols-1 gap-8 hidden"></div>
         <div id="loader" class="flex justify-center py-20"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div></div>
     </main>
 
     <div class="fixed bottom-6 right-6 z-50">
-        <button id="notif-bell" class="bg-brand-dark text-white p-4 rounded-full shadow-2xl relative border-2 border-white hover:scale-110 transition active:scale-95">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-            <span id="notif-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-full border-2 border-white hidden">0</span>
+        <button id="notif-bell" class="bg-brand-dark text-white p-4 rounded-full shadow-2xl relative border-2 border-white transition active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-width="2"/></svg>
+            <span id="notif-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-6 h-6 flex items-center justify-center rounded-full border-2 border-white hidden">0</span>
         </button>
-        <div id="notif-panel" class="absolute bottom-16 right-0 w-72 bg-white rounded-2xl shadow-2xl border border-gray-200 hidden overflow-hidden">
-            <div class="bg-brand-dark text-white p-3 font-bold text-sm flex justify-between items-center"><span>Nouveautés</span><button id="close-notif" class="text-xl">&times;</button></div>
-            <div id="notif-list" class="max-h-60 overflow-y-auto p-2 text-xs space-y-2"><p class="text-gray-400 text-center py-4">Aucun nouvel article</p></div>
-        </div>
     </div>
-
-    <footer class="w-full bg-brand-dark py-8 mt-auto text-center text-gray-400">© 2025 MindCompta - Tous droits réservés.</footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
-            authDomain: "mindcompta-a61ef.firebaseapp.com",
-            projectId: "mindcompta-a61ef",
-            storageBucket: "mindcompta-a61ef.firebasestorage.app",
-            messagingSenderId: "578389020450",
-            appId: "1:578389020450:web:edf9dd48e394cff7601f7b"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const fb = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
+        const app = initializeApp(fb); const auth = getAuth(app); const db = getFirestore(app);
         const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
         setPersistence(auth, browserSessionPersistence);
 
-        window.shareArticle = async (title, content, imageUrl) => {
-            const shareData = { title, text: `${title}\n\n${content.substring(0, 100)}...\n\nLien :`, url: window.location.href };
-            if (imageUrl) shareData.text += `\nImage : ${imageUrl}`;
-            try { if (navigator.share) { await navigator.share(shareData); } else { await navigator.clipboard.writeText(window.location.href); alert("Lien copié !"); } } catch (err) {}
+        window.shareArticle = async (t, c, i) => {
+            const d = { title: t, text: `${t}\n\n${c.substring(0,100)}...\n\nImage: ${i || ''}`, url: window.location.href };
+            try { if (navigator.share) await navigator.share(d); else alert("Lien copié !"); } catch(e){}
         };
 
-        let lastCount = localStorage.getItem('mindcompta_last_count') || 0;
+        window.prepareEdit = (id, t, c, i) => {
+            document.getElementById('edit-doc-id').value = id;
+            document.getElementById('doc-title').value = t;
+            document.getElementById('doc-content').value = c;
+            document.getElementById('doc-image').value = i || '';
+            document.getElementById('submit-btn').innerText = "Mettre à jour";
+            document.getElementById('cancel-edit').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        };
+
+        window.handleLike = async (id) => {
+            const u = auth.currentUser; if(!u) return;
+            const dR = doc(db, "resources", id); const lR = doc(db, "resources", id, "likes", u.uid);
+            const lS = await getDoc(lR);
+            await runTransaction(db, async (t) => {
+                const res = await t.get(dR); let count = res.data().likesCount || 0;
+                if (lS.exists()) { t.delete(lR); t.update(dR, { likesCount: Math.max(0, count-1) }); }
+                else { t.set(lR, { uid: u.uid }); t.update(dR, { likesCount: count+1 }); }
+            });
+        };
+
         onAuthStateChanged(auth, (user) => {
             document.getElementById('loader').classList.add('hidden');
-            const dAuth = document.getElementById('auth-actions-desktop');
-            const mAuth = document.getElementById('auth-actions-mobile');
             if (user) {
                 document.getElementById('documents-list').classList.remove('hidden');
+                const name = user.email.split('@')[0];
                 const isAdmin = user.uid === ADMIN_UID;
-                dAuth.innerHTML = `<button id="logout-btn" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold">DÉCONNEXION</button>`;
-                mAuth.innerHTML = `<button id="logout-btn-mob" class="w-full bg-red-600 text-white p-3 rounded-lg font-bold">DÉCONNEXION</button>`;
-                document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.reload());
-                document.getElementById('logout-btn-mob').onclick = () => signOut(auth).then(() => window.location.reload());
+                document.getElementById('auth-actions-desktop').innerHTML = `<span class="text-xs mr-2">${name}</span><button onclick="signOut(getAuth())" class="bg-red-600 px-2 py-1 rounded text-xs">Déconnexion</button>`;
                 if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
                 loadDocs(isAdmin, user.uid);
             } else { document.getElementById('login-required').classList.remove('hidden'); }
         });
 
         function loadDocs(isAdmin, uid) {
-            const q = query(collection(db, "resources"), orderBy("createdAt", "desc"));
-            onSnapshot(q, (snap) => {
-                const list = document.getElementById('documents-list');
-                list.innerHTML = '';
-                const diff = snap.size - lastCount;
-                if(diff > 0) { 
-                    document.getElementById('notif-count').innerText = diff; 
-                    document.getElementById('notif-count').classList.remove('hidden');
-                    document.getElementById('notif-bell').classList.add('ring-active');
-                }
-                snap.forEach(async (docSnap) => {
-                    const data = docSnap.data(); const docId = docSnap.id;
-                    const userLikeRef = doc(db, "resources", docId, "likes", uid);
-                    const userLikeSnap = await getDoc(userLikeRef);
-                    const isLiked = userLikeSnap.exists();
-                    const article = document.createElement('article');
-                    article.className = "post-card bg-white p-6 rounded-2xl shadow-sm relative";
-                    article.innerHTML = `
-                        <div class="flex justify-between mb-4"><span class="bg-blue-50 text-brand-dark text-[10px] font-bold px-3 py-1 rounded-full uppercase italic">MindCompta</span>
-                        <div>${isAdmin ? `<button onclick="deleteDoc(doc(db, 'resources', '${docId}'))" class="text-red-500 text-xs font-bold">Supprimer</button>` : ''}</div></div>
-                        ${data.imageUrl ? `<img src="${data.imageUrl}" class="w-full h-48 object-cover rounded-xl mb-4">` : ''}
-                        <h3 class="text-xl font-black text-brand-dark mb-2">${data.title}</h3>
-                        <div class="content-text text-gray-600 text-sm content-collapsed">${data.content}</div>
-                        <div class="mt-4 flex justify-between items-center border-t pt-4">
-                            <button onclick="shareArticle(${JSON.stringify(data.title).replace(/"/g, '&quot;')}, ${JSON.stringify(data.content).replace(/"/g, '&quot;')}, ${JSON.stringify(data.imageUrl || '').replace(/"/g, '&quot;')})" class="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg></button>
+            onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snap) => {
+                const list = document.getElementById('documents-list'); list.innerHTML = '';
+                const last = localStorage.getItem('last_cnt') || 0;
+                if(snap.size > last) { document.getElementById('notif-count').innerText = snap.size - last; document.getElementById('notif-count').classList.remove('hidden'); document.getElementById('notif-bell').classList.add('ring-active'); }
+                snap.forEach(async (ds) => {
+                    const d = ds.data(); const id = ds.id;
+                    const lS = await getDoc(doc(db, "resources", id, "likes", uid));
+                    const art = document.createElement('article');
+                    art.className = "post-card bg-white p-6 rounded-2xl shadow-sm";
+                    art.innerHTML = `
+                        <div class="flex justify-between mb-4"><span class="text-xs font-bold text-brand-dark">MindCompta</span>
+                        <div>${isAdmin ? `<button onclick="prepareEdit('${id}', ${JSON.stringify(d.title).replace(/"/g, '&quot;')}, ${JSON.stringify(d.content).replace(/"/g, '&quot;')}, '${d.imageUrl||''}')" class="text-blue-600 text-xs mr-3">Modifier</button><button onclick="deleteDoc(doc(db, 'resources', '${id}'))" class="text-red-500 text-xs">Supprimer</button>` : ''}</div></div>
+                        ${d.imageUrl ? `<img src="${d.imageUrl}" class="w-full h-48 object-cover rounded-xl mb-4">` : ''}
+                        <h3 class="text-xl font-bold mb-2">${d.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4">${d.content}</p>
+                        <div class="flex justify-between border-t pt-4">
+                            <button onclick="shareArticle(${JSON.stringify(d.title).replace(/"/g, '&quot;')}, ${JSON.stringify(d.content).replace(/"/g, '&quot;')}, '${d.imageUrl||''}')" class="text-gray-400">Partager</button>
+                            <button onclick="handleLike('${id}')" class="${lS.exists() ? 'text-red-500' : 'text-gray-400'}">♥ ${d.likesCount || 0}</button>
                         </div>`;
-                    list.appendChild(article);
+                    list.appendChild(art);
                 });
             });
         }
+
         document.getElementById('add-doc-form').onsubmit = async (e) => {
             e.preventDefault();
-            await addDoc(collection(db, "resources"), { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null, createdAt: serverTimestamp() });
-            e.target.reset();
+            const id = document.getElementById('edit-doc-id').value;
+            const data = { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null };
+            if (id) { await updateDoc(doc(db, "resources", id), data); } 
+            else { await addDoc(collection(db, "resources"), { ...data, likesCount: 0, createdAt: serverTimestamp() }); }
+            e.target.reset(); document.getElementById('edit-doc-id').value = ''; document.getElementById('submit-btn').innerText = "Diffuser"; document.getElementById('cancel-edit').classList.add('hidden');
         };
+
+        document.getElementById('notif-bell').onclick = () => { localStorage.setItem('last_cnt', document.querySelectorAll('article').length); document.getElementById('notif-count').classList.add('hidden'); document.getElementById('notif-bell').classList.remove('ring-active'); };
         document.getElementById('menu-button').onclick = () => { document.getElementById('mobile-menu').classList.add('open'); document.getElementById('mobile-menu-overlay').classList.add('open'); };
         document.getElementById('close-menu').onclick = () => { document.getElementById('mobile-menu').classList.remove('open'); document.getElementById('mobile-menu-overlay').classList.remove('open'); };
+        document.getElementById('cancel-edit').onclick = () => { document.getElementById('add-doc-form').reset(); document.getElementById('edit-doc-id').value = ''; document.getElementById('submit-btn').innerText = "Diffuser"; document.getElementById('cancel-edit').classList.add('hidden'); };
     </script>
 </body>
 </html>
