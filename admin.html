@@ -364,8 +364,8 @@
          * Récupère la liste des profils utilisateur depuis Firestore et met à jour le tableau en temps réel.
          */
         function fetchUsersData() {
-            // Path: /artifacts/{appId}/public/data/user_profiles
-            const userProfilesPath = `/artifacts/${appId}/public/data/user_profiles`;
+            // Path: /artifacts/default-app-id/public/data/user_profiles
+            const userProfilesPath = `/artifacts/default-app-id/public/data/user_profiles`;
             const usersRef = collection(db, userProfilesPath);
             const usersQuery = query(usersRef);
 
