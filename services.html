@@ -34,9 +34,20 @@
         #mobile-menu.open { transform: translateX(0); }
         #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
         #mobile-menu-overlay.open { display: block; }
+
+        /* Animation pour la cloche */
+        @keyframes ring {
+            0% { transform: rotate(0); }
+            10% { transform: rotate(15deg); }
+            20% { transform: rotate(-15deg); }
+            30% { transform: rotate(10deg); }
+            40% { transform: rotate(-10deg); }
+            50% { transform: rotate(0); }
+        }
+        .ring-active { animation: ring 1.5s ease infinite; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="bg-gray-50 min-h-screen flex flex-col pb-20">
 
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
@@ -44,7 +55,6 @@
                 <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
                 <span class="text-xl font-bold tracking-wider group-hover:text-accent">MindCompta</span>
             </a>
-
             <nav class="hidden md:flex items-center space-x-2">
                 <a href="index.html" class="nav-link">Accueil</a>
                 <a href="services.html" class="nav-link active-link">Services</a>
@@ -52,7 +62,6 @@
                 <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
                 <div id="auth-actions-desktop" class="flex items-center ml-4 border-l border-blue-800 pl-4"></div>
             </nav>
-
             <button id="menu-button" class="md:hidden p-2 text-white">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
@@ -61,10 +70,7 @@
 
     <div id="mobile-menu-overlay"></div>
     <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark p-6 shadow-2xl flex flex-col">
-        <div class="flex justify-between items-center mb-8">
-            <span class="text-accent font-bold">MENU</span>
-            <button id="close-menu" class="text-white text-4xl">&times;</button>
-        </div>
+        <button id="close-menu" class="text-white text-4xl self-end mb-8">&times;</button>
         <div class="flex flex-col space-y-3 text-white flex-grow">
             <a href="index.html" class="p-3 hover:bg-blue-800 rounded-lg">Accueil</a>
             <a href="services.html" class="p-3 bg-accent text-brand-dark rounded-lg font-bold">Services</a>
@@ -78,7 +84,7 @@
     <main class="w-full max-w-5xl mx-auto p-4 flex-grow">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 mt-6">
             <h1 class="text-4xl font-black text-brand-dark italic uppercase tracking-tight">Espace <span class="text-accent">Ressources</span></h1>
-            <p id="user-welcome" class="text-gray-500 font-medium"></p>
+            <p id="user-welcome" class="text-gray-500 font-medium text-sm"></p>
         </div>
 
         <div id="admin-section" class="bg-white p-8 rounded-2xl shadow-xl mb-12 border-2 border-accent hidden">
@@ -87,13 +93,13 @@
                 <input type="text" id="doc-title" required class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark font-semibold" placeholder="Titre de l'article...">
                 <input type="url" id="doc-image" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Lien de l'image (Optionnel)">
                 <textarea id="doc-content" required rows="6" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Contenu de l'article..."></textarea>
-                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-900 transition uppercase">Diffuser sur le flux</button>
+                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-900 transition uppercase tracking-widest">Diffuser sur le flux</button>
             </form>
         </div>
 
         <div id="login-required" class="hidden text-center py-20 bg-white rounded-3xl shadow">
             <h3 class="text-xl font-bold mb-4 text-brand-dark">Accès réservé aux membres</h3>
-            <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold uppercase">Se connecter / S'inscrire</a>
+            <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold uppercase">Se connecter</a>
         </div>
 
         <div id="documents-list" class="grid grid-cols-1 gap-8 hidden"></div>
@@ -102,6 +108,25 @@
             <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div>
         </div>
     </main>
+
+    <div class="fixed bottom-6 right-6 z-50">
+        <button id="notif-bell" class="bg-brand-dark text-white p-4 rounded-full shadow-2xl relative border-2 border-white hover:scale-110 transition active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <span id="notif-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-full border-2 border-white hidden">0</span>
+        </button>
+
+        <div id="notif-panel" class="absolute bottom-16 right-0 w-72 bg-white rounded-2xl shadow-2xl border border-gray-200 hidden overflow-hidden">
+            <div class="bg-brand-dark text-white p-3 font-bold text-sm flex justify-between items-center">
+                <span>Nouveautés</span>
+                <button id="close-notif" class="text-xl">&times;</button>
+            </div>
+            <div id="notif-list" class="max-h-60 overflow-y-auto p-2 text-xs space-y-2">
+                <p class="text-gray-400 text-center py-4">Aucun nouvel article</p>
+            </div>
+        </div>
+    </div>
 
     <footer class="w-full bg-brand-dark border-t border-gray-700 py-8 mt-auto text-center text-gray-400">
         © 2025 MindCompta - Tous droits réservés.
@@ -128,26 +153,57 @@
 
         setPersistence(auth, browserSessionPersistence);
 
-        // --- NOUVEAU : FONCTION PARTAGER ---
+        // --- CORRECTION PARTAGE ---
         window.shareArticle = async (title, content) => {
             const shareData = {
                 title: title,
                 text: content.substring(0, 100) + "...",
                 url: window.location.href
             };
-
             try {
                 if (navigator.share) {
                     await navigator.share(shareData);
                 } else {
-                    // Repli : copier le lien
                     await navigator.clipboard.writeText(window.location.href);
-                    alert("Lien de la page copié dans le presse-papier !");
+                    alert("Lien copié !");
                 }
-            } catch (err) {
-                console.log("Erreur de partage:", err);
-            }
+            } catch (err) { console.log("Erreur partage"); }
         };
+
+        // --- GESTION DES NOTIFICATIONS ---
+        let lastVisitCount = localStorage.getItem('mindcompta_last_count') || 0;
+        
+        function updateNotifications(snap) {
+            const count = snap.size;
+            const diff = count - lastVisitCount;
+            const badge = document.getElementById('notif-count');
+            const bell = document.getElementById('notif-bell');
+            const list = document.getElementById('notif-list');
+
+            if (diff > 0) {
+                badge.innerText = diff;
+                badge.classList.remove('hidden');
+                bell.classList.add('ring-active');
+                
+                list.innerHTML = "";
+                snap.docs.slice(0, 5).forEach(d => {
+                    list.innerHTML += `<div class="p-2 border-b border-gray-50 hover:bg-gray-50 cursor-pointer font-medium text-brand-dark">• ${d.data().title}</div>`;
+                });
+            } else {
+                badge.classList.add('hidden');
+                bell.classList.remove('ring-active');
+            }
+        }
+
+        document.getElementById('notif-bell').onclick = () => {
+            document.getElementById('notif-panel').classList.toggle('hidden');
+            // Quand on ouvre, on considère que c'est "lu"
+            const currentTotal = document.querySelectorAll('article').length;
+            localStorage.setItem('mindcompta_last_count', currentTotal);
+            document.getElementById('notif-count').classList.add('hidden');
+            document.getElementById('notif-bell').classList.remove('ring-active');
+        };
+        document.getElementById('close-notif').onclick = () => document.getElementById('notif-panel').classList.add('hidden');
 
         // --- LOGIQUE ARTICLES ---
         window.toggleReadMore = (btn) => {
@@ -161,27 +217,22 @@
         window.handleLike = async (docId) => {
             const user = auth.currentUser;
             if (!user) return alert("Veuillez vous connecter !");
-            const likeRef = doc(db, "resources", docId, "likes", user.uid);
             const docRef = doc(db, "resources", docId);
+            const likeRef = doc(db, "resources", docId, "likes", user.uid);
             try {
                 const likeSnap = await getDoc(likeRef);
-                await runTransaction(db, async (transaction) => {
-                    const resDoc = await transaction.get(docRef);
-                    if (!resDoc.exists()) return;
-                    let currentLikes = resDoc.data().likesCount || 0;
+                await runTransaction(db, async (t) => {
+                    const res = await t.get(docRef);
+                    let count = res.data().likesCount || 0;
                     if (likeSnap.exists()) {
-                        transaction.delete(likeRef);
-                        transaction.update(docRef, { likesCount: Math.max(0, currentLikes - 1) });
+                        t.delete(likeRef);
+                        t.update(docRef, { likesCount: Math.max(0, count - 1) });
                     } else {
-                        transaction.set(likeRef, { uid: user.uid });
-                        transaction.update(docRef, { likesCount: currentLikes + 1 });
+                        t.set(likeRef, { uid: user.uid });
+                        t.update(docRef, { likesCount: count + 1 });
                     }
                 });
-            } catch (e) { console.error(e); }
-        };
-
-        window.deletePublication = async (id) => {
-            if(confirm("Supprimer cet article ?")) { try { await deleteDoc(doc(db, "resources", id)); } catch(e) { } }
+            } catch (e) { }
         };
 
         window.editPublication = (id) => {
@@ -201,24 +252,23 @@
             } catch (e) { alert("Erreur"); }
         };
 
+        window.deletePublication = async (id) => {
+            if(confirm("Supprimer cet article ?")) { await deleteDoc(doc(db, "resources", id)); }
+        };
+
         // --- AUTH & CHARGEMENT ---
         onAuthStateChanged(auth, (user) => {
             document.getElementById('loader').classList.add('hidden');
             const dAuth = document.getElementById('auth-actions-desktop');
             const mAuth = document.getElementById('auth-actions-mobile');
-
             if (user) {
                 document.getElementById('documents-list').classList.remove('hidden');
                 const userName = user.displayName || user.email.split('@')[0];
                 const isAdmin = user.uid === ADMIN_UID;
-
-                dAuth.innerHTML = `<div class="flex flex-col items-end mr-4"><span class="text-[10px] text-accent font-bold uppercase">Utilisateur</span><span class="text-xs font-bold text-white">${userName}</span></div><button id="logout-btn" class="bg-red-600/20 border border-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold">DÉCONNEXION</button>`;
+                dAuth.innerHTML = `<div class="flex flex-col items-end mr-4"><span class="text-[10px] text-accent font-bold uppercase tracking-tighter">Utilisateur</span><span class="text-xs font-bold text-white">${userName}</span></div><button id="logout-btn" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 transition">DÉCONNEXION</button>`;
                 mAuth.innerHTML = `<div class="bg-blue-900/50 p-4 rounded-xl mb-4 border border-blue-700"><p class="text-[10px] text-accent font-bold uppercase">Session active</p><p class="text-white font-bold">${userName}</p></div><button id="logout-btn-mob" class="w-full bg-red-600 text-white p-3 rounded-lg font-bold">DÉCONNEXION</button>`;
-
-                const logoff = () => signOut(auth).then(() => window.location.reload());
-                document.getElementById('logout-btn').onclick = logoff;
-                document.getElementById('logout-btn-mob').onclick = logoff;
-
+                document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.reload());
+                document.getElementById('logout-btn-mob').onclick = () => signOut(auth).then(() => window.location.reload());
                 if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
                 loadDocs(isAdmin, user.uid);
             } else {
@@ -233,6 +283,7 @@
             onSnapshot(q, (snap) => {
                 const list = document.getElementById('documents-list');
                 list.innerHTML = '';
+                updateNotifications(snap);
                 snap.forEach(async (docSnap) => {
                     const data = docSnap.data();
                     const docId = docSnap.id;
@@ -255,14 +306,13 @@
                         <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2 hover:underline">Lire la suite</button>
                         <div class="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between">
                             <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center text-[10px] font-bold text-white uppercase">MC</div><span class="text-xs font-bold text-gray-400 uppercase tracking-widest">MindCompta</span></div>
-                            
-                            <div class="flex items-center gap-4">
-                                <button onclick="shareArticle('${data.title.replace(/'/g, "\\'")}', '${data.content.replace(/'/g, "\\'").replace(/\n/g, " ")}')" class="text-gray-400 hover:text-brand-dark transition p-1">
+                                                        <div class="flex items-center gap-4">
+                                <button onclick="shareArticle(${JSON.stringify(data.title).replace(/"/g, '&quot;')}, ${JSON.stringify(data.content).replace(/"/g, '&quot;')})" class="text-gray-400 hover:text-brand-dark transition p-1" title="Partager">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                                     </svg>
                                 </button>
-                                
+
                                 <button onclick="handleLike('${docId}')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-gray-100 transition">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-colors ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -276,19 +326,42 @@
             });
         }
 
+        // --- FORM SUBMISSION (ADMIN) ---
         document.getElementById('add-doc-form').onsubmit = async (e) => {
             e.preventDefault();
+            const title = document.getElementById('doc-title').value;
+            const content = document.getElementById('doc-content').value;
+            const imageUrl = document.getElementById('doc-image').value;
             try {
-                await addDoc(collection(db, "resources"), { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null, likesCount: 0, createdAt: serverTimestamp() });
+                await addDoc(collection(db, "resources"), { 
+                    title, 
+                    content, 
+                    imageUrl: imageUrl || null, 
+                    likesCount: 0, 
+                    createdAt: serverTimestamp() 
+                });
                 e.target.reset();
-            } catch (err) { }
+                alert("Article publié avec succès !");
+            } catch (err) {
+                alert("Erreur lors de la publication.");
+            }
         };
 
+        // --- MOBILE MENU LOGIC ---
         const menuBtn = document.getElementById('menu-button');
         const overlay = document.getElementById('mobile-menu-overlay');
         const menu = document.getElementById('mobile-menu');
-        const toggle = () => { menu.classList.toggle('open'); overlay.classList.toggle('open'); };
-        menuBtn.onclick = toggle; overlay.onclick = toggle; document.getElementById('close-menu').onclick = toggle;
+        const closeBtn = document.getElementById('close-menu');
+
+        const toggleMenu = () => {
+            menu.classList.toggle('open');
+            overlay.classList.toggle('open');
+        };
+
+        menuBtn.onclick = toggleMenu;
+        overlay.onclick = toggleMenu;
+        closeBtn.onclick = toggleMenu;
+
     </script>
 </body>
 </html>
