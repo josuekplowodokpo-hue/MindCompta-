@@ -17,14 +17,11 @@
 
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
-            <a href="index.html" class="flex items-center group">
+            <a href="index.html" class="flex items-center">
                 <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" 
                      class="h-10 w-10 rounded-full mr-3 border-2 border-white object-cover">
                 <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
             </a>
-            <nav class="hidden sm:flex items-center space-x-4">
-                <a href="index.html" class="hover:text-accent transition">Accueil</a>
-            </nav>
         </div>
     </header>
 
@@ -32,7 +29,7 @@
         <div class="w-full max-w-sm bg-white rounded-xl shadow-2xl p-8"> 
             <h2 id="form-title" class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
 
-            <button id="google-btn" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3 rounded-lg mb-6 hover:bg-gray-50 transition shadow-sm">
+            <button id="google-btn" type="button" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3 rounded-lg mb-6 hover:bg-gray-50 transition shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
                     <path fill="#fbc02d" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
                     <path fill="#e53935" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
@@ -66,9 +63,9 @@
             </form>
 
             <div class="mt-6 text-center text-sm">
-                <p id="switch-container" class="text-gray-600">
-                    Pas encore de compte ? 
-                    <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Créer un compte</button>
+                <p class="text-gray-600">
+                    <span id="switch-text">Pas encore de compte ?</span>
+                    <button id="switch-button" type="button" class="text-brand-dark font-semibold hover:underline ml-1">Créer un compte</button>
                 </p>
             </div>
         </div>
@@ -77,13 +74,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
-            getAuth, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword,
-            GoogleAuthProvider,
-            signInWithPopup,
-            setPersistence, 
-            browserSessionPersistence 
+            getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+            GoogleAuthProvider, signInWithPopup, setPersistence, browserSessionPersistence 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -102,15 +94,38 @@
 
         let isSignInMode = true;
 
-        // Message Helper
+        const formTitle = document.getElementById('form-title');
+        const authButton = document.getElementById('auth-button');
+        const switchButton = document.getElementById('switch-button');
+        const switchText = document.getElementById('switch-text');
+        const authMessage = document.getElementById('auth-message');
+
         function showMsg(text, isSuccess) {
-            const msg = document.getElementById('auth-message');
-            msg.innerText = text;
-            msg.className = `text-center p-3 rounded-lg text-sm border-l-4 mt-4 ${isSuccess ? 'bg-green-100 text-green-700 border-green-500' : 'bg-red-100 text-red-700 border-red-500'}`;
-            msg.classList.remove('hidden');
+            authMessage.innerText = text;
+            authMessage.className = `text-center p-3 rounded-lg text-sm border-l-4 mt-4 ${isSuccess ? 'bg-green-100 text-green-700 border-green-500' : 'bg-red-100 text-red-700 border-red-500'}`;
+            authMessage.classList.remove('hidden');
         }
 
-        // 1. GOOGLE LOGIN AVEC PERSISTANCE SESSION
+        // BASCOULEMENT SANS RECHARGEMENT
+        switchButton.onclick = (e) => {
+            e.preventDefault(); // Empêche toute action par défaut
+            isSignInMode = !isSignInMode;
+            
+            if (isSignInMode) {
+                formTitle.innerText = "Connexion";
+                authButton.innerText = "Se Connecter";
+                switchText.innerText = "Pas encore de compte ?";
+                switchButton.innerText = "Créer un compte";
+            } else {
+                formTitle.innerText = "Inscription";
+                authButton.innerText = "S'inscrire";
+                switchText.innerText = "Déjà un compte ?";
+                switchButton.innerText = "Se connecter";
+            }
+            authMessage.classList.add('hidden'); // Cache les anciens messages
+        };
+
+        // CONNEXION GOOGLE
         document.getElementById('google-btn').onclick = async () => {
             const provider = new GoogleAuthProvider();
             try {
@@ -124,48 +139,43 @@
                     lastLogin: serverTimestamp()
                 }, { merge: true });
                 window.location.href = 'index.html';
-            } catch (err) { showMsg(err.message, false); }
+            } catch (err) { showMsg("Erreur Google : " + err.message, false); }
         };
 
-        // 2. EMAIL LOGIN AVEC PERSISTANCE SESSION
+        // SOUMISSION FORMULAIRE
         document.getElementById('auth-form').onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value;
-            const btn = document.getElementById('auth-button');
 
-            btn.disabled = true;
-            btn.innerText = "Patientez...";
+            authButton.disabled = true;
+            authButton.innerText = "Traitement...";
 
             try {
                 await setPersistence(auth, browserSessionPersistence);
                 if (isSignInMode) {
                     const res = await signInWithEmailAndPassword(auth, email, password);
-                    await setDoc(doc(db, "artifacts", res.user.uid), { status: "EN LIGNE", lastLogin: serverTimestamp() }, { merge: true });
+                    await setDoc(doc(db, "artifacts", res.user.uid), { 
+                        status: "EN LIGNE", 
+                        lastLogin: serverTimestamp() 
+                    }, { merge: true });
                 } else {
                     const res = await createUserWithEmailAndPassword(auth, email, password);
                     await setDoc(doc(db, "artifacts", res.user.uid), {
-                        uid: res.user.uid, email, role: "Client", createdAt: serverTimestamp()
+                        uid: res.user.uid,
+                        email: email,
+                        role: "Client",
+                        createdAt: serverTimestamp(),
+                        status: "EN LIGNE"
                     });
+                    showMsg("Compte créé ! Redirection...", true);
                 }
-                window.location.href = 'index.html';
+                setTimeout(() => window.location.href = 'index.html', 1000);
             } catch (err) { 
-                showMsg("Erreur d'identifiants ou réseau.", false);
-                btn.disabled = false;
-                btn.innerText = isSignInMode ? "Se Connecter" : "S'inscrire";
+                showMsg("Erreur : " + err.message, false);
+                authButton.disabled = false;
+                authButton.innerText = isSignInMode ? "Se Connecter" : "S'inscrire";
             }
-        };
-
-        // SWITCH MODE
-        document.getElementById('switch-button').onclick = () => {
-            isSignInMode = !isSignInMode;
-            document.getElementById('form-title').innerText = isSignInMode ? "Connexion" : "Inscription";
-            document.getElementById('auth-button').innerText = isSignInMode ? "Se Connecter" : "S'inscrire";
-            document.getElementById('switch-container').innerHTML = isSignInMode ? 
-                `Pas encore de compte ? <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Créer un compte</button>` :
-                `Déjà un compte ? <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Se connecter</button>`;
-            // Re-bind because innerHTML destroys the element
-            window.location.reload(); 
         };
     </script>
 </body>
