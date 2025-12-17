@@ -6,10 +6,8 @@
     <title>MindCompta - Services & Flux</title>
     
     <meta property="og:title" content="MindCompta - Ressources et Services">
-    <meta property="og:description" content="Découvrez nos derniers articles et conseils financiers.">
     <meta property="og:image" content="https://josuekplowodokpo-hue.github.io/MindCompta-/logo.jpg">
     <meta property="og:url" content="https://josuekplowodokpo-hue.github.io/MindCompta-/services.html">
-    <meta property="og:type" content="website">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -49,30 +47,30 @@
     </header>
 
     <div id="mobile-menu-overlay"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark p-6 shadow-2xl flex flex-col text-white">
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark p-6 shadow-2xl flex flex-col text-white font-bold">
         <button id="close-menu" class="text-4xl self-end mb-8">&times;</button>
-        <div id="auth-actions-mobile" class="mb-6"></div>
-        <a href="index.html" class="p-3 border-b border-blue-800">Accueil</a>
-        <a href="services.html" class="p-3 bg-accent text-brand-dark rounded-lg font-bold my-2">Services</a>
-        <a href="about.html" class="p-3 border-b border-blue-800">À Propos</a>
-        <a href="youtube.html" class="p-3">Vidéos YouTube</a>
+        <div id="auth-actions-mobile" class="mb-6 bg-blue-900/50 p-3 rounded-lg"></div>
+        <a href="index.html" class="p-4 border-b border-blue-800">Accueil</a>
+        <a href="services.html" class="p-4 bg-accent text-brand-dark rounded-lg my-2">Services</a>
+        <a href="about.html" class="p-4 border-b border-blue-800">À Propos</a>
+        <a href="youtube.html" class="p-4 border-b border-blue-800">Vidéos YouTube</a>
     </nav>
 
     <main class="w-full max-w-5xl mx-auto p-4 flex-grow">
         <div id="admin-section" class="bg-white p-8 rounded-2xl shadow-xl mb-12 border-2 border-accent hidden">
-            <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase">Administration Flux</h2>
+            <h2 class="text-xl font-bold text-brand-dark mb-4">ESPACE ADMINISTRATEUR</h2>
             <form id="add-doc-form" class="space-y-4">
                 <input type="hidden" id="edit-doc-id">
-                <input type="text" id="doc-title" required class="w-full border p-3 rounded-lg" placeholder="Titre de l'article...">
-                <input type="url" id="doc-image" class="w-full border p-3 rounded-lg" placeholder="Lien de l'image (URL)...">
-                <textarea id="doc-content" required rows="4" class="w-full border p-3 rounded-lg" placeholder="Votre message..."></textarea>
-                <button type="submit" id="submit-btn" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg uppercase">Publier</button>
-                <button type="button" id="cancel-edit" class="w-full bg-gray-400 text-white font-bold py-2 rounded-lg hidden">Annuler</button>
+                <input type="text" id="doc-title" required class="w-full border p-3 rounded-lg" placeholder="Titre...">
+                <input type="url" id="doc-image" class="w-full border p-3 rounded-lg" placeholder="URL Image...">
+                <textarea id="doc-content" required rows="4" class="w-full border p-3 rounded-lg" placeholder="Message..."></textarea>
+                <button type="submit" id="submit-btn" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg">PUBLIER</button>
+                <button type="button" id="cancel-edit" class="w-full bg-gray-400 text-white font-bold py-2 rounded-lg hidden">ANNULER</button>
             </form>
         </div>
         <div id="login-required" class="hidden text-center py-20 bg-white rounded-3xl shadow">
-            <h3 class="text-brand-dark font-bold mb-4">Veuillez vous connecter pour voir le flux</h3>
-            <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold">Connexion</a>
+            <h3 class="font-bold mb-4">Accès réservé aux membres de MindCompta</h3>
+            <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold">Se connecter</a>
         </div>
         <div id="documents-list" class="grid grid-cols-1 gap-8 hidden"></div>
         <div id="loader" class="flex justify-center py-20"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div></div>
@@ -83,6 +81,10 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-width="2"/></svg>
             <span id="notif-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-6 h-6 flex items-center justify-center rounded-full border-2 border-white hidden">0</span>
         </button>
+        <div id="notif-panel" class="absolute bottom-16 right-0 w-64 bg-white rounded-xl shadow-2xl border hidden overflow-hidden">
+            <div class="bg-brand-dark text-white p-2 text-xs font-bold flex justify-between"><span>Notifications</span><button id="clear-notif">Vu</button></div>
+            <div id="notif-items" class="max-h-48 overflow-y-auto p-2 text-[10px] space-y-1 text-gray-700"></div>
+        </div>
     </div>
 
     <script type="module">
@@ -105,16 +107,12 @@
             document.getElementById('doc-title').value = t;
             document.getElementById('doc-content').value = c;
             document.getElementById('doc-image').value = i || '';
-            document.getElementById('submit-btn').innerText = "Mettre à jour";
+            document.getElementById('submit-btn').innerText = "METTRE À JOUR";
             document.getElementById('cancel-edit').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        window.deletePublication = async (id) => {
-            if(confirm("Voulez-vous vraiment supprimer cet article ?")) {
-                try { await deleteDoc(doc(db, "resources", id)); } catch(e) { alert("Erreur lors de la suppression"); }
-            }
-        };
+        window.deletePublication = async (id) => { if(confirm("Supprimer l'article ?")) await deleteDoc(doc(db, "resources", id)); };
 
         window.handleLike = async (id) => {
             const u = auth.currentUser; if(!u) return;
@@ -133,7 +131,7 @@
                 document.getElementById('documents-list').classList.remove('hidden');
                 const name = user.email.split('@')[0];
                 const isAdmin = user.uid === ADMIN_UID;
-                const logoutHTML = `<div class="flex flex-col items-center"><span class="text-[10px] font-bold text-accent">${name}</span><button onclick="getAuth().signOut().then(()=>window.location.reload())" class="bg-red-600 px-2 py-1 rounded text-[10px] text-white">Quitter</button></div>`;
+                const logoutHTML = `<div class="flex flex-col items-center"><span class="text-xs text-accent">${name}</span><button onclick="getAuth().signOut().then(()=>window.location.reload())" class="bg-red-600 px-2 py-0.5 rounded text-[10px] text-white">Quitter</button></div>`;
                 document.getElementById('auth-actions-desktop').innerHTML = logoutHTML;
                 document.getElementById('auth-actions-mobile').innerHTML = logoutHTML;
                 if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
@@ -144,21 +142,31 @@
         function loadDocs(isAdmin, uid) {
             onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snap) => {
                 const list = document.getElementById('documents-list'); list.innerHTML = '';
-                const last = localStorage.getItem('last_cnt') || 0;
-                if(snap.size > last) { document.getElementById('notif-count').innerText = snap.size - last; document.getElementById('notif-count').classList.remove('hidden'); document.getElementById('notif-bell').classList.add('ring-active'); }
+                const lastCnt = localStorage.getItem('mind_cnt') || 0;
+                const diff = snap.size - lastCnt;
+                const itemsDiv = document.getElementById('notif-items');
+                
+                if(diff > 0) {
+                    document.getElementById('notif-count').innerText = diff;
+                    document.getElementById('notif-count').classList.remove('hidden');
+                    document.getElementById('notif-bell').classList.add('ring-active');
+                    itemsDiv.innerHTML = "";
+                    snap.docs.slice(0, diff).forEach(doc => { itemsDiv.innerHTML += `<div class="p-1 border-b">• ${doc.data().title}</div>`; });
+                }
+
                 snap.forEach(async (ds) => {
                     const d = ds.data(); const id = ds.id;
                     const lS = await getDoc(doc(db, "resources", id, "likes", uid));
                     const art = document.createElement('article');
                     art.className = "post-card bg-white p-6 rounded-2xl shadow-sm";
                     art.innerHTML = `
-                        <div class="flex justify-between mb-4"><span class="text-xs font-bold text-brand-dark italic uppercase">MindCompta</span>
+                        <div class="flex justify-between mb-2"><span class="text-[10px] font-bold text-brand-dark italic">MINDCOMPTA</span>
                         <div>${isAdmin ? `<button onclick="prepareEdit('${id}', ${JSON.stringify(d.title).replace(/"/g, '&quot;')}, ${JSON.stringify(d.content).replace(/"/g, '&quot;')}, '${d.imageUrl||''}')" class="text-blue-600 text-xs mr-3 font-bold">Modifier</button><button onclick="deletePublication('${id}')" class="text-red-500 text-xs font-bold">Supprimer</button>` : ''}</div></div>
                         ${d.imageUrl ? `<img src="${d.imageUrl}" class="w-full h-48 object-cover rounded-xl mb-4">` : ''}
                         <h3 class="text-xl font-bold mb-2">${d.title}</h3>
                         <p class="text-gray-600 text-sm mb-4 whitespace-pre-wrap">${d.content}</p>
                         <div class="flex justify-between items-center border-t pt-4">
-                            <button onclick="shareArticle(${JSON.stringify(d.title).replace(/"/g, '&quot;')}, ${JSON.stringify(d.content).replace(/"/g, '&quot;')}, '${d.imageUrl||''}')" class="text-gray-400 font-bold text-sm">Partager</button>
+                            <button onclick="shareArticle(${JSON.stringify(d.title).replace(/"/g, '&quot;')}, ${JSON.stringify(d.content).replace(/"/g, '&quot;')}, '${d.imageUrl||''}')" class="text-gray-400 text-sm font-bold">Partager</button>
                             <button onclick="handleLike('${id}')" class="flex items-center gap-1 font-bold ${lS.exists() ? 'text-red-500' : 'text-gray-400'}">♥ ${d.likesCount || 0}</button>
                         </div>`;
                     list.appendChild(art);
@@ -170,15 +178,21 @@
             e.preventDefault();
             const id = document.getElementById('edit-doc-id').value;
             const data = { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null };
-            if (id) { await updateDoc(doc(db, "resources", id), data); } 
-            else { await addDoc(collection(db, "resources"), { ...data, likesCount: 0, createdAt: serverTimestamp() }); }
-            e.target.reset(); document.getElementById('edit-doc-id').value = ''; document.getElementById('submit-btn').innerText = "Publier"; document.getElementById('cancel-edit').classList.add('hidden');
+            if (id) await updateDoc(doc(db, "resources", id), data);
+            else await addDoc(collection(db, "resources"), { ...data, likesCount: 0, createdAt: serverTimestamp() });
+            e.target.reset(); document.getElementById('edit-doc-id').value = ''; document.getElementById('submit-btn').innerText = "PUBLIER"; document.getElementById('cancel-edit').classList.add('hidden');
         };
 
-        document.getElementById('notif-bell').onclick = () => { localStorage.setItem('last_cnt', document.querySelectorAll('article').length); document.getElementById('notif-count').classList.add('hidden'); document.getElementById('notif-bell').classList.remove('ring-active'); };
+        document.getElementById('notif-bell').onclick = () => { document.getElementById('notif-panel').classList.toggle('hidden'); };
+        document.getElementById('clear-notif').onclick = () => {
+            localStorage.setItem('mind_cnt', document.querySelectorAll('article').length);
+            document.getElementById('notif-count').classList.add('hidden');
+            document.getElementById('notif-bell').classList.remove('ring-active');
+            document.getElementById('notif-panel').classList.add('hidden');
+        };
         document.getElementById('menu-button').onclick = () => { document.getElementById('mobile-menu').classList.add('open'); document.getElementById('mobile-menu-overlay').classList.add('open'); };
         document.getElementById('close-menu').onclick = () => { document.getElementById('mobile-menu').classList.remove('open'); document.getElementById('mobile-menu-overlay').classList.remove('open'); };
-        document.getElementById('cancel-edit').onclick = () => { document.getElementById('add-doc-form').reset(); document.getElementById('edit-doc-id').value = ''; document.getElementById('submit-btn').innerText = "Publier"; document.getElementById('cancel-edit').classList.add('hidden'); };
+        document.getElementById('cancel-edit').onclick = () => { document.getElementById('add-doc-form').reset(); document.getElementById('edit-doc-id').value = ''; document.getElementById('submit-btn').innerText = "PUBLIER"; document.getElementById('cancel-edit').classList.add('hidden'); };
     </script>
 </body>
 </html>
