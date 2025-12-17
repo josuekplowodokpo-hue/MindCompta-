@@ -21,16 +21,23 @@
                 <div class="h-10 w-10 bg-white rounded-full mr-3 flex items-center justify-center text-brand-dark font-bold">MC</div>
                 <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
             </a>
-            <nav class="hidden sm:flex items-center space-x-4">
-                <a href="index.html" class="hover:text-accent transition">Accueil</a>
-                <a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full text-brand-dark">Se Connecter</a>
-            </nav>
         </div>
     </header>
 
     <main class="flex-grow flex items-center justify-center p-4">
         <div class="w-full max-w-sm bg-white rounded-xl shadow-2xl p-8"> 
             <h2 id="form-title" class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
+
+            <button id="google-btn" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3 rounded-lg mb-6 hover:bg-gray-50 transition shadow-sm">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" class="w-5 h-5">
+                <span class="text-gray-700 font-semibold">Continuer avec Google</span>
+            </button>
+
+            <div class="relative flex py-4 items-center">
+                <div class="flex-grow border-t border-gray-300"></div>
+                <span class="flex-shrink mx-4 text-gray-400 text-xs uppercase">Ou Email</span>
+                <div class="flex-grow border-t border-gray-300"></div>
+            </div>
 
             <form id="auth-form" class="space-y-4">
                 <div>
@@ -40,12 +47,11 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Mot de Passe</label>
                     <input type="password" id="auth-password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none">
-                    <p id="password-hint" class="text-xs text-gray-500 mt-1 hidden">Minimum 6 caractères.</p>
                 </div>
 
                 <div id="auth-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4"></div>
 
-                <button type="submit" id="auth-button" class="w-full bg-accent text-white font-semibold py-3 rounded-lg shadow-md hover:opacity-90 transition mt-6">
+                <button type="submit" id="auth-button" class="w-full bg-brand-dark text-white font-semibold py-3 rounded-lg shadow-md hover:opacity-90 transition mt-6">
                     Se Connecter
                 </button>
             </form>
@@ -64,7 +70,9 @@
         import { 
             getAuth, 
             signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
+            createUserWithEmailAndPassword,
+            GoogleAuthProvider,
+            signInWithPopup,
             setPersistence, 
             browserSessionPersistence 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -76,8 +84,7 @@
             projectId: "mindcompta-a61ef",
             storageBucket: "mindcompta-a61ef.firebasestorage.app",
             messagingSenderId: "578389020450",
-            appId: "1:578389020450:web:edf9dd48e394cff7601f7b",
-            measurementId: "G-CDS9XYT35Y"
+            appId: "1:578389020450:web:edf9dd48e394cff7601f7b"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -85,69 +92,54 @@
         const db = getFirestore(app);
 
         let isSignInMode = true;
-        const authForm = document.getElementById('auth-form');
-        const authButton = document.getElementById('auth-button');
-        const authMessage = document.getElementById('auth-message');
-        const switchBtn = document.getElementById('switch-button');
 
-        function showMsg(msg, success) {
-            authMessage.textContent = msg;
-            authMessage.className = `text-center p-3 rounded-lg text-sm border-l-4 mt-4 ${success ? 'bg-green-100 text-green-700 border-green-500' : 'bg-red-100 text-red-700 border-red-500'}`;
-            authMessage.classList.remove('hidden');
-        }
+        // AUTH PERSISTENCE SETTING (Security: Tabs close = Logout)
+        const setSecurePersistence = () => setPersistence(auth, browserSessionPersistence);
 
-        // Action de switch (simplifiée)
-        document.body.addEventListener('click', (e) => {
-            if(e.target && e.target.id === 'switch-button'){
-                e.preventDefault();
-                isSignInMode = !isSignInMode;
-                document.getElementById('form-title').textContent = isSignInMode ? "Connexion" : "Création de Compte";
-                authButton.textContent = isSignInMode ? "Se Connecter" : "S'inscrire";
-                document.getElementById('switch-container').innerHTML = isSignInMode ? 
-                    `Pas encore de compte ? <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Créer un compte</button>` :
-                    `Déjà un compte ? <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Se connecter</button>`;
-            }
-        });
-
-        authForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('auth-email').value.trim();
-            const password = document.getElementById('auth-password').value;
-
-            authButton.disabled = true;
-            authButton.textContent = "Vérification...";
-
+        // GOOGLE LOGIN
+        document.getElementById('google-btn').onclick = async () => {
+            const provider = new GoogleAuthProvider();
             try {
-                // MODIFICATION ICI : On définit la persistance AVANT de connecter l'utilisateur
-                await setPersistence(auth, browserSessionPersistence);
+                await setSecurePersistence();
+                const res = await signInWithPopup(auth, provider);
+                await setDoc(doc(db, "artifacts", res.user.uid), {
+                    uid: res.user.uid,
+                    email: res.user.email,
+                    displayName: res.user.displayName,
+                    status: "EN LIGNE",
+                    lastLogin: serverTimestamp()
+                }, { merge: true });
+                window.location.href = 'index.html';
+            } catch (err) { alert(err.message); }
+        };
 
+        // EMAIL/PASSWORD LOGIN
+        document.getElementById('auth-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            
+            try {
+                await setSecurePersistence();
                 if (isSignInMode) {
                     const res = await signInWithEmailAndPassword(auth, email, password);
-                    await setDoc(doc(db, "artifacts", res.user.uid), { 
-                        status: "EN LIGNE", 
-                        lastLogin: serverTimestamp() 
-                    }, { merge: true });
-                    showMsg("Connexion réussie ! Redirection...", true);
+                    await setDoc(doc(db, "artifacts", res.user.uid), { status: "EN LIGNE", lastLogin: serverTimestamp() }, { merge: true });
                 } else {
                     const res = await createUserWithEmailAndPassword(auth, email, password);
                     await setDoc(doc(db, "artifacts", res.user.uid), {
-                        uid: res.user.uid,
-                        email: email,
-                        displayName: email.split('@')[0],
-                        role: "Client",
-                        status: "EN LIGNE",
-                        createdAt: serverTimestamp(),
-                        lastLogin: serverTimestamp()
+                        uid: res.user.uid, email, role: "Client", createdAt: serverTimestamp()
                     });
-                    showMsg("Compte créé avec succès !", true);
                 }
-                setTimeout(() => window.location.href = 'index.html', 1000);
-            } catch (err) {
-                showMsg("Erreur : " + err.message, false);
-                authButton.disabled = false;
-                authButton.textContent = isSignInMode ? "Se Connecter" : "S'inscrire";
-            }
-        });
+                window.location.href = 'index.html';
+            } catch (err) { alert(err.message); }
+        };
+
+        // Switch Mode logic
+        document.getElementById('switch-button').onclick = () => {
+            isSignInMode = !isSignInMode;
+            document.getElementById('form-title').innerText = isSignInMode ? "Connexion" : "Inscription";
+            document.getElementById('auth-button').innerText = isSignInMode ? "Se Connecter" : "S'inscrire";
+        };
     </script>
 </body>
 </html>
