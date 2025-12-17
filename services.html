@@ -10,25 +10,30 @@
         :root {
             --brand-dark: #1E3A8A;
             --accent: #F59E0B;
-            --vibrant-green: #10B981;
             font-family: 'Inter', sans-serif;
         }
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-        
+
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
         .nav-link:hover { background-color: #345b85; }
         .active-link { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
 
-        /* Animation Menu Mobile */
+        .post-card { transition: all 0.3s ease; border-left: 6px solid var(--brand-dark); }
+        
+        .content-collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .content-expanded { display: block; }
+
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
         #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
         #mobile-menu-overlay.open { display: block; }
-
-        .post-card { transition: all 0.3s ease; border-left: 6px solid var(--brand-dark); }
-        .post-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -39,15 +44,11 @@
                 <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
                 <span class="text-xl font-bold tracking-wider group-hover:text-accent">MindCompta</span>
             </a>
-            
             <nav class="hidden sm:flex items-center space-x-2">
                 <a href="index.html" class="nav-link">Accueil</a>
                 <a href="services.html" class="nav-link active-link">Services</a>
-                <a href="about.html" class="nav-link">À Propos</a>
-                <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
                 <div id="auth-actions-desktop" class="flex items-center space-x-3 ml-4"></div>
             </nav>
-
             <button id="menu-button" class="sm:hidden p-2 text-white">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
@@ -60,9 +61,6 @@
         <div class="flex flex-col space-y-3 text-white">
             <a href="index.html" class="p-3 hover:bg-blue-800 rounded-lg">Accueil</a>
             <a href="services.html" class="p-3 bg-accent text-brand-dark rounded-lg font-bold">Services</a>
-            <a href="about.html" class="p-3 hover:bg-blue-800 rounded-lg">À Propos</a>
-            <a href="youtube.html" class="p-3 hover:bg-blue-800 rounded-lg">Vidéos YouTube</a>
-            <hr class="border-gray-700 my-4">
             <div id="auth-actions-mobile" class="flex flex-col space-y-3"></div>
         </div>
     </nav>
@@ -74,18 +72,18 @@
         </div>
 
         <div id="admin-section" class="bg-white p-8 rounded-2xl shadow-xl mb-12 border-2 border-accent hidden">
-            <h2 class="text-2xl font-bold text-brand-dark mb-6">Nouvelle Publication</h2>
+            <h2 class="text-2xl font-bold text-brand-dark mb-6 text-center underline">Publier un Article</h2>
             <form id="add-doc-form" class="space-y-4">
-                <input type="text" id="doc-title" required class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark font-semibold" placeholder="Titre du document...">
-                <input type="url" id="doc-image" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Lien URL d'une image trouvée en ligne (Optionnel)">
-                <textarea id="doc-content" required rows="6" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Saisissez votre texte ici..."></textarea>
-                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-900 transition">PUBLIER MAINTENANT</button>
+                <input type="text" id="doc-title" required class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark font-semibold" placeholder="Titre de l'article...">
+                <input type="url" id="doc-image" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Lien de l'image (Optionnel)">
+                <textarea id="doc-content" required rows="6" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Contenu de l'article..."></textarea>
+                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-900 transition uppercase">Diffuser sur le flux</button>
             </form>
         </div>
 
         <div id="login-required" class="hidden text-center py-20 bg-white rounded-3xl shadow">
-            <h3 class="text-xl font-bold mb-4">Accès réservé aux membres</h3>
-            <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold">Se connecter</a>
+            <h3 class="text-xl font-bold mb-4 text-brand-dark">Accès réservé aux membres de MindCompta</h3>
+            <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold uppercase">Se connecter / S'inscrire</a>
         </div>
 
         <div id="documents-list" class="grid grid-cols-1 gap-8 hidden"></div>
@@ -95,14 +93,10 @@
         </div>
     </main>
 
-    <footer class="w-full bg-brand-dark border-t border-gray-700 py-8 mt-auto text-center text-gray-400">
-        © 2025 MindCompta - Tous droits réservés.
-    </footer>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, getDoc, runTransaction, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
@@ -118,65 +112,155 @@
         const db = getFirestore(app);
         const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
 
-        // Suppression globale
+        setPersistence(auth, browserSessionPersistence);
+
+        // --- FONCTIONS GLOBALES (Window) ---
+
+        window.toggleReadMore = (btn) => {
+            const container = btn.parentElement.querySelector('.content-text');
+            const isCollapsed = container.classList.contains('content-collapsed');
+            container.classList.toggle('content-collapsed', !isCollapsed);
+            container.classList.toggle('content-expanded', isCollapsed);
+            btn.innerText = isCollapsed ? "Voir moins" : "Lire la suite";
+        };
+
+        window.handleLike = async (docId) => {
+            const user = auth.currentUser;
+            if (!user) return alert("Veuillez vous connecter !");
+            const likeRef = doc(db, "resources", docId, "likes", user.uid);
+            const docRef = doc(db, "resources", docId);
+            try {
+                const likeSnap = await getDoc(likeRef);
+                await runTransaction(db, async (transaction) => {
+                    const resDoc = await transaction.get(docRef);
+                    if (!resDoc.exists()) return;
+                    let currentLikes = resDoc.data().likesCount || 0;
+                    if (likeSnap.exists()) {
+                        transaction.delete(likeRef);
+                        transaction.update(docRef, { likesCount: Math.max(0, currentLikes - 1) });
+                    } else {
+                        transaction.set(likeRef, { uid: user.uid });
+                        transaction.update(docRef, { likesCount: currentLikes + 1 });
+                    }
+                });
+            } catch (e) { console.error(e); }
+        };
+
         window.deletePublication = async (id) => {
-            if(confirm("Supprimer définitivement ?")) {
-                try { await deleteDoc(doc(db, "resources", id)); } catch(e) { alert("Erreur"); }
+            if(confirm("Supprimer définitivement cet article ?")) {
+                try { await deleteDoc(doc(db, "resources", id)); } catch(e) { alert("Erreur lors de la suppression"); }
             }
         };
+
+        // NOUVEAU : Fonction Modification pour l'Admin
+        window.editPublication = (id) => {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            const titleEl = card.querySelector('.post-title');
+            const contentEl = card.querySelector('.content-text');
+            
+            // On bascule en mode édition
+            const currentTitle = titleEl.innerText;
+            const currentContent = contentEl.innerText;
+
+            titleEl.innerHTML = `<input type="text" class="edit-title w-full p-2 border border-accent rounded mb-2 text-xl font-bold" value="${currentTitle}">`;
+            contentEl.innerHTML = `<textarea class="edit-content w-full p-2 border border-accent rounded h-40 font-normal">${currentContent}</textarea>`;
+            
+            // On change les boutons
+            card.querySelector('.admin-controls').innerHTML = `
+                <button onclick="saveEdit('${id}')" class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold mr-2">ENREGISTRER</button>
+                <button onclick="window.location.reload()" class="bg-gray-400 text-white px-3 py-1 rounded text-xs font-bold">ANNULER</button>
+            `;
+        };
+
+        window.saveEdit = async (id) => {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            const newTitle = card.querySelector('.edit-title').value;
+            const newContent = card.querySelector('.edit-content').value;
+
+            try {
+                await updateDoc(doc(db, "resources", id), {
+                    title: newTitle,
+                    content: newContent,
+                    updatedAt: serverTimestamp()
+                });
+                alert("Article mis à jour !");
+            } catch (e) { alert("Erreur"); }
+        };
+
+        // --- AUTH & CHARGEMENT ---
 
         onAuthStateChanged(auth, (user) => {
             document.getElementById('loader').classList.add('hidden');
             const dAuth = document.getElementById('auth-actions-desktop');
             const mAuth = document.getElementById('auth-actions-mobile');
-            
+
             if (user) {
                 document.getElementById('documents-list').classList.remove('hidden');
-                document.getElementById('user-welcome').innerText = `Bonjour, ${user.email.split('@')[0]}`;
-                
+                document.getElementById('user-welcome').innerText = `Connecté en tant que : ${user.email.split('@')[0]}`;
                 const isAdmin = user.uid === ADMIN_UID;
-                const adminBtn = isAdmin ? `<a href="admin.html" class="bg-red-600 px-4 py-2 rounded-lg text-xs font-bold">CONSOLE ADMIN</a>` : '';
                 
-                dAuth.innerHTML = `${adminBtn} <button id="logout-btn" class="bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">DÉCONNEXION</button>`;
-                mAuth.innerHTML = `${isAdmin ? '<a href="admin.html" class="p-3 bg-red-600 rounded-lg text-center font-bold">CONSOLE ADMIN</a>' : ''} <button id="logout-btn-mob" class="p-3 bg-gray-700 rounded-lg font-bold">DÉCONNEXION</button>`;
-
-                const logoff = () => signOut(auth);
+                const logoutBtn = `<button id="logout-btn" class="bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold text-white">DÉCONNEXION</button>`;
+                dAuth.innerHTML = logoutBtn; mAuth.innerHTML = logoutBtn;
+                
+                const logoff = () => signOut(auth).then(() => window.location.reload());
                 document.getElementById('logout-btn').onclick = logoff;
-                document.getElementById('logout-btn-mob').onclick = logoff;
-                
+
                 if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
-                loadDocs(isAdmin);
+                loadDocs(isAdmin, user.uid);
             } else {
                 document.getElementById('login-required').classList.remove('hidden');
-                const logBtn = `<a href="login.html" class="bg-accent px-6 py-2 rounded-full text-brand-dark font-bold">CONNEXION</a>`;
+                const logBtn = `<a href="login.html" class="bg-accent px-6 py-2 rounded-full text-brand-dark font-bold">CONNEXION / INSCRIPTION</a>`;
                 dAuth.innerHTML = logBtn; mAuth.innerHTML = logBtn;
             }
         });
 
-        function loadDocs(isAdmin) {
+        function loadDocs(isAdmin, currentUid) {
             const q = query(collection(db, "resources"), orderBy("createdAt", "desc"));
             onSnapshot(q, (snap) => {
                 const list = document.getElementById('documents-list');
                 list.innerHTML = '';
-                snap.forEach(docSnap => {
+                snap.forEach(async (docSnap) => {
                     const data = docSnap.data();
+                    const docId = docSnap.id;
                     const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString('fr-FR') : 'Récemment';
                     const img = data.imageUrl ? `<img src="${data.imageUrl}" class="w-full h-64 object-cover rounded-xl mb-4 shadow-sm" onerror="this.style.display='none'">` : '';
                     
-                    list.innerHTML += `
-                        <article class="post-card bg-white p-6 md:p-8 rounded-2xl shadow-sm relative">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="bg-blue-50 text-brand-dark text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-blue-100">${date}</span>
-                                ${isAdmin ? `<button onclick="deletePublication('${docSnap.id}')" class="text-red-500 hover:bg-red-50 px-2 py-1 rounded">Supprimer</button>` : ''}
+                    // État Like
+                    const userLikeRef = doc(db, "resources", docId, "likes", currentUid);
+                    const userLikeSnap = await getDoc(userLikeRef);
+                    const isLiked = userLikeSnap.exists();
+
+                    const article = document.createElement('article');
+                    article.className = "post-card bg-white p-6 md:p-8 rounded-2xl shadow-sm relative";
+                    article.setAttribute('data-id', docId);
+                    article.innerHTML = `
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="bg-blue-50 text-brand-dark text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-blue-100">${date}</span>
+                            <div class="admin-controls">
+                                ${isAdmin ? `
+                                    <button onclick="editPublication('${docId}')" class="text-blue-600 hover:bg-blue-50 px-2 py-1 rounded text-xs font-bold mr-2">Modifier</button>
+                                    <button onclick="deletePublication('${docId}')" class="text-red-500 hover:bg-red-50 px-2 py-1 rounded text-xs font-bold">Supprimer</button>
+                                ` : ''}
                             </div>
-                            ${img}
-                            <h3 class="text-2xl font-black text-brand-dark mb-4">${data.title}</h3>
-                            <div class="text-gray-600 whitespace-pre-wrap leading-relaxed">${data.content}</div>
-                            <div class="mt-6 pt-6 border-t border-gray-100 flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center text-[10px] font-bold text-white">MC</div>
+                        </div>
+                        ${img}
+                        <h3 class="post-title text-2xl font-black text-brand-dark mb-4">${data.title}</h3>
+                        <div class="content-text text-gray-600 whitespace-pre-wrap leading-relaxed content-collapsed">${data.content}</div>
+                        <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2 hover:underline">Lire la suite</button>
+
+                        <div class="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center text-[10px] font-bold text-white uppercase">MC</div>
                                 <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">MindCompta Finance</span>
                             </div>
-                        </article>`;
+                            <button onclick="handleLike('${docId}')" class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-100 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-colors ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                                <span class="text-sm font-bold ${isLiked ? 'text-red-500' : 'text-gray-500'}">${data.likesCount || 0}</span>
+                            </button>
+                        </div>`;
+                    list.appendChild(article);
                 });
             });
         }
@@ -187,17 +271,19 @@
             const content = document.getElementById('doc-content').value;
             const imageUrl = document.getElementById('doc-image').value;
             try {
-                await addDoc(collection(db, "resources"), { title, content, imageUrl: imageUrl || null, createdAt: serverTimestamp() });
+                await addDoc(collection(db, "resources"), { 
+                    title, content, imageUrl: imageUrl || null, likesCount: 0, createdAt: serverTimestamp() 
+                });
                 e.target.reset();
-            } catch (err) { alert(err.message); }
+            } catch (err) { alert("Erreur d'envoi"); }
         };
 
+        // Menu Mobile
         const menuBtn = document.getElementById('menu-button');
-        const closeBtn = document.getElementById('close-menu');
-        const menu = document.getElementById('mobile-menu');
         const overlay = document.getElementById('mobile-menu-overlay');
+        const menu = document.getElementById('mobile-menu');
         const toggle = () => { menu.classList.toggle('open'); overlay.classList.toggle('open'); };
-        menuBtn.onclick = toggle; closeBtn.onclick = toggle; overlay.onclick = toggle;
+        menuBtn.onclick = toggle; overlay.onclick = toggle; document.getElementById('close-menu').onclick = toggle;
     </script>
 </body>
 </html>
