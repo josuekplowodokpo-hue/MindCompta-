@@ -17,14 +17,19 @@
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
         .hover-accent:hover { background-color: #D97706; }
+        
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
         .nav-link:hover { background-color: #345b85; }
-        .active-link-desktop { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
-        #mobile-menu { transform: translateX(100%); transition: 0.3s; z-index: 50; }
+        .active-link { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
+
+        /* Menu Mobile Fix */
+        #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
+        #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
+        #mobile-menu-overlay.open { display: block; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col font-sans">
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
@@ -32,45 +37,63 @@
                 <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
                 <span class="text-xl font-bold tracking-wider group-hover:text-accent">MindCompta</span>
             </a>
+            
             <nav class="hidden sm:flex items-center space-x-4">
                 <a href="index.html" class="nav-link">Accueil</a>
-                <a href="services.html" class="nav-link active-link-desktop">Services</a>
+                <a href="services.html" class="nav-link active-link">Services</a>
                 <a href="about.html" class="nav-link">À Propos</a>
                 <div id="auth-actions-desktop" class="flex items-center space-x-3 ml-4"></div>
             </nav>
-            <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+
+            <button id="menu-button" class="sm:hidden p-2 text-white">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
         </div>
     </header>
 
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
-        <h1 class="text-4xl font-extrabold text-brand-dark mb-8 mt-4 border-b pb-2 border-accent">Ressources Documentaires</h1>
-
-        <div id="login-required-message" class="bg-white p-10 rounded-xl shadow-lg text-center my-10 hidden">
-            <h2 class="text-2xl font-bold text-red-600 mb-4">Accès Réservé</h2>
-            <p class="text-gray-600 mb-6">Connectez-vous pour accéder à votre bibliothèque de documents comptables.</p>
-            <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold hover:bg-opacity-90 transition">Se Connecter</a>
+    <div id="mobile-menu-overlay"></div>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-brand-dark p-6 shadow-2xl">
+        <button id="close-menu" class="text-white text-3xl mb-8">&times;</button>
+        <div class="flex flex-col space-y-4 text-white">
+            <a href="index.html" class="p-2 hover:bg-blue-800 rounded">Accueil</a>
+            <a href="services.html" class="p-2 bg-accent text-brand-dark rounded font-bold">Services</a>
+            <a href="about.html" class="p-2 hover:bg-blue-800 rounded">À Propos</a>
+            <hr class="border-gray-600">
+            <div id="auth-actions-mobile" class="flex flex-col space-y-2"></div>
         </div>
+    </nav>
 
-        <div id="admin-add-section" class="bg-white p-6 rounded-xl shadow-md mb-10 border-t-4 border-accent hidden">
-            <h2 class="text-xl font-bold text-brand-dark mb-4">Ajouter un nouveau document</h2>
-            <form id="add-doc-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input type="text" id="doc-title" placeholder="Titre du document" required class="border p-2 rounded">
-                <input type="url" id="doc-url" placeholder="Lien du PDF (Google Drive, Dropbox, etc)" required class="border p-2 rounded">
-                <button type="submit" class="bg-vibrant-green text-white font-bold py-2 px-4 rounded hover:opacity-90">Publier le document</button>
+    <main class="w-full max-w-4xl mx-auto p-4 flex-grow">
+        <h1 class="text-3xl font-extrabold text-brand-dark mb-8 mt-4">Services & Documents</h1>
+
+        <div id="admin-section" class="bg-white p-6 rounded-xl shadow-lg mb-10 border-t-4 border-accent hidden">
+            <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase text-sm tracking-widest">Nouveau Document (Saisie Admin)</h2>
+            <form id="add-doc-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">TITRE DU DOCUMENT</label>
+                    <input type="text" id="doc-title" required class="w-full border-2 border-gray-200 p-3 rounded-lg focus:border-accent outline-none transition" placeholder="Ex: Rapport mensuel Décembre 2024">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">CONTENU / TEXTE DU DOCUMENT</label>
+                    <textarea id="doc-content" required rows="6" class="w-full border-2 border-gray-200 p-3 rounded-lg focus:border-accent outline-none transition" placeholder="Saisissez ici le texte que les clients pourront lire..."></textarea>
+                </div>
+                <button type="submit" class="w-full bg-brand-dark text-white font-black py-4 rounded-lg shadow-xl hover:bg-blue-900 transition transform hover:scale-[1.01] flex justify-center items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    PUBLIER MAINTENANT
+                </button>
             </form>
         </div>
 
-        <div id="documents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+        <div id="login-required" class="hidden text-center py-20 bg-white rounded-xl shadow">
+            <p class="text-gray-500 mb-4">Veuillez vous connecter pour voir les documents.</p>
+            <a href="login.html" class="bg-accent px-6 py-2 rounded-full font-bold">Se connecter</a>
+        </div>
+
+        <div id="documents-list" class="space-y-6 hidden">
             </div>
 
-        <div id="loading-spinner" class="text-center py-20">
-            <p class="text-gray-500 animate-pulse">Chargement des ressources...</p>
-        </div>
+        <div id="loader" class="text-center py-10 text-gray-400 animate-pulse">Initialisation...</div>
     </main>
-
-    <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
-        <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
-    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -89,87 +112,70 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
         const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
 
-        // DOM Elements
-        const docGrid = document.getElementById('documents-grid');
-        const loginMessage = document.getElementById('login-required-message');
-        const adminSection = document.getElementById('admin-add-section');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const authActions = document.getElementById('auth-actions-desktop');
-
+        // Auth Logic
         onAuthStateChanged(auth, (user) => {
-            loadingSpinner.classList.add('hidden');
+            document.getElementById('loader').classList.add('hidden');
             if (user) {
-                // Connecté
-                loginMessage.classList.add('hidden');
-                docGrid.classList.remove('hidden');
-                renderAuthUI(user);
-                loadDocuments();
+                document.getElementById('documents-list').classList.remove('hidden');
+                document.getElementById('auth-actions-desktop').innerHTML = `<button id="logout-btn" class="bg-red-500 px-4 py-2 rounded-full text-xs font-bold">Déconnexion</button>`;
+                document.getElementById('logout-btn').onclick = () => signOut(auth);
                 
-                // Si admin, montrer le formulaire
-                if (user.uid === ADMIN_UID) {
-                    adminSection.classList.remove('hidden');
-                }
+                if (user.uid === ADMIN_UID) document.getElementById('admin-section').classList.remove('hidden');
+                loadDocs();
             } else {
-                // Déconnecté
-                loginMessage.classList.remove('hidden');
-                docGrid.classList.add('hidden');
-                authActions.innerHTML = `<a href="login.html" class="bg-accent px-4 py-2 rounded-full text-brand-dark font-bold">Connexion</a>`;
+                document.getElementById('login-required').classList.remove('hidden');
             }
         });
 
-        function renderAuthUI(user) {
-            authActions.innerHTML = `
-                <span class="text-xs text-gray-300">${user.email}</span>
-                <button id="logout-btn" class="text-red-400 text-sm font-bold underline">Quitter</button>
-            `;
-            document.getElementById('logout-btn').onclick = () => signOut(auth);
-        }
-
-        // AJOUTER UN DOCUMENT (ADMIN)
+        // Add Doc Logic
         document.getElementById('add-doc-form').onsubmit = async (e) => {
             e.preventDefault();
             const title = document.getElementById('doc-title').value;
-            const url = document.getElementById('doc-url').value;
-
+            const content = document.getElementById('doc-content').value;
+            
             try {
                 await addDoc(collection(db, "resources"), {
-                    title: title,
-                    url: url,
+                    title,
+                    content,
+                    author: auth.currentUser.email,
                     createdAt: serverTimestamp()
                 });
                 e.target.reset();
-                alert("Document ajouté avec succès !");
-            } catch (err) {
-                alert("Erreur lors de l'ajout : " + err.message);
-            }
+                alert("Publié !");
+            } catch (err) { alert("Erreur: " + err.message); }
         };
 
-        // CHARGER LES DOCUMENTS (CLIENT)
-        function loadDocuments() {
+        // Load Docs Logic
+        function loadDocs() {
             const q = query(collection(db, "resources"), orderBy("createdAt", "desc"));
-            onSnapshot(q, (snapshot) => {
-                docGrid.innerHTML = '';
-                if (snapshot.empty) {
-                    docGrid.innerHTML = `<p class="col-span-full text-center text-gray-400 py-10">Aucun document disponible pour le moment.</p>`;
-                }
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const card = `
-                        <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition border-l-4 border-brand-dark">
-                            <h3 class="font-bold text-lg text-brand-dark mb-4">${data.title}</h3>
-                            <a href="${data.url}" target="_blank" class="flex items-center text-vibrant-green font-bold hover:underline">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                Télécharger le PDF
-                            </a>
+            onSnapshot(q, (snap) => {
+                const list = document.getElementById('documents-list');
+                list.innerHTML = '';
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    list.innerHTML += `
+                        <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-brand-dark">
+                            <h3 class="text-xl font-bold text-brand-dark mb-2">${d.title}</h3>
+                            <p class="text-gray-600 whitespace-pre-wrap leading-relaxed">${d.content}</p>
+                            <div class="mt-4 text-[10px] text-gray-400 uppercase tracking-tighter">Publié le ${d.createdAt?.toDate().toLocaleDateString() || '...'}</div>
                         </div>
                     `;
-                    docGrid.innerHTML += card;
                 });
             });
         }
+
+        // Menu Toggle Logic
+        const menuBtn = document.getElementById('menu-button');
+        const closeBtn = document.getElementById('close-menu');
+        const menu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('mobile-menu-overlay');
+
+        const toggle = () => { menu.classList.toggle('open'); overlay.classList.toggle('open'); };
+        menuBtn.onclick = toggle;
+        closeBtn.onclick = toggle;
+        overlay.onclick = toggle;
     </script>
 </body>
 </html>
