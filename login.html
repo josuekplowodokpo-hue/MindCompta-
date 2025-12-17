@@ -4,148 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Authentification</title>
-    <!-- Chargement de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
-        /* Importation de la police Inter */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
-        /* Couleurs de la marque */
-        :root {
-            --brand-dark: #1E3A8A; /* Bleu Profond */
-            --accent: #F59E0B; /* Orange Vif / Or */
-            --vibrant-green: #10B981; /* Vert Brillant */
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Classes Tailwind personnalisées */
+        :root { --brand-dark: #1E3A8A; --accent: #F59E0B; font-family: 'Inter', sans-serif; }
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-        .hover-accent:hover { background-color: #D97706; } 
-
-        /* Styles de Navigation */
-        .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: background-color 0.2s; }
-        .nav-link:hover { background-color: #345b85; }
-        .active-link-desktop { background-color: var(--accent); font-weight: 600; color: var(--brand-dark) !important; }
-
-        /* Styles de Menu Mobile */
-        #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
+        #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; }
         #mobile-menu.open { transform: translateX(0); }
-        #mobile-menu-overlay { display: none; z-index: 40; }
+        #mobile-menu-overlay { display: none; }
         #mobile-menu-overlay.open { display: block; }
-        .mobile-link { display: block; padding: 0.75rem 1rem; color: white; font-weight: 500; border-radius: 0.5rem; transition: background-color 0.2s; }
-        .mobile-link.active-link-mobile { background-color: var(--accent); color: var(--brand-dark); font-weight: 700; }
-
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col font-sans">
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- EN-TÊTE ET NAVIGATION (NON MODIFIÉ) -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between items-center">
-
-                <a href="index.html" class="flex items-center group">
-                    <img src="logo.jpg" 
-                         alt="[Image du Logo MindCompta]" 
-                         onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
-                         class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
-                    <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
-                </a>
-
-                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
-                    <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="services.html" class="nav-link">Services (Livre)</a>
-                    <a href="about.html" class="nav-link">À Propos</a>
-                    <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
-                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 active-link-desktop text-brand-dark">Se Connecter</a>
-                </nav>
-
-                <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-            </div>
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center">
+                <div class="h-10 w-10 bg-white rounded-full mr-3 flex items-center justify-center text-brand-dark font-bold">MC</div>
+                <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
+            </a>
+            <nav class="hidden sm:flex items-center space-x-4">
+                <a href="index.html" class="hover:text-accent transition">Accueil</a>
+                <a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full text-brand-dark">Se Connecter</a>
+            </nav>
+            <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
         </div>
     </header>
 
-    <!-- MENU MOBILE (NON MODIFIÉ) -->
-    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
-        <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none"> &times; </button>
-        <div class="pt-12 space-y-3">
-            <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
-            <a href="index.html" class="mobile-link">Accueil</a>
-            <a href="services.html" class="mobile-link">Services (Livre)</a>
-            <a href="about.html" class="mobile-link">À Propos</a>
-            <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
-            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3">
-                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent block w-full text-center active-link-mobile text-brand-dark">Se Connecter</a>
-            </div>
-        </div>
-    </nav>
-    <!-- FIN MENU MOBILE -->
-
-    <!-- CONTENU PRINCIPAL (FORMULAIRE UNIQUE) -->
     <main class="flex-grow flex items-center justify-center p-4">
         <div class="w-full max-w-sm bg-white rounded-xl shadow-2xl p-8"> 
-
             <h2 id="form-title" class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
 
             <form id="auth-form" class="space-y-4">
                 <div>
-                    <label for="auth-email" class="block text-sm font-medium text-gray-700">Adresse Email</label>
-                    <input type="email" id="auth-email" name="email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
+                    <label class="block text-sm font-medium text-gray-700">Adresse Email</label>
+                    <input type="email" id="auth-email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none">
                 </div>
                 <div>
-                    <label for="auth-password" class="block text-sm font-medium text-gray-700">Mot de Passe</label>
-                    <input type="password" id="auth-password" name="password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-accent focus:border-accent">
+                    <label class="block text-sm font-medium text-gray-700">Mot de Passe</label>
+                    <input type="password" id="auth-password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none">
                     <p id="password-hint" class="text-xs text-gray-500 mt-1 hidden">Minimum 6 caractères.</p>
                 </div>
 
-                <!-- Zone d'affichage des messages Firebase -->
-                <div id="auth-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4" role="alert"></div>
+                <div id="auth-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4"></div>
 
-                <button type="submit" id="auth-button" class="w-full bg-accent text-white font-semibold py-3 rounded-lg shadow-md hover-accent transition duration-300 transform hover:scale-[1.01] mt-6">
+                <button type="submit" id="auth-button" class="w-full bg-accent text-white font-semibold py-3 rounded-lg shadow-md hover:opacity-90 transition mt-6">
                     Se Connecter
                 </button>
             </form>
-            
-            <!-- Bascule Connexion/Inscription -->
+
             <div class="mt-6 text-center text-sm">
-                <p id="switch-text" class="text-gray-600">
+                <p id="switch-container" class="text-gray-600">
                     Pas encore de compte ? 
-                    <button id="switch-button" class="text-brand-dark font-semibold hover:text-accent focus:outline-none">
-                        Créer un compte
-                    </button>
+                    <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Créer un compte</button>
                 </p>
             </div>
         </div>
     </main>
 
-    <!-- PIED DE PAGE -->
-    <footer class="w-full bg-brand-dark border-t border-gray-700 py-6">
-        <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
-    </footer>
-
-    <!-- LOGIQUE JAVASCRIPT FIREBASE -->
     <script type="module">
-        // --- IMPORTS FIREBASE AUTH ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            onAuthStateChanged,
-            signInWithCustomToken,
-            signInAnonymously
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configuration Firebase fournie par l'utilisateur
         const firebaseConfig = {
             apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
             authDomain: "mindcompta-a61ef.firebaseapp.com",
@@ -155,201 +78,85 @@
             appId: "1:578389020450:web:edf9dd48e394cff7601f7b",
             measurementId: "G-CDS9XYT35Y"
         };
-        
-        const REDIRECTION_PAGE = 'index.html';
-        let auth;
-        let isSignInMode = true; // État initial: Connexion
 
-        // Références DOM
-        const formTitle = document.getElementById('form-title');
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let isSignInMode = true;
         const authForm = document.getElementById('auth-form');
-        const authMessage = document.getElementById('auth-message');
         const authButton = document.getElementById('auth-button');
-        const switchText = document.getElementById('switch-text');
-        const switchButton = document.getElementById('switch-button');
+        const authMessage = document.getElementById('auth-message');
+        const switchBtn = document.getElementById('switch-button');
         const passwordHint = document.getElementById('password-hint');
 
-        // --- Fonctions Utilitaires ---
-
-        // Fonction pour afficher les messages d'erreur/succès
-        function showMessage(message, isSuccess) {
-            authMessage.textContent = message;
-            authMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'border-red-500', 'bg-green-100', 'text-green-700', 'border-green-500');
-
-            if (isSuccess) {
-                authMessage.classList.add('bg-green-100', 'text-green-700', 'border-green-500');
-            } else {
-                authMessage.classList.add('bg-red-100', 'text-red-700', 'border-red-500');
-            }
+        // Gestion de l'affichage des messages
+        function showMsg(msg, success) {
+            authMessage.textContent = msg;
+            authMessage.className = `text-center p-3 rounded-lg text-sm border-l-4 mt-4 ${success ? 'bg-green-100 text-green-700 border-green-500' : 'bg-red-100 text-red-700 border-red-500'}`;
+            authMessage.classList.remove('hidden');
         }
 
-        // Traduction des codes d'erreur Firebase
-        function getAuthErrorMessage(errorCode) {
-            switch (errorCode) {
-                // Erreurs Connexion
-                case 'auth/user-not-found':
-                case 'auth/wrong-password':
-                    return "Email ou mot de passe incorrect.";
-                
-                // Erreurs Inscription
-                case 'auth/email-already-in-use':
-                    return "Cette adresse email est déjà utilisée par un autre compte.";
-                case 'auth/weak-password':
-                    return "Le mot de passe doit contenir au moins 6 caractères.";
-                
-                // Erreurs Générales
-                case 'auth/invalid-email':
-                    return "Le format de l'adresse email est invalide.";
-                case 'auth/user-disabled':
-                    return "Ce compte utilisateur a été désactivé.";
-                case 'auth/too-many-requests':
-                    return "Trop de tentatives. Veuillez réessayer plus tard.";
-                default:
-                    console.error("Erreur Firebase non gérée:", errorCode);
-                    return "Une erreur inattendue s'est produite. Veuillez réessayer.";
-            }
-        }
-
-        // --- GESTION DU MODE UI (Connexion / Inscription) ---
-        function updateUIMode() {
-            authMessage.classList.add('hidden'); // Cacher les messages précédents
-
-            if (isSignInMode) {
-                // Mode Connexion
-                formTitle.textContent = "Connexion";
-                authButton.textContent = "Se Connecter";
-                switchText.innerHTML = `
-                    Pas encore de compte ? 
-                    <button id="switch-button" class="text-brand-dark font-semibold hover:text-accent focus:outline-none">
-                        Créer un compte
-                    </button>
-                `;
-                passwordHint.classList.add('hidden');
-            } else {
-                // Mode Inscription
-                formTitle.textContent = "Création de Compte";
-                authButton.textContent = "S'inscrire";
-                switchText.innerHTML = `
-                    Déjà un compte ? 
-                    <button id="switch-button" class="text-brand-dark font-semibold hover:text-accent focus:outline-none">
-                        Se connecter
-                    </button>
-                `;
-                passwordHint.classList.remove('hidden');
-            }
-            // Rattacher l'événement au nouveau bouton
-            document.getElementById('switch-button')?.addEventListener('click', toggleUIMode);
-        }
-
-        function toggleUIMode() {
-            isSignInMode = !isSignInMode;
-            updateUIMode();
-        }
-        
-        // --- LOGIQUE D'AUTHENTIFICATION ---
-        
-        /** Gère la soumission du formulaire */
-        authForm.addEventListener('submit', async function(e) {
+        // Bascule entre Connexion et Inscription
+        switchBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            isSignInMode = !isSignInMode;
+            document.getElementById('form-title').textContent = isSignInMode ? "Connexion" : "Création de Compte";
+            authButton.textContent = isSignInMode ? "Se Connecter" : "S'inscrire";
+            passwordHint.classList.toggle('hidden', isSignInMode);
+            
+            document.getElementById('switch-container').innerHTML = isSignInMode ? 
+                `Pas encore de compte ? <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Créer un compte</button>` :
+                `Déjà un compte ? <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Se connecter</button>`;
+            
+            // Ré-attacher l'événement car le bouton a été recréé par innerHTML
+            document.getElementById('switch-button').addEventListener('click', arguments.callee);
+        });
 
+        // Soumission du formulaire
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value;
             
-            authMessage.classList.add('hidden');
             authButton.disabled = true;
-            authButton.textContent = isSignInMode ? "Connexion en cours..." : "Inscription en cours...";
+            authButton.textContent = "Vérification...";
 
             try {
                 if (isSignInMode) {
-                    // Tente de connecter l'utilisateur
-                    await signInWithEmailAndPassword(auth, email, password);
-                    showMessage(`Connexion réussie ! Redirection...`, true);
+                    const res = await signInWithEmailAndPassword(auth, email, password);
+                    // Mise à jour Firestore (Admin pourra voir "EN LIGNE")
+                    await setDoc(doc(db, "artifacts", res.user.uid), { 
+                        status: "EN LIGNE", 
+                        lastLogin: serverTimestamp() 
+                    }, { merge: true });
+                    showMsg("Connexion réussie ! Redirection...", true);
                 } else {
-                    // Tente de créer un nouveau compte
-                    await createUserWithEmailAndPassword(auth, email, password);
-                    showMessage(`Compte créé avec succès pour ${email} ! Redirection...`, true);
+                    const res = await createUserWithEmailAndPassword(auth, email, password);
+                    // Création du profil pour l'ADMIN dans la collection artifacts
+                    await setDoc(doc(db, "artifacts", res.user.uid), {
+                        uid: res.user.uid,
+                        email: email,
+                        displayName: email.split('@')[0],
+                        role: "Client",
+                        status: "EN LIGNE",
+                        createdAt: serverTimestamp(),
+                        lastLogin: serverTimestamp()
+                    });
+                    showMsg("Compte créé avec succès !", true);
                 }
-
-                setTimeout(() => {
-                    // Redirection après succès (onAuthStateChanged confirmera l'état)
-                    window.location.href = REDIRECTION_PAGE;
-                }, 800);
-
-            } catch (error) {
-                // Échec de l'opération
-                const errorMessage = getAuthErrorMessage(error.code);
-                showMessage(errorMessage, false);
-                console.error("Erreur d'authentification:", error.code, error.message);
+                setTimeout(() => window.location.href = 'index.html', 1200);
+            } catch (err) {
+                let errorMsg = "Erreur d'authentification.";
+                if(err.code === 'auth/weak-password') errorMsg = "Mot de passe trop court.";
+                if(err.code === 'auth/email-already-in-use') errorMsg = "Email déjà utilisé.";
+                if(err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') errorMsg = "Identifiants incorrects.";
                 
-            } finally {
+                showMsg(errorMsg, false);
                 authButton.disabled = false;
                 authButton.textContent = isSignInMode ? "Se Connecter" : "S'inscrire";
             }
         });
-
-        // --- Initialisation Firebase et Listeners ---
-        function initializeFirebase() {
-            try {
-                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                
-                // Vérifie l'état de l'utilisateur au chargement de la page (pour redirection)
-                onAuthStateChanged(auth, (user) => {
-                    if (user && user.email) { // Vérifie aussi l'email pour exclure les connexions anonymes
-                        console.log("Utilisateur déjà connecté, redirection vers l'accueil...");
-                        window.location.href = REDIRECTION_PAGE;
-                    }
-                });
-
-                // Authentification automatique (anonyme ou via jeton)
-                if (initialAuthToken) {
-                    signInWithCustomToken(auth, initialAuthToken).catch(err => {
-                        console.warn("Échec de la connexion par jeton initial:", err.message);
-                    });
-                } else {
-                    signInAnonymously(auth).catch(err => {
-                        console.warn("Échec de la connexion anonyme:", err.message);
-                    });
-                }
-
-            } catch (error) {
-                console.error("Échec de l'initialisation Firebase:", error);
-                showMessage(`Échec de l'initialisation: ${error.message}`, false);
-            }
-            updateUIMode(); // Rendre l'UI initiale après l'initialisation
-        }
-
-        // GESTIONNAIRE DU MENU MOBILE (Off-Canvas, NON MODIFIÉ)
-        const elements = {
-            mobileMenu: document.getElementById('mobile-menu'),
-            overlay: document.getElementById('mobile-menu-overlay'),
-            menuButton: document.getElementById('menu-button'),
-            closeMenuButton: document.getElementById('close-menu-button'),
-        };
-
-        function toggleMobileMenu(isOpen) {
-            const isOpening = isOpen === undefined ? !elements.mobileMenu.classList.contains('open') : isOpen;
-            if (isOpening) {
-                elements.mobileMenu.classList.add('open');
-                elements.overlay.classList.add('open');
-                document.body.style.overflow = 'hidden'; 
-            } else {
-                elements.mobileMenu.classList.remove('open');
-                elements.overlay.classList.remove('open');
-                document.body.style.overflow = '';
-            }
-        }
-        elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
-        elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
-        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
-        
-        // --- Exécution principale ---
-        document.addEventListener('DOMContentLoaded', initializeFirebase);
-        switchButton.addEventListener('click', toggleUIMode);
-
     </script>
 </body>
 </html>
-
