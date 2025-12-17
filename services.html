@@ -50,9 +50,7 @@
                 <a href="services.html" class="nav-link active-link">Services</a>
                 <a href="about.html" class="nav-link">À Propos</a>
                 <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
-                
-                <div id="auth-actions-desktop" class="flex items-center ml-4 border-l border-blue-800 pl-4">
-                    </div>
+                <div id="auth-actions-desktop" class="flex items-center ml-4 border-l border-blue-800 pl-4"></div>
             </nav>
 
             <button id="menu-button" class="md:hidden p-2 text-white">
@@ -67,17 +65,13 @@
             <span class="text-accent font-bold">MENU</span>
             <button id="close-menu" class="text-white text-4xl">&times;</button>
         </div>
-        
         <div class="flex flex-col space-y-3 text-white flex-grow">
             <a href="index.html" class="p-3 hover:bg-blue-800 rounded-lg">Accueil</a>
             <a href="services.html" class="p-3 bg-accent text-brand-dark rounded-lg font-bold">Services</a>
             <a href="about.html" class="p-3 hover:bg-blue-800 rounded-lg">À Propos</a>
             <a href="youtube.html" class="p-3 hover:bg-blue-800 rounded-lg">Vidéos YouTube</a>
-            
             <hr class="border-gray-700 my-4">
-            
-            <div id="auth-actions-mobile" class="mt-auto">
-                </div>
+            <div id="auth-actions-mobile" class="mt-auto"></div>
         </div>
     </nav>
 
@@ -134,50 +128,28 @@
 
         setPersistence(auth, browserSessionPersistence);
 
-        // --- GESTION DE L'AUTHENTIFICATION ET DU MENU ---
-        onAuthStateChanged(auth, (user) => {
-            document.getElementById('loader').classList.add('hidden');
-            const dAuth = document.getElementById('auth-actions-desktop');
-            const mAuth = document.getElementById('auth-actions-mobile');
+        // --- NOUVEAU : FONCTION PARTAGER ---
+        window.shareArticle = async (title, content) => {
+            const shareData = {
+                title: title,
+                text: content.substring(0, 100) + "...",
+                url: window.location.href
+            };
 
-            if (user) {
-                document.getElementById('documents-list').classList.remove('hidden');
-                const userName = user.displayName || user.email.split('@')[0];
-                const isAdmin = user.uid === ADMIN_UID;
-
-                // Affichage Desktop (Nom en petit au-dessus du bouton)
-                dAuth.innerHTML = `
-                    <div class="flex flex-col items-end mr-4">
-                        <span class="text-[10px] text-accent font-bold uppercase tracking-tighter">Utilisateur</span>
-                        <span class="text-xs font-bold text-white truncate max-w-[120px]">${userName}</span>
-                    </div>
-                    <button id="logout-btn" class="bg-red-600/20 border border-red-600 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">DÉCONNEXION</button>
-                `;
-
-                // Affichage Mobile (Nom bien visible)
-                mAuth.innerHTML = `
-                    <div class="bg-blue-900/50 p-4 rounded-xl mb-4 border border-blue-700">
-                        <p class="text-[10px] text-accent font-bold uppercase">Session active</p>
-                        <p class="text-white font-bold">${userName}</p>
-                    </div>
-                    <button id="logout-btn-mob" class="w-full bg-red-600 text-white p-3 rounded-lg font-bold">DÉCONNEXION</button>
-                `;
-
-                const logoff = () => signOut(auth).then(() => window.location.reload());
-                document.getElementById('logout-btn').onclick = logoff;
-                document.getElementById('logout-btn-mob').onclick = logoff;
-
-                if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
-                loadDocs(isAdmin, user.uid);
-            } else {
-                document.getElementById('login-required').classList.remove('hidden');
-                const logBtn = `<a href="login.html" class="bg-accent px-6 py-2 rounded-full text-brand-dark font-bold">CONNEXION / INSCRIPTION</a>`;
-                dAuth.innerHTML = logBtn;
-                mAuth.innerHTML = logBtn;
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    // Repli : copier le lien
+                    await navigator.clipboard.writeText(window.location.href);
+                    alert("Lien de la page copié dans le presse-papier !");
+                }
+            } catch (err) {
+                console.log("Erreur de partage:", err);
             }
-        });
+        };
 
-        // --- LOGIQUE ARTICLES (LIKE, EDIT, DELETE, TOGGLE) ---
+        // --- LOGIQUE ARTICLES ---
         window.toggleReadMore = (btn) => {
             const container = btn.parentElement.querySelector('.content-text');
             const isCollapsed = container.classList.contains('content-collapsed');
@@ -209,34 +181,52 @@
         };
 
         window.deletePublication = async (id) => {
-            if(confirm("Supprimer cet article ?")) {
-                try { await deleteDoc(doc(db, "resources", id)); } catch(e) { }
-            }
+            if(confirm("Supprimer cet article ?")) { try { await deleteDoc(doc(db, "resources", id)); } catch(e) { } }
         };
 
         window.editPublication = (id) => {
             const card = document.querySelector(`[data-id="${id}"]`);
             const titleEl = card.querySelector('.post-title');
             const contentEl = card.querySelector('.content-text');
-            const currentTitle = titleEl.innerText;
-            const currentContent = contentEl.innerText;
-            titleEl.innerHTML = `<input type="text" class="edit-title w-full p-2 border border-accent rounded mb-2 text-xl font-bold text-brand-dark" value="${currentTitle}">`;
-            contentEl.innerHTML = `<textarea class="edit-content w-full p-2 border border-accent rounded h-40 font-normal text-gray-700">${currentContent}</textarea>`;
-            card.querySelector('.admin-controls').innerHTML = `
-                <button onclick="saveEdit('${id}')" class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold mr-2">ENREGISTRER</button>
-                <button onclick="window.location.reload()" class="bg-gray-400 text-white px-3 py-1 rounded text-xs font-bold">ANNULER</button>
-            `;
+            titleEl.innerHTML = `<input type="text" class="edit-title w-full p-2 border border-accent rounded mb-2 text-xl font-bold" value="${titleEl.innerText}">`;
+            contentEl.innerHTML = `<textarea class="edit-content w-full p-2 border border-accent rounded h-40">${contentEl.innerText}</textarea>`;
+            card.querySelector('.admin-controls').innerHTML = `<button onclick="saveEdit('${id}')" class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold mr-2">ENREGISTRER</button><button onclick="window.location.reload()" class="bg-gray-400 text-white px-3 py-1 rounded text-xs font-bold">ANNULER</button>`;
         };
 
         window.saveEdit = async (id) => {
             const card = document.querySelector(`[data-id="${id}"]`);
-            const newTitle = card.querySelector('.edit-title').value;
-            const newContent = card.querySelector('.edit-content').value;
             try {
-                await updateDoc(doc(db, "resources", id), { title: newTitle, content: newContent });
+                await updateDoc(doc(db, "resources", id), { title: card.querySelector('.edit-title').value, content: card.querySelector('.edit-content').value });
                 alert("Article mis à jour !");
             } catch (e) { alert("Erreur"); }
         };
+
+        // --- AUTH & CHARGEMENT ---
+        onAuthStateChanged(auth, (user) => {
+            document.getElementById('loader').classList.add('hidden');
+            const dAuth = document.getElementById('auth-actions-desktop');
+            const mAuth = document.getElementById('auth-actions-mobile');
+
+            if (user) {
+                document.getElementById('documents-list').classList.remove('hidden');
+                const userName = user.displayName || user.email.split('@')[0];
+                const isAdmin = user.uid === ADMIN_UID;
+
+                dAuth.innerHTML = `<div class="flex flex-col items-end mr-4"><span class="text-[10px] text-accent font-bold uppercase">Utilisateur</span><span class="text-xs font-bold text-white">${userName}</span></div><button id="logout-btn" class="bg-red-600/20 border border-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold">DÉCONNEXION</button>`;
+                mAuth.innerHTML = `<div class="bg-blue-900/50 p-4 rounded-xl mb-4 border border-blue-700"><p class="text-[10px] text-accent font-bold uppercase">Session active</p><p class="text-white font-bold">${userName}</p></div><button id="logout-btn-mob" class="w-full bg-red-600 text-white p-3 rounded-lg font-bold">DÉCONNEXION</button>`;
+
+                const logoff = () => signOut(auth).then(() => window.location.reload());
+                document.getElementById('logout-btn').onclick = logoff;
+                document.getElementById('logout-btn-mob').onclick = logoff;
+
+                if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
+                loadDocs(isAdmin, user.uid);
+            } else {
+                document.getElementById('login-required').classList.remove('hidden');
+                const logBtn = `<a href="login.html" class="bg-accent px-6 py-2 rounded-full text-brand-dark font-bold">CONNEXION / INSCRIPTION</a>`;
+                dAuth.innerHTML = logBtn; mAuth.innerHTML = logBtn;
+            }
+        });
 
         function loadDocs(isAdmin, currentUid) {
             const q = query(collection(db, "resources"), orderBy("createdAt", "desc"));
@@ -247,8 +237,6 @@
                     const data = docSnap.data();
                     const docId = docSnap.id;
                     const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString('fr-FR') : 'Récemment';
-                    const img = data.imageUrl ? `<img src="${data.imageUrl}" class="w-full h-64 object-cover rounded-xl mb-4 shadow-sm" onerror="this.style.display='none'">` : '';
-                    
                     const userLikeRef = doc(db, "resources", docId, "likes", currentUid);
                     const userLikeSnap = await getDoc(userLikeRef);
                     const isLiked = userLikeSnap.exists();
@@ -259,28 +247,29 @@
                     article.innerHTML = `
                         <div class="flex justify-between items-center mb-4">
                             <span class="bg-blue-50 text-brand-dark text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-blue-100">${date}</span>
-                            <div class="admin-controls">
-                                ${isAdmin ? `
-                                    <button onclick="editPublication('${docId}')" class="text-blue-600 hover:bg-blue-50 px-2 py-1 rounded text-xs font-bold mr-2">Modifier</button>
-                                    <button onclick="deletePublication('${docId}')" class="text-red-500 hover:bg-red-50 px-2 py-1 rounded text-xs font-bold">Supprimer</button>
-                                ` : ''}
-                            </div>
+                            <div class="admin-controls">${isAdmin ? `<button onclick="editPublication('${docId}')" class="text-blue-600 px-2 py-1 rounded text-xs font-bold mr-2">Modifier</button><button onclick="deletePublication('${docId}')" class="text-red-500 px-2 py-1 rounded text-xs font-bold">Supprimer</button>` : ''}</div>
                         </div>
-                        ${img}
+                        ${data.imageUrl ? `<img src="${data.imageUrl}" class="w-full h-64 object-cover rounded-xl mb-4 shadow-sm" onerror="this.style.display='none'">` : ''}
                         <h3 class="post-title text-2xl font-black text-brand-dark mb-4">${data.title}</h3>
                         <div class="content-text text-gray-600 whitespace-pre-wrap leading-relaxed content-collapsed">${data.content}</div>
                         <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2 hover:underline">Lire la suite</button>
                         <div class="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center text-[10px] font-bold text-white uppercase">MC</div>
-                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">MindCompta</span>
+                            <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center text-[10px] font-bold text-white uppercase">MC</div><span class="text-xs font-bold text-gray-400 uppercase tracking-widest">MindCompta</span></div>
+                            
+                            <div class="flex items-center gap-4">
+                                <button onclick="shareArticle('${data.title.replace(/'/g, "\\'")}', '${data.content.replace(/'/g, "\\'").replace(/\n/g, " ")}')" class="text-gray-400 hover:text-brand-dark transition p-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                    </svg>
+                                </button>
+                                
+                                <button onclick="handleLike('${docId}')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-gray-100 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-colors ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                    <span class="text-sm font-bold ${isLiked ? 'text-red-500' : 'text-gray-500'}">${data.likesCount || 0}</span>
+                                </button>
                             </div>
-                            <button onclick="handleLike('${docId}')" class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-100 transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-colors ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
-                                <span class="text-sm font-bold ${isLiked ? 'text-red-500' : 'text-gray-500'}">${data.likesCount || 0}</span>
-                            </button>
                         </div>`;
                     list.appendChild(article);
                 });
@@ -290,12 +279,7 @@
         document.getElementById('add-doc-form').onsubmit = async (e) => {
             e.preventDefault();
             try {
-                await addDoc(collection(db, "resources"), { 
-                    title: document.getElementById('doc-title').value, 
-                    content: document.getElementById('doc-content').value, 
-                    imageUrl: document.getElementById('doc-image').value || null, 
-                    likesCount: 0, createdAt: serverTimestamp() 
-                });
+                await addDoc(collection(db, "resources"), { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null, likesCount: 0, createdAt: serverTimestamp() });
                 e.target.reset();
             } catch (err) { }
         };
