@@ -4,46 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Services & Flux</title>
+    
+    <meta property="og:title" content="MindCompta - Ressources et Services">
+    <meta property="og:description" content="Découvrez nos derniers articles et conseils financiers.">
+    <meta property="og:image" content="https://josuekplowodokpo-hue.github.io/MindCompta-/logo.jpg">
+    <meta property="og:url" content="https://josuekplowodokpo-hue.github.io/MindCompta-/services.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        :root {
-            --brand-dark: #1E3A8A;
-            --accent: #F59E0B;
-            font-family: 'Inter', sans-serif;
-        }
+        :root { --brand-dark: #1E3A8A; --accent: #F59E0B; font-family: 'Inter', sans-serif; }
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
         .nav-link:hover { background-color: #345b85; }
         .active-link { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
-
         .post-card { transition: all 0.3s ease; border-left: 6px solid var(--brand-dark); }
-        
-        .content-collapsed {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
+        .content-collapsed { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .content-expanded { display: block; }
-
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
         #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
         #mobile-menu-overlay.open { display: block; }
-
-        /* Animation pour la cloche */
-        @keyframes ring {
-            0% { transform: rotate(0); }
-            10% { transform: rotate(15deg); }
-            20% { transform: rotate(-15deg); }
-            30% { transform: rotate(10deg); }
-            40% { transform: rotate(-10deg); }
-            50% { transform: rotate(0); }
-        }
+        @keyframes ring { 0% { transform: rotate(0); } 10% { transform: rotate(15deg); } 20% { transform: rotate(-15deg); } 50% { transform: rotate(0); } }
         .ring-active { animation: ring 1.5s ease infinite; }
     </style>
 </head>
@@ -52,7 +38,7 @@
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center group">
-                <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
+                <img src="logo.jpg" alt="Logo" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
                 <span class="text-xl font-bold tracking-wider group-hover:text-accent">MindCompta</span>
             </a>
             <nav class="hidden md:flex items-center space-x-2">
@@ -96,41 +82,27 @@
                 <button type="submit" class="w-full bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-900 transition uppercase tracking-widest">Diffuser sur le flux</button>
             </form>
         </div>
-
         <div id="login-required" class="hidden text-center py-20 bg-white rounded-3xl shadow">
             <h3 class="text-xl font-bold mb-4 text-brand-dark">Accès réservé aux membres</h3>
             <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold uppercase">Se connecter</a>
         </div>
 
         <div id="documents-list" class="grid grid-cols-1 gap-8 hidden"></div>
-
-        <div id="loader" class="flex justify-center py-20">
-            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div>
-        </div>
+        <div id="loader" class="flex justify-center py-20"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div></div>
     </main>
 
     <div class="fixed bottom-6 right-6 z-50">
         <button id="notif-bell" class="bg-brand-dark text-white p-4 rounded-full shadow-2xl relative border-2 border-white hover:scale-110 transition active:scale-95">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
             <span id="notif-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-full border-2 border-white hidden">0</span>
         </button>
-
         <div id="notif-panel" class="absolute bottom-16 right-0 w-72 bg-white rounded-2xl shadow-2xl border border-gray-200 hidden overflow-hidden">
-            <div class="bg-brand-dark text-white p-3 font-bold text-sm flex justify-between items-center">
-                <span>Nouveautés</span>
-                <button id="close-notif" class="text-xl">&times;</button>
-            </div>
-            <div id="notif-list" class="max-h-60 overflow-y-auto p-2 text-xs space-y-2">
-                <p class="text-gray-400 text-center py-4">Aucun nouvel article</p>
-            </div>
+            <div class="bg-brand-dark text-white p-3 font-bold text-sm flex justify-between items-center"><span>Nouveautés</span><button id="close-notif" class="text-xl">&times;</button></div>
+            <div id="notif-list" class="max-h-60 overflow-y-auto p-2 text-xs space-y-2"><p class="text-gray-400 text-center py-4">Aucun nouvel article</p></div>
         </div>
     </div>
 
-    <footer class="w-full bg-brand-dark border-t border-gray-700 py-8 mt-auto text-center text-gray-400">
-        © 2025 MindCompta - Tous droits réservés.
-    </footer>
+    <footer class="w-full bg-brand-dark py-8 mt-auto text-center text-gray-400">© 2025 MindCompta - Tous droits réservés.</footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -150,218 +122,69 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
-
         setPersistence(auth, browserSessionPersistence);
 
-        // --- CORRECTION PARTAGE ---
-        window.shareArticle = async (title, content) => {
-            const shareData = {
-                title: title,
-                text: content.substring(0, 100) + "...",
-                url: window.location.href
-            };
-            try {
-                if (navigator.share) {
-                    await navigator.share(shareData);
-                } else {
-                    await navigator.clipboard.writeText(window.location.href);
-                    alert("Lien copié !");
-                }
-            } catch (err) { console.log("Erreur partage"); }
+        window.shareArticle = async (title, content, imageUrl) => {
+            const shareData = { title, text: `${title}\n\n${content.substring(0, 100)}...\n\nLien :`, url: window.location.href };
+            if (imageUrl) shareData.text += `\nImage : ${imageUrl}`;
+            try { if (navigator.share) { await navigator.share(shareData); } else { await navigator.clipboard.writeText(window.location.href); alert("Lien copié !"); } } catch (err) {}
         };
 
-        // --- GESTION DES NOTIFICATIONS ---
-        let lastVisitCount = localStorage.getItem('mindcompta_last_count') || 0;
-        
-        function updateNotifications(snap) {
-            const count = snap.size;
-            const diff = count - lastVisitCount;
-            const badge = document.getElementById('notif-count');
-            const bell = document.getElementById('notif-bell');
-            const list = document.getElementById('notif-list');
-
-            if (diff > 0) {
-                badge.innerText = diff;
-                badge.classList.remove('hidden');
-                bell.classList.add('ring-active');
-                
-                list.innerHTML = "";
-                snap.docs.slice(0, 5).forEach(d => {
-                    list.innerHTML += `<div class="p-2 border-b border-gray-50 hover:bg-gray-50 cursor-pointer font-medium text-brand-dark">• ${d.data().title}</div>`;
-                });
-            } else {
-                badge.classList.add('hidden');
-                bell.classList.remove('ring-active');
-            }
-        }
-
-        document.getElementById('notif-bell').onclick = () => {
-            document.getElementById('notif-panel').classList.toggle('hidden');
-            // Quand on ouvre, on considère que c'est "lu"
-            const currentTotal = document.querySelectorAll('article').length;
-            localStorage.setItem('mindcompta_last_count', currentTotal);
-            document.getElementById('notif-count').classList.add('hidden');
-            document.getElementById('notif-bell').classList.remove('ring-active');
-        };
-        document.getElementById('close-notif').onclick = () => document.getElementById('notif-panel').classList.add('hidden');
-
-        // --- LOGIQUE ARTICLES ---
-        window.toggleReadMore = (btn) => {
-            const container = btn.parentElement.querySelector('.content-text');
-            const isCollapsed = container.classList.contains('content-collapsed');
-            container.classList.toggle('content-collapsed', !isCollapsed);
-            container.classList.toggle('content-expanded', isCollapsed);
-            btn.innerText = isCollapsed ? "Voir moins" : "Lire la suite";
-        };
-
-        window.handleLike = async (docId) => {
-            const user = auth.currentUser;
-            if (!user) return alert("Veuillez vous connecter !");
-            const docRef = doc(db, "resources", docId);
-            const likeRef = doc(db, "resources", docId, "likes", user.uid);
-            try {
-                const likeSnap = await getDoc(likeRef);
-                await runTransaction(db, async (t) => {
-                    const res = await t.get(docRef);
-                    let count = res.data().likesCount || 0;
-                    if (likeSnap.exists()) {
-                        t.delete(likeRef);
-                        t.update(docRef, { likesCount: Math.max(0, count - 1) });
-                    } else {
-                        t.set(likeRef, { uid: user.uid });
-                        t.update(docRef, { likesCount: count + 1 });
-                    }
-                });
-            } catch (e) { }
-        };
-
-        window.editPublication = (id) => {
-            const card = document.querySelector(`[data-id="${id}"]`);
-            const titleEl = card.querySelector('.post-title');
-            const contentEl = card.querySelector('.content-text');
-            titleEl.innerHTML = `<input type="text" class="edit-title w-full p-2 border border-accent rounded mb-2 text-xl font-bold" value="${titleEl.innerText}">`;
-            contentEl.innerHTML = `<textarea class="edit-content w-full p-2 border border-accent rounded h-40">${contentEl.innerText}</textarea>`;
-            card.querySelector('.admin-controls').innerHTML = `<button onclick="saveEdit('${id}')" class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold mr-2">ENREGISTRER</button><button onclick="window.location.reload()" class="bg-gray-400 text-white px-3 py-1 rounded text-xs font-bold">ANNULER</button>`;
-        };
-
-        window.saveEdit = async (id) => {
-            const card = document.querySelector(`[data-id="${id}"]`);
-            try {
-                await updateDoc(doc(db, "resources", id), { title: card.querySelector('.edit-title').value, content: card.querySelector('.edit-content').value });
-                alert("Article mis à jour !");
-            } catch (e) { alert("Erreur"); }
-        };
-
-        window.deletePublication = async (id) => {
-            if(confirm("Supprimer cet article ?")) { await deleteDoc(doc(db, "resources", id)); }
-        };
-
-        // --- AUTH & CHARGEMENT ---
+        let lastCount = localStorage.getItem('mindcompta_last_count') || 0;
         onAuthStateChanged(auth, (user) => {
             document.getElementById('loader').classList.add('hidden');
             const dAuth = document.getElementById('auth-actions-desktop');
             const mAuth = document.getElementById('auth-actions-mobile');
             if (user) {
                 document.getElementById('documents-list').classList.remove('hidden');
-                const userName = user.displayName || user.email.split('@')[0];
                 const isAdmin = user.uid === ADMIN_UID;
-                dAuth.innerHTML = `<div class="flex flex-col items-end mr-4"><span class="text-[10px] text-accent font-bold uppercase tracking-tighter">Utilisateur</span><span class="text-xs font-bold text-white">${userName}</span></div><button id="logout-btn" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 transition">DÉCONNEXION</button>`;
-                mAuth.innerHTML = `<div class="bg-blue-900/50 p-4 rounded-xl mb-4 border border-blue-700"><p class="text-[10px] text-accent font-bold uppercase">Session active</p><p class="text-white font-bold">${userName}</p></div><button id="logout-btn-mob" class="w-full bg-red-600 text-white p-3 rounded-lg font-bold">DÉCONNEXION</button>`;
+                dAuth.innerHTML = `<button id="logout-btn" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold">DÉCONNEXION</button>`;
+                mAuth.innerHTML = `<button id="logout-btn-mob" class="w-full bg-red-600 text-white p-3 rounded-lg font-bold">DÉCONNEXION</button>`;
                 document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.reload());
                 document.getElementById('logout-btn-mob').onclick = () => signOut(auth).then(() => window.location.reload());
                 if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
                 loadDocs(isAdmin, user.uid);
-            } else {
-                document.getElementById('login-required').classList.remove('hidden');
-                const logBtn = `<a href="login.html" class="bg-accent px-6 py-2 rounded-full text-brand-dark font-bold">CONNEXION / INSCRIPTION</a>`;
-                dAuth.innerHTML = logBtn; mAuth.innerHTML = logBtn;
-            }
+            } else { document.getElementById('login-required').classList.remove('hidden'); }
         });
 
-        function loadDocs(isAdmin, currentUid) {
+        function loadDocs(isAdmin, uid) {
             const q = query(collection(db, "resources"), orderBy("createdAt", "desc"));
             onSnapshot(q, (snap) => {
                 const list = document.getElementById('documents-list');
                 list.innerHTML = '';
-                updateNotifications(snap);
+                const diff = snap.size - lastCount;
+                if(diff > 0) { 
+                    document.getElementById('notif-count').innerText = diff; 
+                    document.getElementById('notif-count').classList.remove('hidden');
+                    document.getElementById('notif-bell').classList.add('ring-active');
+                }
                 snap.forEach(async (docSnap) => {
-                    const data = docSnap.data();
-                    const docId = docSnap.id;
-                    const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString('fr-FR') : 'Récemment';
-                    const userLikeRef = doc(db, "resources", docId, "likes", currentUid);
+                    const data = docSnap.data(); const docId = docSnap.id;
+                    const userLikeRef = doc(db, "resources", docId, "likes", uid);
                     const userLikeSnap = await getDoc(userLikeRef);
                     const isLiked = userLikeSnap.exists();
-
                     const article = document.createElement('article');
-                    article.className = "post-card bg-white p-6 md:p-8 rounded-2xl shadow-sm relative";
-                    article.setAttribute('data-id', docId);
+                    article.className = "post-card bg-white p-6 rounded-2xl shadow-sm relative";
                     article.innerHTML = `
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="bg-blue-50 text-brand-dark text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-blue-100">${date}</span>
-                            <div class="admin-controls">${isAdmin ? `<button onclick="editPublication('${docId}')" class="text-blue-600 px-2 py-1 rounded text-xs font-bold mr-2">Modifier</button><button onclick="deletePublication('${docId}')" class="text-red-500 px-2 py-1 rounded text-xs font-bold">Supprimer</button>` : ''}</div>
-                        </div>
-                        ${data.imageUrl ? `<img src="${data.imageUrl}" class="w-full h-64 object-cover rounded-xl mb-4 shadow-sm" onerror="this.style.display='none'">` : ''}
-                        <h3 class="post-title text-2xl font-black text-brand-dark mb-4">${data.title}</h3>
-                        <div class="content-text text-gray-600 whitespace-pre-wrap leading-relaxed content-collapsed">${data.content}</div>
-                        <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2 hover:underline">Lire la suite</button>
-                        <div class="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between">
-                            <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center text-[10px] font-bold text-white uppercase">MC</div><span class="text-xs font-bold text-gray-400 uppercase tracking-widest">MindCompta</span></div>
-                                                        <div class="flex items-center gap-4">
-                                <button onclick="shareArticle(${JSON.stringify(data.title).replace(/"/g, '&quot;')}, ${JSON.stringify(data.content).replace(/"/g, '&quot;')})" class="text-gray-400 hover:text-brand-dark transition p-1" title="Partager">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                                    </svg>
-                                </button>
-
-                                <button onclick="handleLike('${docId}')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-gray-100 transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-colors ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                    </svg>
-                                    <span class="text-sm font-bold ${isLiked ? 'text-red-500' : 'text-gray-500'}">${data.likesCount || 0}</span>
-                                </button>
-                            </div>
+                        <div class="flex justify-between mb-4"><span class="bg-blue-50 text-brand-dark text-[10px] font-bold px-3 py-1 rounded-full uppercase italic">MindCompta</span>
+                        <div>${isAdmin ? `<button onclick="deleteDoc(doc(db, 'resources', '${docId}'))" class="text-red-500 text-xs font-bold">Supprimer</button>` : ''}</div></div>
+                        ${data.imageUrl ? `<img src="${data.imageUrl}" class="w-full h-48 object-cover rounded-xl mb-4">` : ''}
+                        <h3 class="text-xl font-black text-brand-dark mb-2">${data.title}</h3>
+                        <div class="content-text text-gray-600 text-sm content-collapsed">${data.content}</div>
+                        <div class="mt-4 flex justify-between items-center border-t pt-4">
+                            <button onclick="shareArticle(${JSON.stringify(data.title).replace(/"/g, '&quot;')}, ${JSON.stringify(data.content).replace(/"/g, '&quot;')}, ${JSON.stringify(data.imageUrl || '').replace(/"/g, '&quot;')})" class="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg></button>
                         </div>`;
                     list.appendChild(article);
                 });
             });
         }
-
-        // --- FORM SUBMISSION (ADMIN) ---
         document.getElementById('add-doc-form').onsubmit = async (e) => {
             e.preventDefault();
-            const title = document.getElementById('doc-title').value;
-            const content = document.getElementById('doc-content').value;
-            const imageUrl = document.getElementById('doc-image').value;
-            try {
-                await addDoc(collection(db, "resources"), { 
-                    title, 
-                    content, 
-                    imageUrl: imageUrl || null, 
-                    likesCount: 0, 
-                    createdAt: serverTimestamp() 
-                });
-                e.target.reset();
-                alert("Article publié avec succès !");
-            } catch (err) {
-                alert("Erreur lors de la publication.");
-            }
+            await addDoc(collection(db, "resources"), { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null, createdAt: serverTimestamp() });
+            e.target.reset();
         };
-
-        // --- MOBILE MENU LOGIC ---
-        const menuBtn = document.getElementById('menu-button');
-        const overlay = document.getElementById('mobile-menu-overlay');
-        const menu = document.getElementById('mobile-menu');
-        const closeBtn = document.getElementById('close-menu');
-
-        const toggleMenu = () => {
-            menu.classList.toggle('open');
-            overlay.classList.toggle('open');
-        };
-
-        menuBtn.onclick = toggleMenu;
-        overlay.onclick = toggleMenu;
-        closeBtn.onclick = toggleMenu;
-
+        document.getElementById('menu-button').onclick = () => { document.getElementById('mobile-menu').classList.add('open'); document.getElementById('mobile-menu-overlay').classList.add('open'); };
+        document.getElementById('close-menu').onclick = () => { document.getElementById('mobile-menu').classList.remove('open'); document.getElementById('mobile-menu-overlay').classList.remove('open'); };
     </script>
 </body>
 </html>
