@@ -364,13 +364,25 @@
          * Récupère la liste des profils utilisateur depuis Firestore et met à jour le tableau en temps réel.
          */
         function fetchUsersData() {
-            // Path: /artifacts/default-app-id/public/data/user_profiles
-            const userProfilesPath = `/artifacts/default-app-id/public/data/user_profiles`;
-            const usersRef = collection(db, userProfilesPath);
-            const usersQuery = query(usersRef);
+    // On pointe directement sur "artifacts" car c'est là que login.html écrit
+    const userProfilesPath = "artifacts"; 
+    const usersRef = collection(db, userProfilesPath);
+    const usersQuery = query(usersRef);
 
-            console.log(`Écoute de la collection d'utilisateurs: ${userProfilesPath}`);
-            
+    console.log(`Écoute de la collection: ${userProfilesPath}`);
+
+    onSnapshot(usersQuery, (snapshot) => {
+        const userProfiles = [];
+        snapshot.forEach(doc => {
+            userProfiles.push({ id: doc.id, ...doc.data() });
+        });
+        renderUsersTable(userProfiles);
+    }, (error) => {
+        console.error("Erreur Firestore:", error);
+        alertMessage("Erreur : " + error.message, 'error');
+    });
+}
+
             // onSnapshot pour les mises à jour en temps réel
             onSnapshot(usersQuery, (snapshot) => {
                 const userProfiles = [];
