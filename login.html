@@ -11,10 +11,6 @@
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-        #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; }
-        #mobile-menu.open { transform: translateX(0); }
-        #mobile-menu-overlay { display: none; }
-        #mobile-menu-overlay.open { display: block; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -29,7 +25,6 @@
                 <a href="index.html" class="hover:text-accent transition">Accueil</a>
                 <a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full text-brand-dark">Se Connecter</a>
             </nav>
-            <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
         </div>
     </header>
 
@@ -66,7 +61,13 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            setPersistence, 
+            browserSessionPersistence 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -88,44 +89,40 @@
         const authButton = document.getElementById('auth-button');
         const authMessage = document.getElementById('auth-message');
         const switchBtn = document.getElementById('switch-button');
-        const passwordHint = document.getElementById('password-hint');
 
-        // Gestion de l'affichage des messages
         function showMsg(msg, success) {
             authMessage.textContent = msg;
             authMessage.className = `text-center p-3 rounded-lg text-sm border-l-4 mt-4 ${success ? 'bg-green-100 text-green-700 border-green-500' : 'bg-red-100 text-red-700 border-red-500'}`;
             authMessage.classList.remove('hidden');
         }
 
-        // Bascule entre Connexion et Inscription
-        switchBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            isSignInMode = !isSignInMode;
-            document.getElementById('form-title').textContent = isSignInMode ? "Connexion" : "Création de Compte";
-            authButton.textContent = isSignInMode ? "Se Connecter" : "S'inscrire";
-            passwordHint.classList.toggle('hidden', isSignInMode);
-            
-            document.getElementById('switch-container').innerHTML = isSignInMode ? 
-                `Pas encore de compte ? <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Créer un compte</button>` :
-                `Déjà un compte ? <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Se connecter</button>`;
-            
-            // Ré-attacher l'événement car le bouton a été recréé par innerHTML
-            document.getElementById('switch-button').addEventListener('click', arguments.callee);
+        // Action de switch (simplifiée)
+        document.body.addEventListener('click', (e) => {
+            if(e.target && e.target.id === 'switch-button'){
+                e.preventDefault();
+                isSignInMode = !isSignInMode;
+                document.getElementById('form-title').textContent = isSignInMode ? "Connexion" : "Création de Compte";
+                authButton.textContent = isSignInMode ? "Se Connecter" : "S'inscrire";
+                document.getElementById('switch-container').innerHTML = isSignInMode ? 
+                    `Pas encore de compte ? <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Créer un compte</button>` :
+                    `Déjà un compte ? <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Se connecter</button>`;
+            }
         });
 
-        // Soumission du formulaire
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value;
-            
+
             authButton.disabled = true;
             authButton.textContent = "Vérification...";
 
             try {
+                // MODIFICATION ICI : On définit la persistance AVANT de connecter l'utilisateur
+                await setPersistence(auth, browserSessionPersistence);
+
                 if (isSignInMode) {
                     const res = await signInWithEmailAndPassword(auth, email, password);
-                    // Mise à jour Firestore (Admin pourra voir "EN LIGNE")
                     await setDoc(doc(db, "artifacts", res.user.uid), { 
                         status: "EN LIGNE", 
                         lastLogin: serverTimestamp() 
@@ -133,7 +130,6 @@
                     showMsg("Connexion réussie ! Redirection...", true);
                 } else {
                     const res = await createUserWithEmailAndPassword(auth, email, password);
-                    // Création du profil pour l'ADMIN dans la collection artifacts
                     await setDoc(doc(db, "artifacts", res.user.uid), {
                         uid: res.user.uid,
                         email: email,
@@ -145,14 +141,9 @@
                     });
                     showMsg("Compte créé avec succès !", true);
                 }
-                setTimeout(() => window.location.href = 'index.html', 1200);
+                setTimeout(() => window.location.href = 'index.html', 1000);
             } catch (err) {
-                let errorMsg = "Erreur d'authentification.";
-                if(err.code === 'auth/weak-password') errorMsg = "Mot de passe trop court.";
-                if(err.code === 'auth/email-already-in-use') errorMsg = "Email déjà utilisé.";
-                if(err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') errorMsg = "Identifiants incorrects.";
-                
-                showMsg(errorMsg, false);
+                showMsg("Erreur : " + err.message, false);
                 authButton.disabled = false;
                 authButton.textContent = isSignInMode ? "Se Connecter" : "S'inscrire";
             }
