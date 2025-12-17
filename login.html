@@ -55,9 +55,13 @@
                     <input type="password" id="auth-password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none">
                 </div>
 
+                <div class="text-right">
+                    <button id="forgot-password" type="button" class="text-xs text-brand-dark hover:underline font-medium">Mot de passe oublié ?</button>
+                </div>
+
                 <div id="auth-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4"></div>
 
-                <button type="submit" id="auth-button" class="w-full bg-brand-dark text-white font-semibold py-3 rounded-lg shadow-md hover:opacity-90 transition mt-6 uppercase tracking-wider">
+                <button type="submit" id="auth-button" class="w-full bg-brand-dark text-white font-semibold py-3 rounded-lg shadow-md hover:opacity-90 transition mt-2 uppercase tracking-wider">
                     Se Connecter
                 </button>
             </form>
@@ -75,7 +79,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-            GoogleAuthProvider, signInWithPopup, setPersistence, browserSessionPersistence 
+            GoogleAuthProvider, signInWithPopup, setPersistence, browserSessionPersistence,
+            sendPasswordResetEmail 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -106,26 +111,33 @@
             authMessage.classList.remove('hidden');
         }
 
-        // BASCOULEMENT SANS RECHARGEMENT
+        // SWITCH BETWEEN LOGIN AND SIGNUP
         switchButton.onclick = (e) => {
-            e.preventDefault(); // Empêche toute action par défaut
+            e.preventDefault();
             isSignInMode = !isSignInMode;
-            
-            if (isSignInMode) {
-                formTitle.innerText = "Connexion";
-                authButton.innerText = "Se Connecter";
-                switchText.innerText = "Pas encore de compte ?";
-                switchButton.innerText = "Créer un compte";
-            } else {
-                formTitle.innerText = "Inscription";
-                authButton.innerText = "S'inscrire";
-                switchText.innerText = "Déjà un compte ?";
-                switchButton.innerText = "Se connecter";
-            }
-            authMessage.classList.add('hidden'); // Cache les anciens messages
+            formTitle.innerText = isSignInMode ? "Connexion" : "Inscription";
+            authButton.innerText = isSignInMode ? "Se Connecter" : "S'inscrire";
+            switchText.innerText = isSignInMode ? "Pas encore de compte ?" : "Déjà un compte ?";
+            switchButton.innerText = isSignInMode ? "Créer un compte" : "Se connecter";
+            authMessage.classList.add('hidden');
         };
 
-        // CONNEXION GOOGLE
+        // FORGOT PASSWORD FUNCTION
+        document.getElementById('forgot-password').onclick = async () => {
+            const email = document.getElementById('auth-email').value.trim();
+            if (!email) {
+                showMsg("Veuillez saisir votre email d'abord.", false);
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showMsg("Email de réinitialisation envoyé !", true);
+            } catch (err) {
+                showMsg("Erreur : " + err.message, false);
+            }
+        };
+
+        // GOOGLE LOGIN
         document.getElementById('google-btn').onclick = async () => {
             const provider = new GoogleAuthProvider();
             try {
@@ -139,10 +151,10 @@
                     lastLogin: serverTimestamp()
                 }, { merge: true });
                 window.location.href = 'index.html';
-            } catch (err) { showMsg("Erreur Google : " + err.message, false); }
+            } catch (err) { showMsg(err.message, false); }
         };
 
-        // SOUMISSION FORMULAIRE
+        // FORM SUBMISSION
         document.getElementById('auth-form').onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('auth-email').value.trim();
@@ -168,7 +180,7 @@
                         createdAt: serverTimestamp(),
                         status: "EN LIGNE"
                     });
-                    showMsg("Compte créé ! Redirection...", true);
+                    showMsg("Compte créé !", true);
                 }
                 setTimeout(() => window.location.href = 'index.html', 1000);
             } catch (err) { 
