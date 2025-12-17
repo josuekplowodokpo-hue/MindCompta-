@@ -3,338 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCompta - Nos Services et le Livre</title>
+    <title>MindCompta - Ressources & Documents</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
-        /* Import the Inter font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
-        /* Brand Colors (Standardized) */
         :root {
-            --brand-dark: #1E3A8A; /* Deep Blue (Indigo-900) */
-            --accent: #F59E0B; /* Vivid Orange / Gold (Amber-500) */
-            --vibrant-green: #10B981; /* Bright Green (Emerald-500) */
+            --brand-dark: #1E3A8A;
+            --accent: #F59E0B;
+            --vibrant-green: #10B981;
             font-family: 'Inter', sans-serif;
         }
-
-        /* Custom Tailwind classes for colors */
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
         .hover-accent:hover { background-color: #D97706; }
-
-        /* Navigation Link Styles - Desktop */
-        .nav-link {
-            color: white;
-            font-weight: 500;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
-        }
-        .nav-link:hover {
-            background-color: #345b85;
-        }
-        .active-link-desktop {
-            background-color: var(--accent); 
-            font-weight: 600;
-            color: var(--brand-dark) !important;
-        }
-
-        /* Mobile Menu Styles (Off-Canvas) */
-        #mobile-menu {
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 50; 
-        }
-        #mobile-menu.open {
-            transform: translateX(0);
-        }
-        /* Overlay */
-        #mobile-menu-overlay {
-            display: none; 
-            z-index: 40;
-        }
-        #mobile-menu-overlay.open {
-            display: block;
-        }
-        .mobile-link {
-            display: block;
-            padding: 0.75rem 1rem;
-            color: white;
-            font-weight: 500;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
-        }
-        .mobile-link.active-link-mobile {
-            background-color: var(--accent);
-            color: var(--brand-dark);
-            font-weight: 700;
-        }
-        .mobile-link-btn {
-             display: block;
-             width: 100%;
-             text-align: center;
-        }
+        .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
+        .nav-link:hover { background-color: #345b85; }
+        .active-link-desktop { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
+        #mobile-menu { transform: translateX(100%); transition: 0.3s; z-index: 50; }
+        #mobile-menu.open { transform: translateX(0); }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col font-sans">
 
-    <!-- EN-TÊTE ET NAVIGATION -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between items-center">
-
-                <!-- LOGO/BRAND (CLICKABLE) -->
-                <a href="index.html" class="flex items-center group">
-                    <img src="logo.jpg" 
-                         alt="MindCompta Logo" 
-                         onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
-                         class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
-                    <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta</span>
-                </a>
-
-                <!-- DESKTOP NAVIGATION -->
-                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
-                    <a href="index.html" class="nav-link">Accueil</a>
-                    <!-- Lien actif pour Services -->
-                    <a href="services.html" class="nav-link active-link-desktop">Services (Livre)</a> 
-                    <a href="about.html" class="nav-link">À Propos</a>
-                    <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
-
-                    <!-- Action Buttons and User Info (Managed by JS) -->
-                    <div id="auth-actions-desktop" class="flex items-center space-x-3">
-                        <!-- Content managed by JS (checkSessionAndRenderHeader) -->
-                    </div>
-                </nav>
-
-                <!-- MOBILE MENU BUTTON -->
-                <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-            </div>
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center group">
+                <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
+                <span class="text-xl font-bold tracking-wider group-hover:text-accent">MindCompta</span>
+            </a>
+            <nav class="hidden sm:flex items-center space-x-4">
+                <a href="index.html" class="nav-link">Accueil</a>
+                <a href="services.html" class="nav-link active-link-desktop">Services</a>
+                <a href="about.html" class="nav-link">À Propos</a>
+                <div id="auth-actions-desktop" class="flex items-center space-x-3 ml-4"></div>
+            </nav>
+            <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
         </div>
     </header>
 
-    <!-- MOBILE MENU OFF-CANVAS -->
-    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
-        <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none">
-            &times;
-        </button>
-        <div class="pt-12 space-y-3">
-            <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
-            <a href="index.html" class="mobile-link">Accueil</a>
-            <a href="services.html" class="mobile-link active-link-mobile">Services (Livre)</a>
-            <a href="about.html" class="mobile-link">À Propos</a>
-            <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
-
-            <!-- Authentication Actions Container (Filled by JS) -->
-            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
-                <!-- Content managed by JS (checkSessionAndRenderHeader) -->
-            </div>
-        </div>
-    </nav>
-    <!-- END MOBILE MENU -->
-
-    <!-- CONTENU PRINCIPAL -->
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
-        <h1 class="text-4xl font-extrabold text-brand-dark mb-8 mt-4 border-b pb-2 border-accent">
-            Nos Services et Ressources
-        </h1>
+        <h1 class="text-4xl font-extrabold text-brand-dark mb-8 mt-4 border-b pb-2 border-accent">Ressources Documentaires</h1>
 
-        <!-- 1. MESSAGE NÉCESSITANT UNE CONNEXION (Affiché si non connecté) -->
-        <div id="login-required-message" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-lg shadow-lg text-center my-10 hidden">
-            <h2 class="text-2xl font-bold mb-3">Accès Restreint</h2>
-            <p class="text-lg mb-6">
-                Pour télécharger notre livre exclusif et accéder à nos ressources complètes, veuillez vous connecter ou vous inscrire.
-            </p>
-            <a href="login.html" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-red-500 hover:bg-red-600 transition duration-300 transform hover:scale-[1.02]">
-                Se Connecter pour Accéder au Livre
-            </a>
+        <div id="login-required-message" class="bg-white p-10 rounded-xl shadow-lg text-center my-10 hidden">
+            <h2 class="text-2xl font-bold text-red-600 mb-4">Accès Réservé</h2>
+            <p class="text-gray-600 mb-6">Connectez-vous pour accéder à votre bibliothèque de documents comptables.</p>
+            <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold hover:bg-opacity-90 transition">Se Connecter</a>
         </div>
 
-        <!-- 2. BLOC PRINCIPAL DU LIVRE (Affiché uniquement si connecté) -->
-        <div id="book-access-area" class="bg-white rounded-xl shadow-2xl p-6 sm:p-10 flex flex-col lg:flex-row gap-8 items-center hidden">
-            
-            <!-- COUVERTURE SIMULÉE DU LIVRE (Placeholder) -->
-            <div class="w-full lg:w-1/3 flex justify-center">
-                <div class="w-48 h-64 sm:w-64 sm:h-80 bg-gray-200 border-4 border-gray-800 rounded-lg shadow-xl transform hover:scale-[1.02] transition duration-300 relative overflow-hidden">
-                    <div class="absolute inset-0 bg-cover bg-center flex flex-col justify-between p-4 text-center" 
-                         style="background-image: url('https://placehold.co/600x800/1E3A8A/ffffff?text=Livre+Comptable%0AMindCompta');">
-                        <span class="text-lg font-bold">MindCompta</span>
-                        <h2 class="text-2xl font-black leading-tight">Le Guide du Comptable Moderne</h2>
-                    </div>
-                </div>
-            </div>
-
-            <!-- DÉTAILS ET LIEN DE TÉLÉCHARGEMENT -->
-            <div class="w-full lg:w-2/3 space-y-6">
-                <h2 class="text-3xl font-bold text-gray-800">
-                    Téléchargez Votre Livre Exclusif
-                </h2>
-                <p class="text-lg text-gray-600">
-                    Félicitations ! En tant que membre de MindCompta, vous avez un accès complet à notre guide indispensable sur les pratiques comptables essentielles.
-                </p>
-                
-                <ul class="list-disc list-inside text-gray-700 ml-4 space-y-2">
-                    <li>Principes de la comptabilité simplifiée.</li>
-                    <li>Outils et techniques pour l'optimisation fiscale.</li>
-                    <li>Études de cas pratiques.</li>
-                </ul>
-
-                <!-- BOUTON DE TÉLÉCHARGEMENT (MAINTENANT AVEC LE LIEN RELATIF SEUL) -->
-                <a href="comptable.pdf" 
-                   target="_blank" 
-                   class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-brand-dark bg-vibrant-green hover:bg-opacity-90 transition duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-vibrant-green focus:ring-opacity-50">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Télécharger Maintenant (PDF)
-                </a>
-
-                <p class="text-sm text-gray-500 pt-2">
-                    Le fichier s'ouvrira dans un nouvel onglet pour la consultation ou le téléchargement.
-                </p>
-            </div>
+        <div id="admin-add-section" class="bg-white p-6 rounded-xl shadow-md mb-10 border-t-4 border-accent hidden">
+            <h2 class="text-xl font-bold text-brand-dark mb-4">Ajouter un nouveau document</h2>
+            <form id="add-doc-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input type="text" id="doc-title" placeholder="Titre du document" required class="border p-2 rounded">
+                <input type="url" id="doc-url" placeholder="Lien du PDF (Google Drive, Dropbox, etc)" required class="border p-2 rounded">
+                <button type="submit" class="bg-vibrant-green text-white font-bold py-2 px-4 rounded hover:opacity-90">Publier le document</button>
+            </form>
         </div>
-        <!-- FIN BLOC PRINCIPAL DU LIVRE -->
 
+        <div id="documents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+            </div>
+
+        <div id="loading-spinner" class="text-center py-20">
+            <p class="text-gray-500 animate-pulse">Chargement des ressources...</p>
+        </div>
     </main>
 
-    <!-- PIED DE PAGE -->
     <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT GLOBALE & GESTION DE LA SESSION -->
-    <script>
-        // Page de redirection par défaut 
-        const REDIRECTION_PAGE = 'login.html'; 
-        const ADMIN_ROLE = 'admin';
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        /** Gère la déconnexion de l'utilisateur. */
-        window.handleLogout = () => {
-            localStorage.removeItem('isAuthenticated');
-            localStorage.removeItem('userEmail');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userRole');
-            window.location.href = REDIRECTION_PAGE; 
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
+            authDomain: "mindcompta-a61ef.firebaseapp.com",
+            projectId: "mindcompta-a61ef",
+            storageBucket: "mindcompta-a61ef.firebasestorage.app",
+            messagingSenderId: "578389020450",
+            appId: "1:578389020450:web:edf9dd48e394cff7601f7b"
         };
 
-        /**
-         * Vérifie l'état de la session et met à jour l'interface utilisateur.
-         */
-        function checkSessionAndRenderHeader() {
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
-            const desktopActions = document.getElementById('auth-actions-desktop');
-            const mobileActions = document.getElementById('auth-actions-mobile');
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-            // --- Utilisateur Connecté ---
-            if (userName) {
-                const isAdmin = userRole?.toLowerCase() === ADMIN_ROLE;
+        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
 
-                let adminLinkHtml = isAdmin ? `
-                    <a href="admin.html" class="nav-link bg-red-500 hover:bg-red-600">Admin</a>
-                ` : '';
+        // DOM Elements
+        const docGrid = document.getElementById('documents-grid');
+        const loginMessage = document.getElementById('login-required-message');
+        const adminSection = document.getElementById('admin-add-section');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const authActions = document.getElementById('auth-actions-desktop');
 
-                // 1. Desktop Actions 
-                desktopActions.innerHTML = `
-                    ${adminLinkHtml}
-                    <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600 hidden lg:inline">
-                        Bienvenue, ${userName}
-                    </span>
-                    <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
-                        Déconnexion
-                    </button>
-                `;
-
-                // 2. Mobile Actions
-                mobileActions.innerHTML = `
-                    <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
-                    <p class="text-white text-md font-semibold mb-3">${userName} (${userRole || 'Utilisateur'})</p>
-                    ${isAdmin ? '<a href="admin.html" class="mobile-link bg-red-500 mobile-link-btn mb-3">Admin</a>' : ''}
-                    <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
-                `;
-
-                // 3. Attacher les écouteurs de déconnexion
-                document.getElementById('logout-desktop-btn')?.addEventListener('click', window.handleLogout);
-                document.getElementById('logout-mobile-btn')?.addEventListener('click', window.handleLogout);
-
+        onAuthStateChanged(auth, (user) => {
+            loadingSpinner.classList.add('hidden');
+            if (user) {
+                // Connecté
+                loginMessage.classList.add('hidden');
+                docGrid.classList.remove('hidden');
+                renderAuthUI(user);
+                loadDocuments();
+                
+                // Si admin, montrer le formulaire
+                if (user.uid === ADMIN_UID) {
+                    adminSection.classList.remove('hidden');
+                }
             } else {
-                // --- Utilisateur Déconnecté ---
-
-                // 1. Desktop Actions (Affiche uniquement "Se Connecter")
-                desktopActions.innerHTML = `
-                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                        Se Connecter
-                    </a>
-                `;
-
-                // 2. Mobile Actions
-                mobileActions.innerHTML = `
-                    <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
-                `;
+                // Déconnecté
+                loginMessage.classList.remove('hidden');
+                docGrid.classList.add('hidden');
+                authActions.innerHTML = `<a href="login.html" class="bg-accent px-4 py-2 rounded-full text-brand-dark font-bold">Connexion</a>`;
             }
-        }
-
-        /**
-         * Gère l'affichage du contenu basé sur l'état d'authentification.
-         * Tous les utilisateurs connectés ont accès au livre.
-         */
-        function checkContentAccess() {
-            // Only authentication status is checked, not the role.
-            const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'; 
-            
-            const bookArea = document.getElementById('book-access-area');
-            const loginRequired = document.getElementById('login-required-message');
-
-            if (isAuthenticated) {
-                // Show book content
-                bookArea.classList.remove('hidden');
-                loginRequired.classList.add('hidden');
-            } else {
-                // Show login required message
-                bookArea.classList.add('hidden');
-                loginRequired.classList.remove('hidden');
-            }
-        }
-
-
-        // --- MOBILE MENU HANDLER (Off-Canvas) ---
-        const elements = {
-            mobileMenu: document.getElementById('mobile-menu'),
-            overlay: document.getElementById('mobile-menu-overlay'),
-            menuButton: document.getElementById('menu-button'),
-            closeMenuButton: document.getElementById('close-menu-button'),
-        };
-
-        function toggleMobileMenu(isOpen) {
-            const isOpening = isOpen === undefined ? !elements.mobileMenu.classList.contains('open') : isOpen;
-            if (isOpening) {
-                elements.mobileMenu.classList.add('open');
-                elements.overlay.classList.add('open');
-                document.body.style.overflow = 'hidden'; 
-            } else {
-                elements.mobileMenu.classList.remove('open');
-                elements.overlay.classList.remove('open');
-                document.body.style.overflow = '';
-            }
-        }
-        elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
-        elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
-        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
-
-
-        // Execution on load
-        document.addEventListener('DOMContentLoaded', () => {
-             // 1. Render header (Manage Login / Logout buttons)
-             checkSessionAndRenderHeader();
-             // 2. Manage conditional display of book content
-             checkContentAccess();
         });
+
+        function renderAuthUI(user) {
+            authActions.innerHTML = `
+                <span class="text-xs text-gray-300">${user.email}</span>
+                <button id="logout-btn" class="text-red-400 text-sm font-bold underline">Quitter</button>
+            `;
+            document.getElementById('logout-btn').onclick = () => signOut(auth);
+        }
+
+        // AJOUTER UN DOCUMENT (ADMIN)
+        document.getElementById('add-doc-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('doc-title').value;
+            const url = document.getElementById('doc-url').value;
+
+            try {
+                await addDoc(collection(db, "resources"), {
+                    title: title,
+                    url: url,
+                    createdAt: serverTimestamp()
+                });
+                e.target.reset();
+                alert("Document ajouté avec succès !");
+            } catch (err) {
+                alert("Erreur lors de l'ajout : " + err.message);
+            }
+        };
+
+        // CHARGER LES DOCUMENTS (CLIENT)
+        function loadDocuments() {
+            const q = query(collection(db, "resources"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                docGrid.innerHTML = '';
+                if (snapshot.empty) {
+                    docGrid.innerHTML = `<p class="col-span-full text-center text-gray-400 py-10">Aucun document disponible pour le moment.</p>`;
+                }
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const card = `
+                        <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition border-l-4 border-brand-dark">
+                            <h3 class="font-bold text-lg text-brand-dark mb-4">${data.title}</h3>
+                            <a href="${data.url}" target="_blank" class="flex items-center text-vibrant-green font-bold hover:underline">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                Télécharger le PDF
+                            </a>
+                        </div>
+                    `;
+                    docGrid.innerHTML += card;
+                });
+            });
+        }
     </script>
 </body>
 </html>
-
