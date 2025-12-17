@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCompta - Services & Ressources</title>
+    <title>MindCompta - Authentification</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -11,56 +11,81 @@
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-        .post-card { transition: all 0.3s ease; border-left: 6px solid var(--brand-dark); }
-        .post-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center group">
                 <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" 
-                     class="h-10 w-10 rounded-full mr-3 border-2 border-white object-cover transition group-hover:scale-105">
-                <span class="text-xl font-bold tracking-wider group-hover:text-accent">MindCompta Finance</span>
+                     class="h-10 w-10 rounded-full mr-3 border-2 border-white object-cover">
+                <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
             </a>
-            <nav class="hidden sm:flex items-center space-x-6">
-                <a href="index.html" class="hover:text-accent transition font-medium">Accueil</a>
-                <a href="services.html" class="text-accent font-bold">Services</a>
-                <div id="auth-status-desktop"></div>
+            <nav class="hidden sm:flex items-center space-x-4">
+                <a href="index.html" class="hover:text-accent transition">Accueil</a>
             </nav>
         </div>
     </header>
 
-    <main class="w-full max-w-5xl mx-auto p-4 flex-grow">
-        <div class="mt-8 mb-10 text-center md:text-left">
-            <h1 class="text-4xl font-black text-brand-dark italic uppercase">Flux <span class="text-accent">Ressources</span></h1>
-            <p id="welcome-msg" class="text-gray-500 mt-2 font-medium"></p>
-        </div>
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-sm bg-white rounded-xl shadow-2xl p-8"> 
+            <h2 id="form-title" class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
 
-        <div id="admin-section" class="bg-white p-8 rounded-2xl shadow-xl mb-12 border-2 border-accent hidden">
-            <h2 class="text-2xl font-bold text-brand-dark mb-6">Nouvelle Publication</h2>
-            <form id="add-doc-form" class="space-y-4">
-                <input type="text" id="doc-title" required class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark font-semibold" placeholder="Titre de l'article...">
-                <input type="url" id="doc-image" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Lien de l'image (ex: https://...jpg)">
-                <textarea id="doc-content" required rows="6" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Votre contenu..."></textarea>
-                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-900 transition uppercase tracking-widest">Publier sur le site</button>
-            </form>
-        </div>
+            <button id="google-btn" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3 rounded-lg mb-6 hover:bg-gray-50 transition shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
+                    <path fill="#fbc02d" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                    <path fill="#e53935" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
+                    <path fill="#4caf50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
+                    <path fill="#1565c0" d="M43.611,20.083L43.595,20L42,20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                </svg>
+                <span class="text-gray-700 font-semibold">Continuer avec Google</span>
+            </button>
 
-        <div id="documents-list" class="space-y-8 pb-12">
+            <div class="relative flex py-4 items-center">
+                <div class="flex-grow border-t border-gray-300"></div>
+                <span class="flex-shrink mx-4 text-gray-400 text-xs uppercase">Ou</span>
+                <div class="flex-grow border-t border-gray-300"></div>
             </div>
 
-        <div id="login-prompt" class="hidden text-center py-20 bg-white rounded-3xl shadow">
-            <h3 class="text-xl font-bold mb-4 text-gray-700">Connectez-vous pour voir les ressources</h3>
-            <a href="login.html" class="bg-accent text-brand-dark px-10 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition inline-block">Connexion</a>
+            <form id="auth-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Adresse Email</label>
+                    <input type="email" id="auth-email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Mot de Passe</label>
+                    <input type="password" id="auth-password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none">
+                </div>
+
+                <div id="auth-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4"></div>
+
+                <button type="submit" id="auth-button" class="w-full bg-brand-dark text-white font-semibold py-3 rounded-lg shadow-md hover:opacity-90 transition mt-6 uppercase tracking-wider">
+                    Se Connecter
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-sm">
+                <p id="switch-container" class="text-gray-600">
+                    Pas encore de compte ? 
+                    <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Créer un compte</button>
+                </p>
+            </div>
         </div>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword,
+            GoogleAuthProvider,
+            signInWithPopup,
+            setPersistence, 
+            browserSessionPersistence 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
@@ -74,95 +99,73 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
 
-        // SECURITÉ : DÉCONNEXION AUTOMATIQUE À LA FERMETURE DU NAVIGATEUR
-        setPersistence(auth, browserSessionPersistence);
+        let isSignInMode = true;
 
-        // SUPPRESSION (ACCÈS ADMIN UNIQUEMENT)
-        window.deletePublication = async (id) => {
-            if(confirm("Voulez-vous supprimer cette publication ?")) {
-                try { await deleteDoc(doc(db, "resources", id)); } 
-                catch(e) { alert("Action refusée."); }
+        // Message Helper
+        function showMsg(text, isSuccess) {
+            const msg = document.getElementById('auth-message');
+            msg.innerText = text;
+            msg.className = `text-center p-3 rounded-lg text-sm border-l-4 mt-4 ${isSuccess ? 'bg-green-100 text-green-700 border-green-500' : 'bg-red-100 text-red-700 border-red-500'}`;
+            msg.classList.remove('hidden');
+        }
+
+        // 1. GOOGLE LOGIN AVEC PERSISTANCE SESSION
+        document.getElementById('google-btn').onclick = async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                await setPersistence(auth, browserSessionPersistence);
+                const res = await signInWithPopup(auth, provider);
+                await setDoc(doc(db, "artifacts", res.user.uid), {
+                    uid: res.user.uid,
+                    email: res.user.email,
+                    displayName: res.user.displayName,
+                    status: "EN LIGNE",
+                    lastLogin: serverTimestamp()
+                }, { merge: true });
+                window.location.href = 'index.html';
+            } catch (err) { showMsg(err.message, false); }
+        };
+
+        // 2. EMAIL LOGIN AVEC PERSISTANCE SESSION
+        document.getElementById('auth-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+            const btn = document.getElementById('auth-button');
+
+            btn.disabled = true;
+            btn.innerText = "Patientez...";
+
+            try {
+                await setPersistence(auth, browserSessionPersistence);
+                if (isSignInMode) {
+                    const res = await signInWithEmailAndPassword(auth, email, password);
+                    await setDoc(doc(db, "artifacts", res.user.uid), { status: "EN LIGNE", lastLogin: serverTimestamp() }, { merge: true });
+                } else {
+                    const res = await createUserWithEmailAndPassword(auth, email, password);
+                    await setDoc(doc(db, "artifacts", res.user.uid), {
+                        uid: res.user.uid, email, role: "Client", createdAt: serverTimestamp()
+                    });
+                }
+                window.location.href = 'index.html';
+            } catch (err) { 
+                showMsg("Erreur d'identifiants ou réseau.", false);
+                btn.disabled = false;
+                btn.innerText = isSignInMode ? "Se Connecter" : "S'inscrire";
             }
         };
 
-        // GESTION DE L'ÉTAT DE CONNEXION
-        onAuthStateChanged(auth, (user) => {
-            const list = document.getElementById('documents-list');
-            const prompt = document.getElementById('login-prompt');
-            const authDesktop = document.getElementById('auth-status-desktop');
-
-            if (user) {
-                document.getElementById('welcome-msg').innerText = `Ravi de vous revoir, ${user.displayName || user.email.split('@')[0]}`;
-                prompt.classList.add('hidden');
-                
-                const isAdmin = user.uid === ADMIN_UID;
-                if(isAdmin) document.getElementById('admin-section').classList.remove('hidden');
-
-                authDesktop.innerHTML = `<button id="logout-btn" class="bg-gray-200 text-brand-dark px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-100 hover:text-red-600 transition">Déconnexion</button>`;
-                document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.reload());
-
-                loadPublications(isAdmin);
-            } else {
-                list.innerHTML = '';
-                prompt.classList.remove('hidden');
-                authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-lg text-sm font-bold">Connexion</a>`;
-            }
-        });
-
-        // CHARGEMENT DES PUBLICATIONS
-        function loadPublications(isAdmin) {
-            const q = query(collection(db, "resources"), orderBy("createdAt", "desc"));
-            onSnapshot(q, (snap) => {
-                const list = document.getElementById('documents-list');
-                list.innerHTML = '';
-                snap.forEach(documentSnap => {
-                    const d = documentSnap.data();
-                    const date = d.createdAt ? d.createdAt.toDate().toLocaleDateString('fr-FR') : 'À l\'instant';
-                    const imageHtml = d.imageUrl ? `<img src="${d.imageUrl}" class="w-full h-72 object-cover rounded-2xl mb-6 shadow-md" onerror="this.style.display='none'">` : '';
-
-                    list.innerHTML += `
-                        <article class="post-card bg-white p-6 md:p-10 rounded-3xl shadow-sm relative">
-                            <div class="flex justify-between items-center mb-6">
-                                <span class="bg-blue-50 text-brand-dark text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest border border-blue-100">${date}</span>
-                                ${isAdmin ? `<button onclick="deletePublication('${documentSnap.id}')" class="text-red-400 hover:text-red-600 font-bold text-xs uppercase transition">Supprimer</button>` : ''}
-                            </div>
-                            ${imageHtml}
-                            <h2 class="text-3xl font-black text-brand-dark mb-4 leading-tight">${d.title}</h2>
-                            <div class="text-gray-600 whitespace-pre-wrap leading-relaxed text-lg">${d.content}</div>
-                            <div class="mt-8 pt-6 border-t border-gray-100 flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center text-xs font-bold text-white shadow-lg">MC</div>
-                                <div>
-                                    <p class="text-xs font-black text-brand-dark uppercase tracking-tighter">Équipe MindCompta</p>
-                                    <p class="text-[10px] text-gray-400 font-medium">Expertise Financière</p>
-                                </div>
-                            </div>
-                        </article>
-                    `;
-                });
-            });
-        }
-
-        // ENVOI D'UNE NOUVELLE PUBLICATION
-        document.getElementById('add-doc-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const title = document.getElementById('doc-title').value;
-            const content = document.getElementById('doc-content').value;
-            const imageUrl = document.getElementById('doc-image').value;
-
-            try {
-                await addDoc(collection(db, "resources"), {
-                    title,
-                    content,
-                    imageUrl: imageUrl || null,
-                    createdAt: serverTimestamp()
-                });
-                e.target.reset();
-                alert("Publié avec succès !");
-            } catch (err) {
-                alert("Erreur de publication.");
-            }
+        // SWITCH MODE
+        document.getElementById('switch-button').onclick = () => {
+            isSignInMode = !isSignInMode;
+            document.getElementById('form-title').innerText = isSignInMode ? "Connexion" : "Inscription";
+            document.getElementById('auth-button').innerText = isSignInMode ? "Se Connecter" : "S'inscrire";
+            document.getElementById('switch-container').innerHTML = isSignInMode ? 
+                `Pas encore de compte ? <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Créer un compte</button>` :
+                `Déjà un compte ? <button id="switch-button" class="text-brand-dark font-semibold hover:underline">Se connecter</button>`;
+            // Re-bind because innerHTML destroys the element
+            window.location.reload(); 
         };
     </script>
 </body>
