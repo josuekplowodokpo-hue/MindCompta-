@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCompta - Ressources & Documents</title>
+    <title>MindCompta - Services & Documents</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -16,20 +16,23 @@
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-        .hover-accent:hover { background-color: #D97706; }
         
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
         .nav-link:hover { background-color: #345b85; }
         .active-link { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
 
-        /* Menu Mobile Fix */
+        /* Animation du menu mobile */
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
         #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
         #mobile-menu-overlay.open { display: block; }
+
+        /* Style des publications */
+        .post-card { transition: all 0.3s ease; border-left: 6px solid var(--brand-dark); }
+        .post-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-50 min-h-screen flex flex-col">
 
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
@@ -38,11 +41,13 @@
                 <span class="text-xl font-bold tracking-wider group-hover:text-accent">MindCompta</span>
             </a>
             
-            <nav class="hidden sm:flex items-center space-x-4">
+            <nav class="hidden sm:flex items-center space-x-2">
                 <a href="index.html" class="nav-link">Accueil</a>
                 <a href="services.html" class="nav-link active-link">Services</a>
                 <a href="about.html" class="nav-link">À Propos</a>
-                <div id="auth-actions-desktop" class="flex items-center space-x-3 ml-4"></div>
+                <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
+                <div id="auth-actions-desktop" class="flex items-center space-x-3 ml-4">
+                    </div>
             </nav>
 
             <button id="menu-button" class="sm:hidden p-2 text-white">
@@ -52,53 +57,64 @@
     </header>
 
     <div id="mobile-menu-overlay"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-brand-dark p-6 shadow-2xl">
-        <button id="close-menu" class="text-white text-3xl mb-8">&times;</button>
-        <div class="flex flex-col space-y-4 text-white">
-            <a href="index.html" class="p-2 hover:bg-blue-800 rounded">Accueil</a>
-            <a href="services.html" class="p-2 bg-accent text-brand-dark rounded font-bold">Services</a>
-            <a href="about.html" class="p-2 hover:bg-blue-800 rounded">À Propos</a>
-            <hr class="border-gray-600">
-            <div id="auth-actions-mobile" class="flex flex-col space-y-2"></div>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark p-6 shadow-2xl">
+        <button id="close-menu" class="text-white text-4xl mb-8">&times;</button>
+        <div class="flex flex-col space-y-3 text-white">
+            <a href="index.html" class="p-3 hover:bg-blue-800 rounded-lg">Accueil</a>
+            <a href="services.html" class="p-3 bg-accent text-brand-dark rounded-lg font-bold">Services</a>
+            <a href="about.html" class="p-3 hover:bg-blue-800 rounded-lg">À Propos</a>
+            <a href="youtube.html" class="p-3 hover:bg-blue-800 rounded-lg">Vidéos YouTube</a>
+            <hr class="border-gray-700 my-4">
+            <div id="auth-actions-mobile" class="flex flex-col space-y-3"></div>
         </div>
     </nav>
 
-    <main class="w-full max-w-4xl mx-auto p-4 flex-grow">
-        <h1 class="text-3xl font-extrabold text-brand-dark mb-8 mt-4">Services & Documents</h1>
+    <main class="w-full max-w-5xl mx-auto p-4 flex-grow">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 mt-6">
+            <h1 class="text-4xl font-black text-brand-dark italic uppercase tracking-tight">Ressources <span class="text-accent">&</span> Flux</h1>
+            <p id="user-welcome" class="text-gray-500 font-medium"></p>
+        </div>
 
-        <div id="admin-section" class="bg-white p-6 rounded-xl shadow-lg mb-10 border-t-4 border-accent hidden">
-            <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase text-sm tracking-widest">Nouveau Document (Saisie Admin)</h2>
-            <form id="add-doc-form" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">TITRE DU DOCUMENT</label>
-                    <input type="text" id="doc-title" required class="w-full border-2 border-gray-200 p-3 rounded-lg focus:border-accent outline-none transition" placeholder="Ex: Rapport mensuel Décembre 2024">
+        <div id="admin-section" class="bg-white p-8 rounded-2xl shadow-xl mb-12 border-2 border-accent hidden">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="bg-accent p-2 rounded-lg">
+                    <svg class="w-6 h-6 text-brand-dark" fill="currentColor" viewBox="0 0 20 20"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path></svg>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">CONTENU / TEXTE DU DOCUMENT</label>
-                    <textarea id="doc-content" required rows="6" class="w-full border-2 border-gray-200 p-3 rounded-lg focus:border-accent outline-none transition" placeholder="Saisissez ici le texte que les clients pourront lire..."></textarea>
-                </div>
-                <button type="submit" class="w-full bg-brand-dark text-white font-black py-4 rounded-lg shadow-xl hover:bg-blue-900 transition transform hover:scale-[1.01] flex justify-center items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    PUBLIER MAINTENANT
+                <h2 class="text-2xl font-bold text-brand-dark">Espace Publication Admin</h2>
+            </div>
+            <form id="add-doc-form" class="space-y-5">
+                <input type="text" id="doc-title" required class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl focus:border-brand-dark focus:bg-white outline-none transition-all font-semibold" placeholder="Titre accrocheur du document...">
+                <textarea id="doc-content" required rows="5" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl focus:border-brand-dark focus:bg-white outline-none transition-all" placeholder="Rédigez votre contenu ici (les paragraphes sont respectés)..."></textarea>
+                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-900 transition flex justify-center items-center gap-3">
+                    PUBLIER SUR LE FLUX CLIENT
                 </button>
             </form>
         </div>
 
-        <div id="login-required" class="hidden text-center py-20 bg-white rounded-xl shadow">
-            <p class="text-gray-500 mb-4">Veuillez vous connecter pour voir les documents.</p>
-            <a href="login.html" class="bg-accent px-6 py-2 rounded-full font-bold">Se connecter</a>
+        <div id="login-required" class="hidden text-center py-24 bg-white rounded-3xl shadow-inner border-2 border-dashed border-gray-200">
+            <div class="max-w-md mx-auto">
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">Contenu protégé</h3>
+                <p class="text-gray-500 mb-8">Rejoignez la communauté MindCompta pour consulter nos documents exclusifs.</p>
+                <a href="login.html" class="bg-brand-dark text-white px-10 py-4 rounded-full font-bold shadow-lg hover:scale-105 transition inline-block">Se connecter maintenant</a>
+            </div>
         </div>
 
-        <div id="documents-list" class="space-y-6 hidden">
+        <div id="documents-list" class="grid grid-cols-1 gap-8 hidden">
             </div>
 
-        <div id="loader" class="text-center py-10 text-gray-400 animate-pulse">Initialisation...</div>
+        <div id="loader" class="flex justify-center items-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-accent"></div>
+        </div>
     </main>
+
+    <footer class="w-full bg-brand-dark border-t border-gray-700 py-8 mt-auto">
+        <p class="text-center text-gray-400">© 2025 MindCompta - Expertise & Modernité</p>
+    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
@@ -114,57 +130,82 @@
         const db = getFirestore(app);
         const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
 
-        // Auth Logic
+        // GESTION SUPPRESSION (ADMIN UNIQUEMENT)
+        window.deletePublication = async (id) => {
+            if(confirm("Voulez-vous vraiment supprimer cette publication ?")) {
+                try {
+                    await deleteDoc(doc(db, "resources", id));
+                } catch (e) { alert("Erreur lors de la suppression"); }
+            }
+        };
+
         onAuthStateChanged(auth, (user) => {
             document.getElementById('loader').classList.add('hidden');
+            const desktopAuth = document.getElementById('auth-actions-desktop');
+            const mobileAuth = document.getElementById('auth-actions-mobile');
+            
             if (user) {
                 document.getElementById('documents-list').classList.remove('hidden');
-                document.getElementById('auth-actions-desktop').innerHTML = `<button id="logout-btn" class="bg-red-500 px-4 py-2 rounded-full text-xs font-bold">Déconnexion</button>`;
-                document.getElementById('logout-btn').onclick = () => signOut(auth);
+                document.getElementById('user-welcome').innerText = `Connecté : ${user.email.split('@')[0]}`;
+                
+                // Menu Desktop
+                let adminBtn = (user.uid === ADMIN_UID) ? `<a href="admin.html" class="bg-red-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-700">CONSOLE ADMIN</a>` : '';
+                desktopAuth.innerHTML = `${adminBtn} <button id="logout-btn" class="bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold">DÉCONNEXION</button>`;
+                
+                // Menu Mobile
+                mobileAuth.innerHTML = `${(user.uid === ADMIN_UID) ? '<a href="admin.html" class="p-3 bg-red-600 rounded-lg font-bold text-center">CONSOLE ADMIN</a>' : ''} 
+                                        <button id="logout-btn-mob" class="p-3 bg-gray-700 rounded-lg font-bold">DÉCONNEXION</button>`;
+
+                const logout = () => signOut(auth);
+                document.getElementById('logout-btn').onclick = logout;
+                document.getElementById('logout-btn-mob').onclick = logout;
                 
                 if (user.uid === ADMIN_UID) document.getElementById('admin-section').classList.remove('hidden');
-                loadDocs();
+                loadDocs(user.uid === ADMIN_UID);
             } else {
                 document.getElementById('login-required').classList.remove('hidden');
+                desktopAuth.innerHTML = `<a href="login.html" class="bg-accent px-6 py-2 rounded-full text-brand-dark font-bold">CONNEXION</a>`;
+                mobileAuth.innerHTML = `<a href="login.html" class="p-3 bg-accent text-brand-dark rounded-lg font-bold text-center">CONNEXION</a>`;
             }
         });
+
+        function loadDocs(isAdmin) {
+            const q = query(collection(db, "resources"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snap) => {
+                const list = document.getElementById('documents-list');
+                list.innerHTML = '';
+                snap.forEach(documentSnap => {
+                    const d = documentSnap.data();
+                    const dateStr = d.createdAt ? d.createdAt.toDate().toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'}) : 'À l\'instant';
+                    
+                    list.innerHTML += `
+                        <article class="post-card bg-white p-8 rounded-2xl shadow-sm relative group">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="bg-blue-50 text-brand-dark text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-blue-100">${dateStr}</span>
+                                ${isAdmin ? `<button onclick="deletePublication('${documentSnap.id}')" class="text-red-400 hover:text-red-600 transition p-1"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg></button>` : ''}
+                            </div>
+                            <h3 class="text-2xl font-black text-brand-dark mb-4 leading-tight">${d.title}</h3>
+                            <div class="text-gray-600 whitespace-pre-wrap leading-relaxed text-lg">${d.content}</div>
+                            <div class="mt-6 pt-6 border-t border-gray-100 flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center text-[10px] font-bold text-white">MC</div>
+                                <span class="text-xs font-bold text-gray-400 uppercase">Équipe MindCompta</span>
+                            </div>
+                        </article>
+                    `;
+                });
+            });
+        }
 
         // Add Doc Logic
         document.getElementById('add-doc-form').onsubmit = async (e) => {
             e.preventDefault();
             const title = document.getElementById('doc-title').value;
             const content = document.getElementById('doc-content').value;
-            
             try {
-                await addDoc(collection(db, "resources"), {
-                    title,
-                    content,
-                    author: auth.currentUser.email,
-                    createdAt: serverTimestamp()
-                });
+                await addDoc(collection(db, "resources"), { title, content, createdAt: serverTimestamp() });
                 e.target.reset();
-                alert("Publié !");
-            } catch (err) { alert("Erreur: " + err.message); }
+            } catch (err) { alert(err.message); }
         };
-
-        // Load Docs Logic
-        function loadDocs() {
-            const q = query(collection(db, "resources"), orderBy("createdAt", "desc"));
-            onSnapshot(q, (snap) => {
-                const list = document.getElementById('documents-list');
-                list.innerHTML = '';
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    list.innerHTML += `
-                        <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-brand-dark">
-                            <h3 class="text-xl font-bold text-brand-dark mb-2">${d.title}</h3>
-                            <p class="text-gray-600 whitespace-pre-wrap leading-relaxed">${d.content}</p>
-                            <div class="mt-4 text-[10px] text-gray-400 uppercase tracking-tighter">Publié le ${d.createdAt?.toDate().toLocaleDateString() || '...'}</div>
-                        </div>
-                    `;
-                });
-            });
-        }
 
         // Menu Toggle Logic
         const menuBtn = document.getElementById('menu-button');
@@ -173,9 +214,7 @@
         const overlay = document.getElementById('mobile-menu-overlay');
 
         const toggle = () => { menu.classList.toggle('open'); overlay.classList.toggle('open'); };
-        menuBtn.onclick = toggle;
-        closeBtn.onclick = toggle;
-        overlay.onclick = toggle;
+        menuBtn.onclick = toggle; closeBtn.onclick = toggle; overlay.onclick = toggle;
     </script>
 </body>
 </html>
