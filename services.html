@@ -44,24 +44,40 @@
                 <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
                 <span class="text-xl font-bold tracking-wider group-hover:text-accent">MindCompta</span>
             </a>
-            <nav class="hidden sm:flex items-center space-x-2">
+
+            <nav class="hidden md:flex items-center space-x-2">
                 <a href="index.html" class="nav-link">Accueil</a>
                 <a href="services.html" class="nav-link active-link">Services</a>
-                <div id="auth-actions-desktop" class="flex items-center space-x-3 ml-4"></div>
+                <a href="about.html" class="nav-link">À Propos</a>
+                <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
+                
+                <div id="auth-actions-desktop" class="flex items-center ml-4 border-l border-blue-800 pl-4">
+                    </div>
             </nav>
-            <button id="menu-button" class="sm:hidden p-2 text-white">
+
+            <button id="menu-button" class="md:hidden p-2 text-white">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
         </div>
     </header>
 
     <div id="mobile-menu-overlay"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark p-6 shadow-2xl">
-        <button id="close-menu" class="text-white text-4xl mb-8">&times;</button>
-        <div class="flex flex-col space-y-3 text-white">
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark p-6 shadow-2xl flex flex-col">
+        <div class="flex justify-between items-center mb-8">
+            <span class="text-accent font-bold">MENU</span>
+            <button id="close-menu" class="text-white text-4xl">&times;</button>
+        </div>
+        
+        <div class="flex flex-col space-y-3 text-white flex-grow">
             <a href="index.html" class="p-3 hover:bg-blue-800 rounded-lg">Accueil</a>
             <a href="services.html" class="p-3 bg-accent text-brand-dark rounded-lg font-bold">Services</a>
-            <div id="auth-actions-mobile" class="flex flex-col space-y-3"></div>
+            <a href="about.html" class="p-3 hover:bg-blue-800 rounded-lg">À Propos</a>
+            <a href="youtube.html" class="p-3 hover:bg-blue-800 rounded-lg">Vidéos YouTube</a>
+            
+            <hr class="border-gray-700 my-4">
+            
+            <div id="auth-actions-mobile" class="mt-auto">
+                </div>
         </div>
     </nav>
 
@@ -72,7 +88,7 @@
         </div>
 
         <div id="admin-section" class="bg-white p-8 rounded-2xl shadow-xl mb-12 border-2 border-accent hidden">
-            <h2 class="text-2xl font-bold text-brand-dark mb-6 text-center underline">Publier un Article</h2>
+            <h2 class="text-2xl font-bold text-brand-dark mb-6 text-center underline uppercase">Publier un Article</h2>
             <form id="add-doc-form" class="space-y-4">
                 <input type="text" id="doc-title" required class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark font-semibold" placeholder="Titre de l'article...">
                 <input type="url" id="doc-image" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Lien de l'image (Optionnel)">
@@ -82,7 +98,7 @@
         </div>
 
         <div id="login-required" class="hidden text-center py-20 bg-white rounded-3xl shadow">
-            <h3 class="text-xl font-bold mb-4 text-brand-dark">Accès réservé aux membres de MindCompta</h3>
+            <h3 class="text-xl font-bold mb-4 text-brand-dark">Accès réservé aux membres</h3>
             <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold uppercase">Se connecter / S'inscrire</a>
         </div>
 
@@ -93,10 +109,14 @@
         </div>
     </main>
 
+    <footer class="w-full bg-brand-dark border-t border-gray-700 py-8 mt-auto text-center text-gray-400">
+        © 2025 MindCompta - Tous droits réservés.
+    </footer>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, getDoc, runTransaction, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
@@ -114,8 +134,50 @@
 
         setPersistence(auth, browserSessionPersistence);
 
-        // --- FONCTIONS GLOBALES (Window) ---
+        // --- GESTION DE L'AUTHENTIFICATION ET DU MENU ---
+        onAuthStateChanged(auth, (user) => {
+            document.getElementById('loader').classList.add('hidden');
+            const dAuth = document.getElementById('auth-actions-desktop');
+            const mAuth = document.getElementById('auth-actions-mobile');
 
+            if (user) {
+                document.getElementById('documents-list').classList.remove('hidden');
+                const userName = user.displayName || user.email.split('@')[0];
+                const isAdmin = user.uid === ADMIN_UID;
+
+                // Affichage Desktop (Nom en petit au-dessus du bouton)
+                dAuth.innerHTML = `
+                    <div class="flex flex-col items-end mr-4">
+                        <span class="text-[10px] text-accent font-bold uppercase tracking-tighter">Utilisateur</span>
+                        <span class="text-xs font-bold text-white truncate max-w-[120px]">${userName}</span>
+                    </div>
+                    <button id="logout-btn" class="bg-red-600/20 border border-red-600 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">DÉCONNEXION</button>
+                `;
+
+                // Affichage Mobile (Nom bien visible)
+                mAuth.innerHTML = `
+                    <div class="bg-blue-900/50 p-4 rounded-xl mb-4 border border-blue-700">
+                        <p class="text-[10px] text-accent font-bold uppercase">Session active</p>
+                        <p class="text-white font-bold">${userName}</p>
+                    </div>
+                    <button id="logout-btn-mob" class="w-full bg-red-600 text-white p-3 rounded-lg font-bold">DÉCONNEXION</button>
+                `;
+
+                const logoff = () => signOut(auth).then(() => window.location.reload());
+                document.getElementById('logout-btn').onclick = logoff;
+                document.getElementById('logout-btn-mob').onclick = logoff;
+
+                if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
+                loadDocs(isAdmin, user.uid);
+            } else {
+                document.getElementById('login-required').classList.remove('hidden');
+                const logBtn = `<a href="login.html" class="bg-accent px-6 py-2 rounded-full text-brand-dark font-bold">CONNEXION / INSCRIPTION</a>`;
+                dAuth.innerHTML = logBtn;
+                mAuth.innerHTML = logBtn;
+            }
+        });
+
+        // --- LOGIQUE ARTICLES (LIKE, EDIT, DELETE, TOGGLE) ---
         window.toggleReadMore = (btn) => {
             const container = btn.parentElement.querySelector('.content-text');
             const isCollapsed = container.classList.contains('content-collapsed');
@@ -147,25 +209,19 @@
         };
 
         window.deletePublication = async (id) => {
-            if(confirm("Supprimer définitivement cet article ?")) {
-                try { await deleteDoc(doc(db, "resources", id)); } catch(e) { alert("Erreur lors de la suppression"); }
+            if(confirm("Supprimer cet article ?")) {
+                try { await deleteDoc(doc(db, "resources", id)); } catch(e) { }
             }
         };
 
-        // NOUVEAU : Fonction Modification pour l'Admin
         window.editPublication = (id) => {
             const card = document.querySelector(`[data-id="${id}"]`);
             const titleEl = card.querySelector('.post-title');
             const contentEl = card.querySelector('.content-text');
-            
-            // On bascule en mode édition
             const currentTitle = titleEl.innerText;
             const currentContent = contentEl.innerText;
-
-            titleEl.innerHTML = `<input type="text" class="edit-title w-full p-2 border border-accent rounded mb-2 text-xl font-bold" value="${currentTitle}">`;
-            contentEl.innerHTML = `<textarea class="edit-content w-full p-2 border border-accent rounded h-40 font-normal">${currentContent}</textarea>`;
-            
-            // On change les boutons
+            titleEl.innerHTML = `<input type="text" class="edit-title w-full p-2 border border-accent rounded mb-2 text-xl font-bold text-brand-dark" value="${currentTitle}">`;
+            contentEl.innerHTML = `<textarea class="edit-content w-full p-2 border border-accent rounded h-40 font-normal text-gray-700">${currentContent}</textarea>`;
             card.querySelector('.admin-controls').innerHTML = `
                 <button onclick="saveEdit('${id}')" class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold mr-2">ENREGISTRER</button>
                 <button onclick="window.location.reload()" class="bg-gray-400 text-white px-3 py-1 rounded text-xs font-bold">ANNULER</button>
@@ -176,43 +232,11 @@
             const card = document.querySelector(`[data-id="${id}"]`);
             const newTitle = card.querySelector('.edit-title').value;
             const newContent = card.querySelector('.edit-content').value;
-
             try {
-                await updateDoc(doc(db, "resources", id), {
-                    title: newTitle,
-                    content: newContent,
-                    updatedAt: serverTimestamp()
-                });
+                await updateDoc(doc(db, "resources", id), { title: newTitle, content: newContent });
                 alert("Article mis à jour !");
             } catch (e) { alert("Erreur"); }
         };
-
-        // --- AUTH & CHARGEMENT ---
-
-        onAuthStateChanged(auth, (user) => {
-            document.getElementById('loader').classList.add('hidden');
-            const dAuth = document.getElementById('auth-actions-desktop');
-            const mAuth = document.getElementById('auth-actions-mobile');
-
-            if (user) {
-                document.getElementById('documents-list').classList.remove('hidden');
-                document.getElementById('user-welcome').innerText = `Connecté en tant que : ${user.email.split('@')[0]}`;
-                const isAdmin = user.uid === ADMIN_UID;
-                
-                const logoutBtn = `<button id="logout-btn" class="bg-gray-700 px-4 py-2 rounded-lg text-xs font-bold text-white">DÉCONNEXION</button>`;
-                dAuth.innerHTML = logoutBtn; mAuth.innerHTML = logoutBtn;
-                
-                const logoff = () => signOut(auth).then(() => window.location.reload());
-                document.getElementById('logout-btn').onclick = logoff;
-
-                if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
-                loadDocs(isAdmin, user.uid);
-            } else {
-                document.getElementById('login-required').classList.remove('hidden');
-                const logBtn = `<a href="login.html" class="bg-accent px-6 py-2 rounded-full text-brand-dark font-bold">CONNEXION / INSCRIPTION</a>`;
-                dAuth.innerHTML = logBtn; mAuth.innerHTML = logBtn;
-            }
-        });
 
         function loadDocs(isAdmin, currentUid) {
             const q = query(collection(db, "resources"), orderBy("createdAt", "desc"));
@@ -225,7 +249,6 @@
                     const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString('fr-FR') : 'Récemment';
                     const img = data.imageUrl ? `<img src="${data.imageUrl}" class="w-full h-64 object-cover rounded-xl mb-4 shadow-sm" onerror="this.style.display='none'">` : '';
                     
-                    // État Like
                     const userLikeRef = doc(db, "resources", docId, "likes", currentUid);
                     const userLikeSnap = await getDoc(userLikeRef);
                     const isLiked = userLikeSnap.exists();
@@ -247,11 +270,10 @@
                         <h3 class="post-title text-2xl font-black text-brand-dark mb-4">${data.title}</h3>
                         <div class="content-text text-gray-600 whitespace-pre-wrap leading-relaxed content-collapsed">${data.content}</div>
                         <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2 hover:underline">Lire la suite</button>
-
                         <div class="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center text-[10px] font-bold text-white uppercase">MC</div>
-                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">MindCompta Finance</span>
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">MindCompta</span>
                             </div>
                             <button onclick="handleLike('${docId}')" class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-100 transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-colors ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor">
@@ -267,18 +289,17 @@
 
         document.getElementById('add-doc-form').onsubmit = async (e) => {
             e.preventDefault();
-            const title = document.getElementById('doc-title').value;
-            const content = document.getElementById('doc-content').value;
-            const imageUrl = document.getElementById('doc-image').value;
             try {
                 await addDoc(collection(db, "resources"), { 
-                    title, content, imageUrl: imageUrl || null, likesCount: 0, createdAt: serverTimestamp() 
+                    title: document.getElementById('doc-title').value, 
+                    content: document.getElementById('doc-content').value, 
+                    imageUrl: document.getElementById('doc-image').value || null, 
+                    likesCount: 0, createdAt: serverTimestamp() 
                 });
                 e.target.reset();
-            } catch (err) { alert("Erreur d'envoi"); }
+            } catch (err) { }
         };
 
-        // Menu Mobile
         const menuBtn = document.getElementById('menu-button');
         const overlay = document.getElementById('mobile-menu-overlay');
         const menu = document.getElementById('mobile-menu');
