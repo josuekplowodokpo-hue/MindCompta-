@@ -71,9 +71,9 @@
             <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase">Publier une vidéo</h2>
             <form id="add-video-form" class="space-y-4">
                 <input type="text" id="v-title" required class="w-full border p-3 rounded-lg" placeholder="Titre de la vidéo">
-                <input type="url" id="v-url" required class="w-full border p-3 rounded-lg" placeholder="Lien YouTube (ex: https://www.youtube.com/watch?v=...)">
+                <input type="url" id="v-url" required class="w-full border p-3 rounded-lg" placeholder="Lien YouTube complet...">
                 <textarea id="v-desc" rows="2" class="w-full border p-3 rounded-lg" placeholder="Description initiale..."></textarea>
-                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg uppercase hover:bg-blue-900 transition">Publier maintenant</button>
+                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg uppercase hover:bg-blue-900 transition">Publier</button>
             </form>
         </div>
 
@@ -108,17 +108,14 @@
                 const logoutUI = `<div class="flex flex-col items-center"><span class="text-accent text-[10px] font-bold">${name}</span><button id="lo-btn" class="bg-red-600 px-3 py-1 rounded text-white text-[10px] font-bold uppercase">Déconnexion</button></div>`;
                 dActions.innerHTML = logoutUI;
                 mActions.innerHTML = `<span class="text-accent text-sm font-bold block">Connecté: ${name}</span><button id="lo-btn-m" class="bg-red-600 w-full py-2 rounded text-white font-bold text-xs uppercase">Déconnexion</button>`;
-                
-                const btns = [document.getElementById('lo-btn'), document.getElementById('lo-btn-m')];
-                btns.forEach(b => b?.addEventListener('click', () => signOut(auth).then(() => window.location.reload())));
-                
+                document.getElementById('lo-btn')?.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
+                document.getElementById('lo-btn-m')?.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
                 if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
             } else {
                 const loginUI = `<a href="login.html" class="bg-accent py-2 px-5 text-sm font-bold rounded-full text-white">Connexion</a>`;
                 dActions.innerHTML = loginUI;
                 mActions.innerHTML = `<a href="login.html" class="mobile-link bg-accent text-brand-dark text-center font-bold">Connexion</a>`;
             }
-            // On charge les vidéos même si non connecté
             loadVideos(isAdmin);
         });
 
@@ -126,10 +123,15 @@
             onSnapshot(query(collection(db, "youtube_videos"), orderBy("createdAt", "desc")), (snap) => {
                 const list = document.getElementById('videos-list'); list.innerHTML = '';
                 document.getElementById('loader')?.remove();
-                snap.forEach((ds) => {
+                const isLoggedIn = auth.currentUser !== null;
+
+                snap.forEach((ds, index) => {
+                    // Restriction logic: Only first video if not logged in
+                    if (!isLoggedIn && index > 0) return;
+
                     const v = ds.data(); const id = ds.id;
                     const card = document.createElement('div');
-                    card.className = "bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 flex flex-col";
+                    card.className = "bg-white rounded-xl shadow-lg overflow-hidden border flex flex-col";
                     card.innerHTML = `
                         <div class="aspect-video"><iframe class="w-full h-full" src="https://www.youtube.com/embed/${v.youtubeId}" frameborder="0" allowfullscreen></iframe></div>
                         <div class="p-5 flex-grow">
@@ -146,43 +148,43 @@
                                     : `<p class="text-sm text-gray-600 line-clamp-3">${v.description || 'Pas de description.'}</p>`
                                 }
                             </div>
-                            ${isAdmin ? `<button onclick="window.delVideo('${id}')" class="text-red-500 text-[10px] font-bold mt-4 uppercase">Supprimer la vidéo</button>` : ''}
+                            ${isAdmin ? `<button onclick="window.delVideo('${id}')" class="text-red-500 text-[10px] font-bold mt-4 uppercase">Supprimer</button>` : ''}
                         </div>`;
                     list.appendChild(card);
                 });
+
+                if (!isLoggedIn && snap.size > 1) {
+                    const invite = document.createElement('div');
+                    invite.className = "col-span-full text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 mt-4";
+                    invite.innerHTML = `
+                        <p class="text-gray-500 font-bold mb-4 italic">Plus de vidéos disponibles. Connectez-vous pour voir l'intégralité du contenu !</p>
+                        <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold uppercase text-xs shadow-md">Se connecter</a>
+                    `;
+                    list.appendChild(invite);
+                }
             });
         }
 
-        // Action: Publier
         document.getElementById('add-video-form').onsubmit = async (e) => {
             e.preventDefault();
             const yId = extractID(document.getElementById('v-url').value);
             if(!yId) return alert("Lien YouTube invalide !");
-            await addDoc(collection(db, "youtube_videos"), {
-                title: document.getElementById('v-title').value,
-                youtubeId: yId,
-                description: document.getElementById('v-desc').value,
-                likesCount: 0,
-                createdAt: serverTimestamp()
-            });
+            await addDoc(collection(db, "youtube_videos"), { title: document.getElementById('v-title').value, youtubeId: yId, description: document.getElementById('v-desc').value, likesCount: 0, createdAt: serverTimestamp() });
             e.target.reset();
         };
 
-        // Action: Liker (nécessite d'être connecté)
         window.handleLike = async (id) => {
-            if(!auth.currentUser) return alert("Veuillez vous connecter pour liker cette vidéo.");
-            const vRef = doc(db, "youtube_videos", id);
-            await updateDoc(vRef, { likesCount: increment(1) });
+            if(!auth.currentUser) return alert("Veuillez vous connecter pour liker.");
+            await updateDoc(doc(db, "youtube_videos", id), { likesCount: increment(1) });
         };
 
-        // Action: Modifier description (Admin)
         window.updateDesc = async (id, val) => {
             await updateDoc(doc(db, "youtube_videos", id), { description: val });
         };
 
-        window.delVideo = async (id) => { if(confirm("Supprimer cette vidéo ?")) await deleteDoc(doc(db, "youtube_videos", id)); };
+        window.delVideo = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "youtube_videos", id)); };
 
-        // Menu Mobile logic
+        // Menu Mobile
         const menu = document.getElementById('mobile-menu');
         const overlay = document.getElementById('mobile-menu-overlay');
         document.getElementById('menu-button').onclick = () => { menu.classList.add('open'); overlay.classList.add('open'); };
