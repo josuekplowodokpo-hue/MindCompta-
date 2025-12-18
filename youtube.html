@@ -7,302 +7,174 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        /* Import the Inter font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
-        /* Brand Colors (Standardized) */
         :root {
-            --brand-dark: #1E3A8A; /* Deep Blue (Indigo-900) */
-            --accent: #F59E0B; /* Vivid Orange / Gold (Amber-500) */
-            --vibrant-green: #10B981; /* Bright Green (Emerald-500) */
+            --brand-dark: #1E3A8A; 
+            --accent: #F59E0B; 
+            --vibrant-green: #10B981; 
             font-family: 'Inter', sans-serif;
         }
 
-        /* Custom Tailwind classes for colors */
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
         .hover-accent:hover { background-color: #D97706; } 
         .bg-vibrant-green { background-color: var(--vibrant-green); }
 
-        /* Navigation Link Styles - Desktop */
-        .nav-link {
-            color: white;
-            font-weight: 500;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
-        }
-        .nav-link:hover {
-            background-color: #345b85;
-        }
-        .active-link-desktop {
-            background-color: var(--accent);
-            font-weight: 600;
-            color: var(--brand-dark) !important;
-        }
+        .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
+        .nav-link:hover { background-color: #345b85; }
+        .active-link-desktop { background-color: var(--accent); font-weight: 600; color: var(--brand-dark) !important; }
 
-        /* Mobile Menu Styles (Off-Canvas) */
-        #mobile-menu {
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 50; 
-        }
-        #mobile-menu.open {
-            transform: translateX(0);
-        }
-        /* Overlay */
-        #mobile-menu-overlay {
-            display: none; 
-            z-index: 40;
-        }
-        #mobile-menu-overlay.open {
-            display: block;
-        }
-        .mobile-link {
-            display: block;
-            padding: 0.75rem 1rem;
-            color: white;
-            font-weight: 500;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
-        }
-        .mobile-link.active-link-mobile {
-            background-color: var(--accent);
-            color: var(--brand-dark);
-            font-weight: 700;
-        }
-        .mobile-link-btn {
-             display: block;
-             width: 100%;
-             text-align: center;
-        }
+        #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
+        #mobile-menu.open { transform: translateX(0); }
+        #mobile-menu-overlay { display: none; z-index: 40; position: fixed; inset: 0; background: rgba(0,0,0,0.5); }
+        #mobile-menu-overlay.open { display: block; }
+        
+        .mobile-link { display: block; padding: 0.75rem 1rem; color: white; font-weight: 500; border-radius: 0.5rem; }
+        .mobile-link.active-link-mobile { background-color: var(--accent); color: var(--brand-dark); font-weight: 700; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- HEADER AND NAVIGATION -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between items-center">
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center group">
+                <img src="logo.jpg" alt="Logo" class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
+                <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
+            </a>
 
-                <!-- LOGO/BRAND (CLICKABLE) -->
-                <a href="index.html" class="flex items-center group">
-                    <img src="logo.jpg" 
-                         alt="MindCompta Logo" 
-                         onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
-                         class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
-                    <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
-                </a>
+            <nav class="hidden sm:flex items-center space-x-4">
+                <a href="index.html" class="nav-link">Accueil</a>
+                <a href="services.html" class="nav-link">Services (Livre)</a>
+                <a href="about.html" class="nav-link">À Propos</a>
+                <a href="youtube.html" class="nav-link active-link-desktop">Vidéos YouTube</a>
+                <div id="auth-actions-desktop" class="flex items-center ml-4 pl-4 border-l border-blue-800"></div>
+            </nav>
 
-                <!-- DESKTOP NAVIGATION -->
-                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
-                    <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="services.html" class="nav-link">Services (Livre)</a>
-                    <a href="about.html" class="nav-link">À Propos</a>
-                    <a href="youtube.html" class="nav-link active-link-desktop">Vidéos YouTube</a>
-
-                    <!-- Action Buttons and User Info (Managed by JS) -->
-                    <div id="auth-actions-desktop" class="flex items-center space-x-3">
-                        <!-- Default Login Button -->
-                        <a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                            Se Connecter
-                        </a>
-                    </div>
-                </nav>
-
-                <!-- MOBILE MENU BUTTON -->
-                <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-            </div>
+            <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
         </div>
     </header>
 
-    <!-- MOBILE MENU OFF-CANVAS -->
-    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
-        <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none">
-            &times;
-        </button>
-        <div class="pt-12 space-y-3">
-            <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
-
+    <div id="mobile-menu-overlay"></div>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-brand-dark text-white shadow-2xl z-50 p-6 flex flex-col">
+        <button id="close-menu-button" class="text-4xl self-end mb-8">&times;</button>
+        <div class="space-y-3">
             <a href="index.html" class="mobile-link">Accueil</a>
             <a href="services.html" class="mobile-link">Services (Livre)</a>
             <a href="about.html" class="mobile-link">À Propos</a>
             <a href="youtube.html" class="mobile-link active-link-mobile">Vidéos YouTube</a>
-
-            <!-- Authentication Actions Container (Filled by JS) -->
-            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
-                <!-- Default Login Button -->
-                <a href="login.html" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
-            </div>
         </div>
+        <div id="auth-actions-mobile" class="mt-auto pt-6 border-t border-gray-700 space-y-3 text-center"></div>
     </nav>
-    <!-- END MOBILE MENU -->
 
-    <!-- CONTENU PRINCIPAL -->
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-16 md:py-24">
+    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-12">
+        <div id="admin-section" class="bg-white p-6 rounded-2xl shadow-lg mb-12 border-2 border-accent hidden">
+            <h2 class="text-xl font-bold text-brand-dark mb-4">Ajouter une Vidéo</h2>
+            <form id="add-video-form" class="space-y-3">
+                <input type="text" id="v-title" required class="w-full border p-2 rounded" placeholder="Titre de la vidéo">
+                <input type="text" id="v-id" required class="w-full border p-2 rounded" placeholder="ID YouTube (ex: dQw4w9WgXcQ)">
+                <textarea id="v-desc" class="w-full border p-2 rounded" placeholder="Description courte"></textarea>
+                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-2 rounded">PUBLIER LA VIDÉO</button>
+            </form>
+        </div>
 
         <div class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-brand-dark mb-4">Vidéos YouTube : Apprenez le Droit OHADA</h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                Consultez nos tutoriels et analyses vidéo pour une compréhension visuelle des réglementations.
-            </p>
+            <h1 class="text-4xl font-extrabold text-brand-dark mb-4">Vidéos YouTube</h1>
+            <p class="text-gray-600">Apprenez le Droit OHADA en vidéo.</p>
         </div>
 
-        <section class="grid md:grid-cols-2 gap-8">
-            <!-- Vidéo 1 -->
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                <div class="aspect-w-16 aspect-h-9">
-                    <!-- Placeholder pour vidéo YouTube. Remplacer par un véritable iframe -->
-                    <div class="h-64 bg-gray-700 flex items-center justify-center text-white text-lg font-semibold">
-                        [Vidéo Placeholder : Fiscalité des Sociétés]
-                    </div>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold text-brand-dark mb-2">Décryptage : Les Nouveautés Fiscales UEMOA 2025</h3>
-                    <p class="text-gray-600 text-sm">Une analyse détaillée des dernières modifications réglementaires ayant un impact sur votre entreprise.</p>
-                </div>
-            </div>
+        <div id="videos-list" class="grid md:grid-cols-2 gap-8">
+            <div id="loader" class="col-span-2 flex justify-center py-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div></div>
+        </div>
 
-            <!-- Vidéo 2 -->
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                <div class="aspect-w-16 aspect-h-9">
-                    <!-- Placeholder pour vidéo YouTube. Remplacer par un véritable iframe -->
-                    <div class="h-64 bg-gray-700 flex items-center justify-center text-white text-lg font-semibold">
-                        [Vidéo Placeholder : Comptabilité]
-                    </div>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold text-brand-dark mb-2">Tutoriel : Enregistrer les Opérations de Fin d'Exercice</h3>
-                    <p class="text-gray-600 text-sm">Étape par étape, comment préparer votre comptabilité de fin d'exercice selon les normes OHADA.</p>
-                </div>
-            </div>
-
-            <!-- Bouton vers la chaîne YouTube -->
-            <div class="md:col-span-2 text-center mt-8">
-                <a href="https://www.youtube.com/channel/votre_chaine" target="_blank" class="inline-flex items-center bg-red-500 text-white font-bold py-3 px-8 rounded-full shadow-xl hover:bg-red-600 transition duration-300 transform hover:scale-105">
-                    <!-- Icône YouTube (SVG standard) -->
-                    <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M21.543 7.104c-.114-.403-.385-.75-.789-.864-1.22-.33-6.108-.33-6.108-.33h-.002s-4.888 0-6.108.33c-.404.114-.675.461-.789.864-.33 1.22-.33 6.108-.33 6.108s0 4.888.33 6.108c.114.403.385.75.789.864 1.22.33 6.108.33 6.108.33s4.888 0 6.108-.33c.404-.114.675-.461.789-.864.33-1.22.33-6.108.33-6.108s0-4.888-.33-6.108zm-12.262 5.865V9.452l4.464 2.164-4.464 2.164z"/></svg>
-                    Voir toute la chaîne
-                </a>
-            </div>
-        </section>
-
+        <div class="text-center mt-12">
+            <a href="https://www.youtube.com/@VOTRE_CHAINE" class="inline-flex items-center bg-red-500 text-white font-bold py-3 px-8 rounded-full shadow-xl hover:bg-red-600 transition">
+                Voir toute la chaîne
+            </a>
+        </div>
     </main>
 
-    <!-- PIED DE PAGE -->
-    <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
+    <footer class="w-full bg-brand-dark py-6 mt-auto">
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- JAVASCRIPT LOGIC AND AUTHENTICATION (LOCAL STORAGE) -->
     <script type="module">
-        // Page de redirection en cas de déconnexion ou d'accès non autorisé
-        const REDIRECTION_PAGE = 'login.html'; 
-        const ADMIN_ROLE = 'Admin';
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- GESTION DE LA SESSION ---
+        const fb = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
+        const app = initializeApp(fb); const auth = getAuth(app); const db = getFirestore(app);
+        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
+        setPersistence(auth, browserSessionPersistence);
 
-        /** Gère la déconnexion de l'utilisateur. */
-        function handleLogout() {
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userRole');
-            window.location.href = 'index.html'; 
-        }
-
-        /**
-         * Vérifie l'état de la session et met à jour l'interface utilisateur.
-         */
-        function checkSessionAndRenderHeader() {
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
-
-            const desktopActions = document.getElementById('auth-actions-desktop');
-            const mobileActions = document.getElementById('auth-actions-mobile');
-
-            // --- Utilisateur Connecté ---
-            if (userName) {
-                const isUserAdmin = userRole === ADMIN_ROLE;
-
-                // 1. Desktop Actions (Cache "Se Connecter" et affiche le profil/déconnexion)
-                const adminButtonHtml = isUserAdmin 
-                    ? `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
-                    : '';
+        onAuthStateChanged(auth, (user) => {
+            const dActions = document.getElementById('auth-actions-desktop');
+            const mActions = document.getElementById('auth-actions-mobile');
+            if (user) {
+                const name = user.email.split('@')[0];
+                const isAdmin = user.uid === ADMIN_UID;
+                const logoutBtn = `<div class="flex flex-col items-center"><span class="text-accent text-[10px] font-bold">${name}</span><button onclick="window.fbLogout()" class="bg-red-600 px-3 py-1 rounded text-white text-[10px] font-bold uppercase">Quitter</button></div>`;
                 
-                desktopActions.innerHTML = `
-                    ${adminButtonHtml}
-                    <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
-                        <span class="hidden sm:inline">Bienvenue,</span> ${userName}
-                    </span>
-                    <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
-                        Déconnexion
-                    </button>
-                `;
-
-                // 2. Mobile Actions
-                mobileActions.innerHTML = `
-                    ${isUserAdmin ? 
-                        `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
-                        : ''}
-                    <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
-                    <p class="text-white text-md font-semibold mb-3">${userName}</p>
-                    <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
-                `;
-
-                // 3. Attacher les écouteurs de déconnexion
-                document.getElementById('logout-desktop-btn')?.addEventListener('click', handleLogout);
-                document.getElementById('logout-mobile-btn')?.addEventListener('click', handleLogout);
+                dActions.innerHTML = logoutBtn;
+                mActions.innerHTML = `<p class="text-accent text-xs font-bold">Connecté : ${name}</p><button onclick="window.fbLogout()" class="mobile-link bg-red-600 text-center font-bold">Déconnexion</button>`;
                 
+                if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
+                loadVideos(isAdmin);
             } else {
-                // --- Utilisateur Déconnecté ---
-                
-                // 1. Desktop Actions (Affiche uniquement "Se Connecter")
-                desktopActions.innerHTML = `
-                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                        Se Connecter
-                    </a>
-                `;
-
-                // 2. Mobile Actions
-                mobileActions.innerHTML = `
-                    <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
-                `;
+                const loginBtn = `<a href="login.html" class="bg-accent py-2 px-5 text-sm font-bold rounded-full text-white">Se Connecter</a>`;
+                dActions.innerHTML = loginBtn;
+                mActions.innerHTML = `<a href="login.html" class="mobile-link bg-accent text-brand-dark text-center font-bold">Se Connecter</a>`;
+                loadVideos(false);
             }
+        });
+
+        window.fbLogout = () => signOut(auth).then(() => window.location.reload());
+
+        function loadVideos(isAdmin) {
+            onSnapshot(query(collection(db, "youtube_videos"), orderBy("createdAt", "desc")), (snap) => {
+                const list = document.getElementById('videos-list'); list.innerHTML = '';
+                document.getElementById('loader')?.remove();
+                snap.forEach((ds) => {
+                    const v = ds.data(); const id = ds.id;
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200";
+                    card.innerHTML = `
+                        <div class="aspect-video">
+                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/${v.youtubeId}" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-lg font-bold text-brand-dark mb-2">${v.title}</h3>
+                                ${isAdmin ? `<button onclick="window.delVideo('${id}')" class="text-red-500 text-[10px] font-bold">SUPPRIMER</button>` : ''}
+                            </div>
+                            <p class="text-gray-600 text-xs">${v.description || ''}</p>
+                        </div>`;
+                    list.appendChild(card);
+                });
+            });
         }
 
-        // --- GESTIONNAIRE DU MENU MOBILE (Off-Canvas) ---
-        const elements = {
-            mobileMenu: document.getElementById('mobile-menu'),
-            overlay: document.getElementById('mobile-menu-overlay'),
-            menuButton: document.getElementById('menu-button'),
-            closeMenuButton: document.getElementById('close-menu-button'),
+        document.getElementById('add-video-form').onsubmit = async (e) => {
+            e.preventDefault();
+            await addDoc(collection(db, "youtube_videos"), {
+                title: document.getElementById('v-title').value,
+                youtubeId: document.getElementById('v-id').value,
+                description: document.getElementById('v-desc').value,
+                createdAt: serverTimestamp()
+            });
+            e.target.reset();
         };
 
-        function toggleMobileMenu(isOpen) {
-            const isOpening = isOpen === undefined ? !elements.mobileMenu.classList.contains('open') : isOpen;
-            if (isOpening) {
-                elements.mobileMenu.classList.add('open');
-                elements.overlay.classList.add('open');
-                document.body.style.overflow = 'hidden'; 
-            } else {
-                elements.mobileMenu.classList.remove('open');
-                elements.overlay.classList.remove('open');
-                document.body.style.overflow = '';
-            }
-        }
-        elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
-        elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
-        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
+        window.delVideo = async (id) => { if(confirm("Supprimer cette vidéo ?")) await deleteDoc(doc(db, "youtube_videos", id)); };
 
-        // --- Exécution principale ---
-        document.addEventListener('DOMContentLoaded', checkSessionAndRenderHeader);
-
+        // Mobile Menu logic
+        const menu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('mobile-menu-overlay');
+        document.getElementById('menu-button').onclick = () => { menu.classList.add('open'); overlay.classList.add('open'); };
+        document.getElementById('close-menu-button').onclick = () => { menu.classList.remove('open'); overlay.classList.remove('open'); };
+        overlay.onclick = () => { menu.classList.remove('open'); overlay.classList.remove('open'); };
     </script>
 </body>
 </html>
-
