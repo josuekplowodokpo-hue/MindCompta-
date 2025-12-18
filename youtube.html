@@ -8,31 +8,19 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
-        :root {
-            --brand-dark: #1E3A8A; 
-            --accent: #F59E0B; 
-            --vibrant-green: #10B981; 
-            font-family: 'Inter', sans-serif;
-        }
-
+        :root { --brand-dark: #1E3A8A; --accent: #F59E0B; font-family: 'Inter', sans-serif; }
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-        .hover-accent:hover { background-color: #D97706; } 
-        .bg-vibrant-green { background-color: var(--vibrant-green); }
-
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
         .nav-link:hover { background-color: #345b85; }
-        .active-link-desktop { background-color: var(--accent); font-weight: 600; color: var(--brand-dark) !important; }
-
+        .active-link-desktop { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
-        #mobile-menu-overlay { display: none; z-index: 40; position: fixed; inset: 0; background: rgba(0,0,0,0.5); }
+        #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
         #mobile-menu-overlay.open { display: block; }
-        
         .mobile-link { display: block; padding: 0.75rem 1rem; color: white; font-weight: 500; border-radius: 0.5rem; }
-        .mobile-link.active-link-mobile { background-color: var(--accent); color: var(--brand-dark); font-weight: 700; }
+        .active-link-mobile { background-color: var(--accent); color: var(--brand-dark); font-weight: 700; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -40,10 +28,9 @@
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center group">
-                <img src="logo.jpg" alt="Logo" class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
+                <img src="logo.jpg" alt="Logo" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
                 <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
             </a>
-
             <nav class="hidden sm:flex items-center space-x-4">
                 <a href="index.html" class="nav-link">Accueil</a>
                 <a href="services.html" class="nav-link">Services (Livre)</a>
@@ -51,53 +38,45 @@
                 <a href="youtube.html" class="nav-link active-link-desktop">Vidéos YouTube</a>
                 <div id="auth-actions-desktop" class="flex items-center ml-4 pl-4 border-l border-blue-800"></div>
             </nav>
-
             <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
         </div>
     </header>
 
     <div id="mobile-menu-overlay"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-brand-dark text-white shadow-2xl z-50 p-6 flex flex-col">
-        <button id="close-menu-button" class="text-4xl self-end mb-8">&times;</button>
-        <div class="space-y-3">
-            <a href="index.html" class="mobile-link">Accueil</a>
-            <a href="services.html" class="mobile-link">Services (Livre)</a>
-            <a href="about.html" class="mobile-link">À Propos</a>
-            <a href="youtube.html" class="mobile-link active-link-mobile">Vidéos YouTube</a>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
+        <button id="close-menu-button" class="text-4xl absolute top-4 right-4">&times;</button>
+        <div class="pt-12 flex flex-col h-full">
+            <div class="space-y-2">
+                <a href="index.html" class="mobile-link">Accueil</a>
+                <a href="services.html" class="mobile-link">Services (Livre)</a>
+                <a href="about.html" class="mobile-link">À Propos</a>
+                <a href="youtube.html" class="mobile-link active-link-mobile">Vidéos YouTube</a>
+                
+                <div id="auth-actions-mobile" class="pt-4 border-t border-blue-800 mt-4 space-y-3"></div>
+            </div>
         </div>
-        <div id="auth-actions-mobile" class="mt-auto pt-6 border-t border-gray-700 space-y-3 text-center"></div>
     </nav>
 
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-12">
         <div id="admin-section" class="bg-white p-6 rounded-2xl shadow-lg mb-12 border-2 border-accent hidden">
-            <h2 class="text-xl font-bold text-brand-dark mb-4">Ajouter une Vidéo</h2>
-            <form id="add-video-form" class="space-y-3">
-                <input type="text" id="v-title" required class="w-full border p-2 rounded" placeholder="Titre de la vidéo">
-                <input type="text" id="v-id" required class="w-full border p-2 rounded" placeholder="ID YouTube (ex: dQw4w9WgXcQ)">
-                <textarea id="v-desc" class="w-full border p-2 rounded" placeholder="Description courte"></textarea>
-                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-2 rounded">PUBLIER LA VIDÉO</button>
+            <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase">Publier une nouvelle vidéo</h2>
+            <form id="add-video-form" class="space-y-4">
+                <input type="text" id="v-title" required class="w-full border p-3 rounded-lg" placeholder="Titre de la vidéo">
+                <input type="url" id="v-url" required class="w-full border p-3 rounded-lg" placeholder="Collez le lien YouTube ici (ex: https://www.youtube.com/watch?v=...)">
+                <textarea id="v-desc" rows="2" class="w-full border p-3 rounded-lg" placeholder="Petite description..."></textarea>
+                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg hover:bg-blue-900 transition">PUBLIER</button>
             </form>
         </div>
 
         <div class="text-center mb-16">
-            <h1 class="text-4xl font-extrabold text-brand-dark mb-4">Vidéos YouTube</h1>
-            <p class="text-gray-600">Apprenez le Droit OHADA en vidéo.</p>
+            <h1 class="text-4xl font-extrabold text-brand-dark mb-2">Vidéos YouTube</h1>
+            <p class="text-gray-600">Formations et analyses en Droit OHADA</p>
         </div>
 
         <div id="videos-list" class="grid md:grid-cols-2 gap-8">
             <div id="loader" class="col-span-2 flex justify-center py-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div></div>
         </div>
-
-        <div class="text-center mt-12">
-            <a href="https://www.youtube.com/@VOTRE_CHAINE" class="inline-flex items-center bg-red-500 text-white font-bold py-3 px-8 rounded-full shadow-xl hover:bg-red-600 transition">
-                Voir toute la chaîne
-            </a>
-        </div>
     </main>
-
-    <footer class="w-full bg-brand-dark py-6 mt-auto">
-        <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
-    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -109,19 +88,27 @@
         const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
         setPersistence(auth, browserSessionPersistence);
 
+        // Utility to extract ID from various YouTube link formats
+        function extractID(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
         onAuthStateChanged(auth, (user) => {
             const dActions = document.getElementById('auth-actions-desktop');
             const mActions = document.getElementById('auth-actions-mobile');
             if (user) {
                 const name = user.email.split('@')[0];
-                const isAdmin = user.uid === ADMIN_UID;
-                const logoutBtn = `<div class="flex flex-col items-center"><span class="text-accent text-[10px] font-bold">${name}</span><button onclick="window.fbLogout()" class="bg-red-600 px-3 py-1 rounded text-white text-[10px] font-bold uppercase">Quitter</button></div>`;
-                
+                const logoutBtn = `<div class="flex flex-col items-center"><span class="text-accent text-[10px] font-bold">${name}</span><button id="logout-btn" class="bg-red-600 px-3 py-1 rounded text-white text-[10px] font-bold uppercase">Déconnexion</button></div>`;
                 dActions.innerHTML = logoutBtn;
-                mActions.innerHTML = `<p class="text-accent text-xs font-bold">Connecté : ${name}</p><button onclick="window.fbLogout()" class="mobile-link bg-red-600 text-center font-bold">Déconnexion</button>`;
+                mActions.innerHTML = `<span class="text-accent text-sm font-bold block">Connecté: ${name}</span><button id="logout-btn-m" class="bg-red-600 w-full py-2 rounded text-white font-bold text-xs uppercase">Se déconnecter</button>`;
                 
-                if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
-                loadVideos(isAdmin);
+                const logActions = [document.getElementById('logout-btn'), document.getElementById('logout-btn-m')];
+                logActions.forEach(btn => btn?.addEventListener('click', () => signOut(auth).then(() => window.location.reload())));
+
+                if (user.uid === ADMIN_UID) document.getElementById('admin-section').classList.remove('hidden');
+                loadVideos(user.uid === ADMIN_UID);
             } else {
                 const loginBtn = `<a href="login.html" class="bg-accent py-2 px-5 text-sm font-bold rounded-full text-white">Se Connecter</a>`;
                 dActions.innerHTML = loginBtn;
@@ -129,8 +116,6 @@
                 loadVideos(false);
             }
         });
-
-        window.fbLogout = () => signOut(auth).then(() => window.location.reload());
 
         function loadVideos(isAdmin) {
             onSnapshot(query(collection(db, "youtube_videos"), orderBy("createdAt", "desc")), (snap) => {
@@ -141,15 +126,13 @@
                     const card = document.createElement('div');
                     card.className = "bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200";
                     card.innerHTML = `
-                        <div class="aspect-video">
-                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/${v.youtubeId}" frameborder="0" allowfullscreen></iframe>
-                        </div>
+                        <div class="aspect-video"><iframe class="w-full h-full" src="https://www.youtube.com/embed/${v.youtubeId}" frameborder="0" allowfullscreen></iframe></div>
                         <div class="p-6">
                             <div class="flex justify-between items-start">
                                 <h3 class="text-lg font-bold text-brand-dark mb-2">${v.title}</h3>
                                 ${isAdmin ? `<button onclick="window.delVideo('${id}')" class="text-red-500 text-[10px] font-bold">SUPPRIMER</button>` : ''}
                             </div>
-                            <p class="text-gray-600 text-xs">${v.description || ''}</p>
+                            <p class="text-gray-600 text-sm">${v.description || ''}</p>
                         </div>`;
                     list.appendChild(card);
                 });
@@ -158,9 +141,13 @@
 
         document.getElementById('add-video-form').onsubmit = async (e) => {
             e.preventDefault();
+            const url = document.getElementById('v-url').value;
+            const yId = extractID(url);
+            if(!yId) return alert("Lien YouTube invalide !");
+
             await addDoc(collection(db, "youtube_videos"), {
                 title: document.getElementById('v-title').value,
-                youtubeId: document.getElementById('v-id').value,
+                youtubeId: yId,
                 description: document.getElementById('v-desc').value,
                 createdAt: serverTimestamp()
             });
@@ -169,7 +156,7 @@
 
         window.delVideo = async (id) => { if(confirm("Supprimer cette vidéo ?")) await deleteDoc(doc(db, "youtube_videos", id)); };
 
-        // Mobile Menu logic
+        // Menu Toggle
         const menu = document.getElementById('mobile-menu');
         const overlay = document.getElementById('mobile-menu-overlay');
         document.getElementById('menu-button').onclick = () => { menu.classList.add('open'); overlay.classList.add('open'); };
