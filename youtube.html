@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Vidéos YouTube</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         :root { --brand-dark: #1E3A8A; --accent: #F59E0B; font-family: 'Inter', sans-serif; }
@@ -15,10 +14,12 @@
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
         .nav-link:hover { background-color: #345b85; }
         .active-link-desktop { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
+        
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
         #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
         #mobile-menu-overlay.open { display: block; }
+        
         .mobile-link { display: block; padding: 0.75rem 1rem; color: white; font-weight: 500; border-radius: 0.5rem; }
         .active-link-mobile { background-color: var(--accent); color: var(--brand-dark); font-weight: 700; }
     </style>
@@ -33,7 +34,7 @@
             </a>
             <nav class="hidden sm:flex items-center space-x-4">
                 <a href="index.html" class="nav-link">Accueil</a>
-                <a href="services.html" class="nav-link">Services (Livre)</a>
+                <a href="services.html" class="nav-link">Services</a>
                 <a href="about.html" class="nav-link">À Propos</a>
                 <a href="youtube.html" class="nav-link active-link-desktop">Vidéos YouTube</a>
                 <div id="auth-actions-desktop" class="flex items-center ml-4 pl-4 border-l border-blue-800"></div>
@@ -48,29 +49,32 @@
         <div class="pt-12 flex flex-col h-full">
             <div class="space-y-2">
                 <a href="index.html" class="mobile-link">Accueil</a>
-                <a href="services.html" class="mobile-link">Services (Livre)</a>
+                <a href="services.html" class="mobile-link">Services</a>
                 <a href="about.html" class="mobile-link">À Propos</a>
                 <a href="youtube.html" class="mobile-link active-link-mobile">Vidéos YouTube</a>
-                
                 <div id="auth-actions-mobile" class="pt-4 border-t border-blue-800 mt-4 space-y-3"></div>
             </div>
         </div>
     </nav>
 
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-12">
-        <div id="admin-section" class="bg-white p-6 rounded-2xl shadow-lg mb-12 border-2 border-accent hidden">
-            <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase">Publier une nouvelle vidéo</h2>
-            <form id="add-video-form" class="space-y-4">
-                <input type="text" id="v-title" required class="w-full border p-3 rounded-lg" placeholder="Titre de la vidéo">
-                <input type="url" id="v-url" required class="w-full border p-3 rounded-lg" placeholder="Collez le lien YouTube ici (ex: https://www.youtube.com/watch?v=...)">
-                <textarea id="v-desc" rows="2" class="w-full border p-3 rounded-lg" placeholder="Petite description..."></textarea>
-                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg hover:bg-blue-900 transition">PUBLIER</button>
-            </form>
+        
+        <div class="text-center mb-6">
+            <h1 class="text-4xl font-extrabold text-brand-dark mb-4">Vidéos YouTube</h1>
+            <a href="https://www.youtube.com/@VOTRE_CHAINE" target="_blank" class="inline-flex items-center bg-red-600 text-white px-6 py-2 rounded-full font-bold hover:bg-red-700 transition shadow-lg uppercase text-sm">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 4-8 4z"/></svg>
+                Suivez notre chaîne
+            </a>
         </div>
 
-        <div class="text-center mb-16">
-            <h1 class="text-4xl font-extrabold text-brand-dark mb-2">Vidéos YouTube</h1>
-            <p class="text-gray-600">Formations et analyses en Droit OHADA</p>
+        <div id="admin-section" class="bg-white p-6 rounded-2xl shadow-lg mb-12 border-2 border-accent hidden">
+            <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase">Publier une vidéo</h2>
+            <form id="add-video-form" class="space-y-4">
+                <input type="text" id="v-title" required class="w-full border p-3 rounded-lg" placeholder="Titre de la vidéo">
+                <input type="url" id="v-url" required class="w-full border p-3 rounded-lg" placeholder="Lien YouTube (ex: https://www.youtube.com/watch?v=...)">
+                <textarea id="v-desc" rows="2" class="w-full border p-3 rounded-lg" placeholder="Description initiale..."></textarea>
+                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg uppercase hover:bg-blue-900 transition">Publier maintenant</button>
+            </form>
         </div>
 
         <div id="videos-list" class="grid md:grid-cols-2 gap-8">
@@ -81,14 +85,13 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const fb = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
         const app = initializeApp(fb); const auth = getAuth(app); const db = getFirestore(app);
         const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
         setPersistence(auth, browserSessionPersistence);
 
-        // Utility to extract ID from various YouTube link formats
         function extractID(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
@@ -98,23 +101,25 @@
         onAuthStateChanged(auth, (user) => {
             const dActions = document.getElementById('auth-actions-desktop');
             const mActions = document.getElementById('auth-actions-mobile');
+            const isAdmin = user && user.uid === ADMIN_UID;
+
             if (user) {
                 const name = user.email.split('@')[0];
-                const logoutBtn = `<div class="flex flex-col items-center"><span class="text-accent text-[10px] font-bold">${name}</span><button id="logout-btn" class="bg-red-600 px-3 py-1 rounded text-white text-[10px] font-bold uppercase">Déconnexion</button></div>`;
-                dActions.innerHTML = logoutBtn;
-                mActions.innerHTML = `<span class="text-accent text-sm font-bold block">Connecté: ${name}</span><button id="logout-btn-m" class="bg-red-600 w-full py-2 rounded text-white font-bold text-xs uppercase">Se déconnecter</button>`;
+                const logoutUI = `<div class="flex flex-col items-center"><span class="text-accent text-[10px] font-bold">${name}</span><button id="lo-btn" class="bg-red-600 px-3 py-1 rounded text-white text-[10px] font-bold uppercase">Déconnexion</button></div>`;
+                dActions.innerHTML = logoutUI;
+                mActions.innerHTML = `<span class="text-accent text-sm font-bold block">Connecté: ${name}</span><button id="lo-btn-m" class="bg-red-600 w-full py-2 rounded text-white font-bold text-xs uppercase">Déconnexion</button>`;
                 
-                const logActions = [document.getElementById('logout-btn'), document.getElementById('logout-btn-m')];
-                logActions.forEach(btn => btn?.addEventListener('click', () => signOut(auth).then(() => window.location.reload())));
-
-                if (user.uid === ADMIN_UID) document.getElementById('admin-section').classList.remove('hidden');
-                loadVideos(user.uid === ADMIN_UID);
+                const btns = [document.getElementById('lo-btn'), document.getElementById('lo-btn-m')];
+                btns.forEach(b => b?.addEventListener('click', () => signOut(auth).then(() => window.location.reload())));
+                
+                if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
             } else {
-                const loginBtn = `<a href="login.html" class="bg-accent py-2 px-5 text-sm font-bold rounded-full text-white">Se Connecter</a>`;
-                dActions.innerHTML = loginBtn;
-                mActions.innerHTML = `<a href="login.html" class="mobile-link bg-accent text-brand-dark text-center font-bold">Se Connecter</a>`;
-                loadVideos(false);
+                const loginUI = `<a href="login.html" class="bg-accent py-2 px-5 text-sm font-bold rounded-full text-white">Connexion</a>`;
+                dActions.innerHTML = loginUI;
+                mActions.innerHTML = `<a href="login.html" class="mobile-link bg-accent text-brand-dark text-center font-bold">Connexion</a>`;
             }
+            // On charge les vidéos même si non connecté
+            loadVideos(isAdmin);
         });
 
         function loadVideos(isAdmin) {
@@ -124,39 +129,60 @@
                 snap.forEach((ds) => {
                     const v = ds.data(); const id = ds.id;
                     const card = document.createElement('div');
-                    card.className = "bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200";
+                    card.className = "bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 flex flex-col";
                     card.innerHTML = `
                         <div class="aspect-video"><iframe class="w-full h-full" src="https://www.youtube.com/embed/${v.youtubeId}" frameborder="0" allowfullscreen></iframe></div>
-                        <div class="p-6">
-                            <div class="flex justify-between items-start">
-                                <h3 class="text-lg font-bold text-brand-dark mb-2">${v.title}</h3>
-                                ${isAdmin ? `<button onclick="window.delVideo('${id}')" class="text-red-500 text-[10px] font-bold">SUPPRIMER</button>` : ''}
+                        <div class="p-5 flex-grow">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-brand-dark leading-tight">${v.title}</h3>
+                                <button onclick="window.handleLike('${id}')" class="flex items-center space-x-1 text-gray-400 hover:text-red-500 transition">
+                                    <span class="text-lg">❤️</span>
+                                    <span class="text-xs font-bold">${v.likesCount || 0}</span>
+                                </button>
                             </div>
-                            <p class="text-gray-600 text-sm">${v.description || ''}</p>
+                            <div class="mt-3">
+                                ${isAdmin ? 
+                                    `<textarea onblur="window.updateDesc('${id}', this.value)" class="w-full text-sm border p-2 rounded bg-blue-50 focus:ring-1 focus:ring-accent" rows="2">${v.description || ''}</textarea>` 
+                                    : `<p class="text-sm text-gray-600 line-clamp-3">${v.description || 'Pas de description.'}</p>`
+                                }
+                            </div>
+                            ${isAdmin ? `<button onclick="window.delVideo('${id}')" class="text-red-500 text-[10px] font-bold mt-4 uppercase">Supprimer la vidéo</button>` : ''}
                         </div>`;
                     list.appendChild(card);
                 });
             });
         }
 
+        // Action: Publier
         document.getElementById('add-video-form').onsubmit = async (e) => {
             e.preventDefault();
-            const url = document.getElementById('v-url').value;
-            const yId = extractID(url);
+            const yId = extractID(document.getElementById('v-url').value);
             if(!yId) return alert("Lien YouTube invalide !");
-
             await addDoc(collection(db, "youtube_videos"), {
                 title: document.getElementById('v-title').value,
                 youtubeId: yId,
                 description: document.getElementById('v-desc').value,
+                likesCount: 0,
                 createdAt: serverTimestamp()
             });
             e.target.reset();
         };
 
+        // Action: Liker (nécessite d'être connecté)
+        window.handleLike = async (id) => {
+            if(!auth.currentUser) return alert("Veuillez vous connecter pour liker cette vidéo.");
+            const vRef = doc(db, "youtube_videos", id);
+            await updateDoc(vRef, { likesCount: increment(1) });
+        };
+
+        // Action: Modifier description (Admin)
+        window.updateDesc = async (id, val) => {
+            await updateDoc(doc(db, "youtube_videos", id), { description: val });
+        };
+
         window.delVideo = async (id) => { if(confirm("Supprimer cette vidéo ?")) await deleteDoc(doc(db, "youtube_videos", id)); };
 
-        // Menu Toggle
+        // Menu Mobile logic
         const menu = document.getElementById('mobile-menu');
         const overlay = document.getElementById('mobile-menu-overlay');
         document.getElementById('menu-button').onclick = () => { menu.classList.add('open'); overlay.classList.add('open'); };
