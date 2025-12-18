@@ -68,12 +68,12 @@
         </div>
 
         <div id="admin-section" class="bg-white p-6 rounded-2xl shadow-lg mb-12 border-2 border-accent hidden">
-            <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase">Publier une vidéo</h2>
-            <form id="add-video-form" class="space-y-4">
+            <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase text-center">Publier une vidéo</h2>
+            <form id="add-video-form" class="space-y-4 max-w-2xl mx-auto">
                 <input type="text" id="v-title" required class="w-full border p-3 rounded-lg" placeholder="Titre de la vidéo">
-                <input type="url" id="v-url" required class="w-full border p-3 rounded-lg" placeholder="Lien YouTube complet...">
-                <textarea id="v-desc" rows="2" class="w-full border p-3 rounded-lg" placeholder="Description initiale..."></textarea>
-                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg uppercase hover:bg-blue-900 transition">Publier</button>
+                <input type="url" id="v-url" required class="w-full border p-3 rounded-lg" placeholder="Lien YouTube complet (ex: https://www.youtube.com/watch?v=...)">
+                <textarea id="v-desc" rows="2" class="w-full border p-3 rounded-lg" placeholder="Description de la vidéo..."></textarea>
+                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg uppercase hover:bg-blue-900 transition shadow-md">Publier sur le site</button>
             </form>
         </div>
 
@@ -81,6 +81,21 @@
             <div id="loader" class="col-span-2 flex justify-center py-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div></div>
         </div>
     </main>
+
+    <footer class="w-full bg-brand-dark border-t border-gray-700 py-8">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-white font-bold text-lg mb-2">MindCompta Finance</p>
+            <p class="text-gray-400 text-sm mb-6">Expertise en Droit OHADA et Comptabilité.</p>
+            <div class="flex justify-center space-x-6 mb-8">
+                <a href="index.html" class="text-gray-400 hover:text-white transition text-xs">Accueil</a>
+                <a href="services.html" class="text-gray-400 hover:text-white transition text-xs">Services</a>
+                <a href="youtube.html" class="text-gray-400 hover:text-white transition text-xs">YouTube</a>
+            </div>
+            <p class="text-gray-500 text-[10px] tracking-widest uppercase">
+                &copy; 2025 MindCompta. Tous droits réservés.
+            </p>
+        </div>
+    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -126,7 +141,6 @@
                 const isLoggedIn = auth.currentUser !== null;
 
                 snap.forEach((ds, index) => {
-                    // Restriction logic: Only first video if not logged in
                     if (!isLoggedIn && index > 0) return;
 
                     const v = ds.data(); const id = ds.id;
@@ -184,7 +198,6 @@
 
         window.delVideo = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "youtube_videos", id)); };
 
-        // Menu Mobile
         const menu = document.getElementById('mobile-menu');
         const overlay = document.getElementById('mobile-menu-overlay');
         document.getElementById('menu-button').onclick = () => { menu.classList.add('open'); overlay.classList.add('open'); };
