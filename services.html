@@ -266,9 +266,16 @@
             e.target.reset(); alert("Livre ajouté !");
         };
 
-        const toggle = () => { document.getElementById('mobile-menu').classList. toggle ('open' )
-document.getElementById( 'mobile-menu-over lay').classList.toggle('open ');
-tton').onclick
-ementById( 'close-menu-button' ).onclick toggle; document.getElementBy Id ('mobile -menu -overlay').onclick = toggle;
+        // --- FIN DU SCRIPT MANQUANT ---
+        const toggle = () => { 
+            document.getElementById('mobile-menu').classList.toggle('open'); 
+            document.getElementById('mobile-menu-overlay').classList.toggle('open'); 
+        };
+        document.getElementById('menu-button').onclick = toggle; 
+        document.getElementById('close-menu-button').onclick = toggle; 
+        document.getElementById('mobile-menu-overlay').onclick = toggle;
+
+        window.signOut = (a) => signOut(a).then(() => window.location.reload());
+    </script>
 </body>
 </html>
