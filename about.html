@@ -4,336 +4,309 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - À Propos de Nous</title>
-    <!-- Chargement de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
-        /* Import the Inter font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
-        /* Brand Colors (Standardized) */
         :root {
-            --brand-dark: #1E3A8A; /* Deep Blue (Indigo-900) */
-            --accent: #F59E0B; /* Vivid Orange / Gold (Amber-500) */
-            --vibrant-green: #10B981; /* Bright Green (Emerald-500) */
+            --brand-dark: #1E3A8A;
+            --accent: #F59E0B;
             font-family: 'Inter', sans-serif;
         }
-
-        /* Custom Tailwind classes for colors */
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
         .hover-accent:hover { background-color: #D97706; } 
-        .bg-vibrant-green { background-color: var(--vibrant-green); }
 
-        /* Navigation Link Styles - Desktop */
         .nav-link {
             color: white;
             font-weight: 500;
             padding: 0.5rem 0.75rem;
             border-radius: 0.5rem;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
         }
-        .nav-link:hover {
-            background-color: #345b85;
-        }
+        .nav-link:hover { background-color: #345b85; }
         .active-link-desktop {
             background-color: var(--accent);
             font-weight: 600;
             color: var(--brand-dark) !important;
         }
 
-        /* Mobile Menu Styles (Off-Canvas) */
+        /* Menu Mobile Off-Canvas */
         #mobile-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 280px;
+            height: 100%;
+            background-color: var(--brand-dark);
             transform: translateX(100%);
             transition: transform 0.3s ease-in-out;
-            z-index: 50; 
+            z-index: 100;
+            padding: 2rem;
+            box-shadow: -10px 0 15px -3px rgba(0, 0, 0, 0.1);
         }
-        #mobile-menu.open {
-            transform: translateX(0);
-        }
-        /* Overlay */
+        #mobile-menu.open { transform: translateX(0); }
+        
         #mobile-menu-overlay {
-            display: none; 
-            z-index: 40;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+            z-index: 90;
         }
         #mobile-menu-overlay.open {
-            display: block;
+            opacity: 1;
+            visibility: visible;
         }
+
         .mobile-link {
             display: block;
             padding: 0.75rem 1rem;
             color: white;
             font-weight: 500;
             border-radius: 0.5rem;
-            transition: background-color 0.2s;
+            margin-bottom: 0.5rem;
         }
-        .mobile-link.active-link-mobile {
+        .active-link-mobile {
             background-color: var(--accent);
             color: var(--brand-dark);
             font-weight: 700;
-        }
-        .mobile-link-btn {
-             display: block;
-             width: 100%;
-             text-align: center;
         }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- HEADER AND NAVIGATION -->
+    <!-- HEADER -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between items-center">
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center group">
+                <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
+                     class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
+                <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
+            </a>
 
-                <!-- LOGO/BRAND (CLICKABLE) -->
-                <a href="index.html" class="flex items-center group">
-                    <img src="logo.jpg" 
-                         alt="MindCompta Logo" 
-                         onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
-                         class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
-                    <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
-                </a>
+            <!-- Menu Bureau -->
+            <nav class="hidden sm:flex items-center space-x-2">
+                <a href="index.html" class="nav-link">Accueil</a>
+                <a href="services.html" class="nav-link">Services</a>
+                <a href="about.html" class="nav-link active-link-desktop">À Propos</a>
+                <a href="youtube.html" class="nav-link">Vidéos</a>
+                <div id="auth-actions-desktop" class="flex items-center space-x-3 ml-4"></div>
+            </nav>
 
-                <!-- DESKTOP NAVIGATION -->
-                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
-                    <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="services.html" class="nav-link">Services (Livre)</a>
-                    <a href="about.html" class="nav-link active-link-desktop">À Propos</a>
-                    <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
-
-                    <!-- Action Buttons and User Info (Managed by JS) -->
-                    <div id="auth-actions-desktop" class="flex items-center space-x-3">
-                        <!-- Default content, replaced by JS if connected -->
-                        <a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                            Se Connecter
-                        </a>
-                    </div>
-                </nav>
-
-                <!-- MOBILE MENU BUTTON -->
-                <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-            </div>
+            <!-- Bouton Menu Mobile -->
+            <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] focus:outline-none" aria-label="Ouvrir le menu">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
         </div>
     </header>
 
-    <!-- MOBILE MENU OFF-CANVAS -->
-    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
-        <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none">
-            &times;
-        </button>
-        <div class="pt-12 space-y-3">
-            <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
-
+    <!-- Menu Mobile (Off-Canvas) -->
+    <div id="mobile-menu-overlay"></div>
+    <nav id="mobile-menu">
+        <div class="flex justify-between items-center mb-8">
+            <span class="text-accent font-bold text-lg uppercase">Menu</span>
+            <button id="close-menu-button" class="text-white text-3xl focus:outline-none">&times;</button>
+        </div>
+        <div class="space-y-2">
             <a href="index.html" class="mobile-link">Accueil</a>
-            <a href="services.html" class="mobile-link">Services (Livre)</a>
+            <a href="services.html" class="mobile-link">Services</a>
             <a href="about.html" class="mobile-link active-link-mobile">À Propos</a>
-            <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
-
-            <!-- Authentication Actions Container (Filled by JS) -->
-            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
-                <!-- Default content, replaced by JS if connected -->
-                <a href="login.html" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
-            </div>
+            <a href="youtube.html" class="mobile-link">Vidéos</a>
+            <div id="auth-actions-mobile" class="pt-6 border-t border-gray-700 mt-6 space-y-3"></div>
         </div>
     </nav>
-    <!-- END MOBILE MENU -->
 
-    <!-- CONTENU PRINCIPAL -->
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-16 md:py-24">
-
-        <div class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-brand-dark mb-4">Notre Mission : Simplifier l'OHADA</h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                MindCompta a été créé pour transformer l'accès à la finance et au droit comptable en Afrique.
-            </p>
+    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-12">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-extrabold text-brand-dark mb-4">Notre Mission : Simplifier l'OHADA</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">MindCompta transforme l'accès au droit comptable en Afrique.</p>
         </div>
 
-        <!-- Section 1 : Notre Philosophie -->
-        <section class="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-gray-200 mb-16">
+        <!-- Section Contact Affichage Public -->
+        <section class="grid md:grid-cols-2 gap-8 mb-16">
+            <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
+                <h2 class="text-2xl font-bold text-brand-dark mb-6 border-b pb-2">Nos Coordonnées</h2>
+                <ul class="space-y-6">
+                    <li class="flex items-start">
+                        <span class="text-accent text-2xl mr-4">📍</span>
+                        <div>
+                            <p class="font-bold text-gray-800">Adresse</p>
+                            <p id="display-address" class="text-gray-600 italic">Chargement...</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-accent text-2xl mr-4">📞</span>
+                        <div>
+                            <p class="font-bold text-gray-800">Téléphone</p>
+                            <p id="display-phone" class="text-gray-600">Chargement...</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-accent text-2xl mr-4">📧</span>
+                        <div>
+                            <p class="font-bold text-gray-800">Email Professionnel</p>
+                            <p id="display-email" class="text-gray-600">Chargement...</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
 
-            <div class="text-center">
-                <h2 class="text-3xl font-bold text-brand-dark mb-6">Un Partenaire pour la Conformité et la Croissance</h2>
+            <div class="bg-brand-dark text-white p-8 rounded-2xl shadow-lg flex flex-col justify-center">
+                <h2 class="text-2xl font-bold mb-4">Un accompagnement sur mesure</h2>
+                <p class="mb-6 opacity-90">Nos experts OHADA vous répondent pour toute question relative à votre comptabilité ou fiscalité.</p>
+                <a href="services.html" class="bg-accent text-center py-3 rounded-xl font-bold uppercase tracking-wider hover:scale-105 transition shadow-xl text-brand-dark">Découvrir nos services</a>
+            </div>
+        </section>
+
+        <!-- Section Admin : Mise à jour des informations -->
+        <div id="admin-info-panel" class="hidden bg-blue-50 border-2 border-blue-200 p-8 rounded-2xl shadow-inner mb-16">
+            <h3 class="text-xl font-bold text-brand-dark mb-4 flex items-center">
+                <span class="mr-2">⚙️</span> Gestion des informations de contact
+            </h3>
+            <p class="text-sm text-gray-500 mb-6 italic">Modifiez les champs ci-dessous pour mettre à jour les informations visibles par tous.</p>
+            
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-400 uppercase">Adresse</label>
+                    <input type="text" id="input-address" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-400 uppercase">Téléphone</label>
+                    <input type="text" id="input-phone" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-400 uppercase">Email</label>
+                    <input type="email" id="input-email" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent outline-none">
+                </div>
             </div>
             
-            <div class="grid md:grid-cols-2 gap-8 items-start">
-                <div>
-                    <h3 class="text-2xl font-semibold text-gray-800 mb-3 flex items-center">
-                        <span class="text-accent mr-3">🚀</span> Notre Vision
-                    </h3>
-                    <p class="text-gray-600 mb-4">
-                        Nous visons un avenir où chaque entrepreneur et professionnel de la finance en Afrique de l'Ouest puisse accéder facilement, rapidement et avec certitude aux outils nécessaires pour la conformité OHADA. Fini les recherches fastidieuses et les risques d'erreurs dues à des calculs manuels.
-                    </p>
-                    <p class="text-gray-600">
-                        MindCompta est le pont entre la complexité réglementaire et la simplicité opérationnelle, vous permettant de vous concentrer sur ce qui compte : la croissance de votre activité.
-                    </p>
-                </div>
-                <div>
-                    <h3 class="text-2xl font-semibold text-gray-800 mb-3 flex items-center">
-                        <span class="text-accent mr-3">🤝</span> Notre Engagement
-                    </h3>
-                    <p class="text-gray-600 mb-4">
-                        Nous nous engageons à maintenir nos ressources à jour avec les dernières révisions de l'OHADA. La fiabilité de nos outils est notre priorité absolue. Nous croyons que la démocratisation du savoir financier est essentielle pour le développement économique régional.
-                    </p>
-                    <p class="text-gray-600">
-                        Rejoignez la communauté MindCompta pour transformer la manière dont vous abordez vos obligations comptables et fiscales.
-                    </p>
-                </div>
+            <div class="mt-6 flex items-center gap-4">
+                <button id="update-info-btn" class="bg-brand-dark text-white px-8 py-3 rounded-lg font-bold hover:bg-black transition shadow-md">
+                    Enregistrer les modifications
+                </button>
+                <p id="update-status" class="hidden text-sm font-semibold"></p>
             </div>
-        </section>
-
-        <!-- Section 2 : Nos Valeurs et Engagement -->
-        <section class="mb-16">
-            <h2 class="text-3xl font-bold text-center text-brand-dark mb-10">Nos Valeurs</h2>
-            <div class="grid md:grid-cols-3 gap-8 text-center">
-
-                <div class="p-6 bg-white rounded-xl shadow-lg border-b-4 border-accent">
-                    <div class="text-accent text-4xl mb-3">🎯</div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Précision</h3>
-                    <p class="text-gray-500 text-sm">Des outils de calcul et des sources réglementaires d'une exactitude irréprochable.</p>
-                </div>
-
-                <div class="p-6 bg-white rounded-xl shadow-lg border-b-4 border-accent">
-                    <div class="text-accent text-4xl mb-3">🌐</div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Accessibilité</h3>
-                    <p class="text-gray-500 text-sm">Rendre l'information financière complexe simple et disponible pour tous, partout.</p>
-                </div>
-
-                <div class="p-6 bg-white rounded-xl shadow-lg border-b-4 border-accent">
-                    <div class="text-accent text-4xl mb-3">💡</div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Innovation</h3>
-                    <p class="text-gray-500 text-sm">Utiliser les meilleures technologies pour automatiser les tâches complexes.</p>
-                </div>
-            </div>
-        </section>
-
-        <div class="text-center mt-12 p-8 bg-brand-dark rounded-xl shadow-2xl">
-            <h3 class="text-3xl font-bold text-white mb-4">Prêt à simplifier votre conformité ?</h3>
-            <a href="login.html" class="inline-block py-3 px-8 text-lg font-semibold text-brand-dark rounded-full bg-accent hover-accent transition duration-300 shadow-xl transform hover:scale-105 text-white">
-                Accéder aux Outils
-            </a>
         </div>
-
     </main>
 
-    <!-- PIED DE PAGE -->
-    <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
+    <footer class="w-full bg-brand-dark py-6 mt-auto">
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- JAVASCRIPT LOGIC AND AUTHENTICATION (LOCAL STORAGE) -->
     <script type="module">
-        // Page de redirection en cas de déconnexion ou d'accès non autorisé
-        const REDIRECTION_PAGE = 'login.html'; 
-        const ADMIN_ROLE = 'Admin';
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- GESTION DE LA SESSION ---
+        const firebaseConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        /** Gère la déconnexion de l'utilisateur. */
-        function handleLogout() {
-            // Suppression des informations de session du stockage local
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userRole');
-            // Redirection vers la page d'accueil pour réinitialiser l'état
-            window.location.href = 'index.html'; 
-        }
+        // UID Josué (Admin)
+        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
+        const APP_ID = "mindcompta-finance";
+        const configDocRef = doc(db, "artifacts", APP_ID, "public", "data", "contactInfo");
+        
+        // --- Navigation Mobile Logic ---
+        const menuBtn = document.getElementById('menu-button');
+        const closeMenuBtn = document.getElementById('close-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('mobile-menu-overlay');
 
-        /**
-         * Vérifie l'état de la session et met à jour l'interface utilisateur.
-         */
-        function checkSessionAndRenderHeader() {
-            const userName = localStorage.getItem('userName');
-            const userRole = localStorage.getItem('userRole');
-
-            // Log de vérification pour le débogage
-            console.log(`[About Page] Session Check: User Name is ${userName ? userName : 'DISCONNECTED'}`);
-
-            const desktopActions = document.getElementById('auth-actions-desktop');
-            const mobileActions = document.getElementById('auth-actions-mobile');
-
-            // --- Utilisateur Connecté ---
-            if (userName) {
-                const isUserAdmin = userRole === ADMIN_ROLE;
-
-                // 1. Desktop Actions (Cache "Se Connecter" et affiche le profil/déconnexion)
-                const adminButtonHtml = isUserAdmin 
-                    ? `<a href="admin.html" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
-                    : '';
-                
-                desktopActions.innerHTML = `
-                    ${adminButtonHtml}
-                    <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
-                        <span class="hidden sm:inline">Bienvenue,</span> ${userName}
-                    </span>
-                    <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
-                        Déconnexion
-                    </button>
-                `;
-
-                // 2. Mobile Actions
-                mobileActions.innerHTML = `
-                    ${isUserAdmin ? 
-                        `<a href="admin.html" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
-                        : ''}
-                    <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
-                    <p class="text-white text-md font-semibold mb-3">${userName}</p>
-                    <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
-                `;
-
-                // 3. Attacher les écouteurs de déconnexion
-                document.getElementById('logout-desktop-btn')?.addEventListener('click', handleLogout);
-                document.getElementById('logout-mobile-btn')?.addEventListener('click', handleLogout);
-                
+        function toggleMenu(isOpen) {
+            if (isOpen) {
+                mobileMenu.classList.add('open');
+                overlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
             } else {
-                // --- Utilisateur Déconnecté ---
-                
-                // 1. Desktop Actions (Affiche uniquement "Se Connecter")
-                desktopActions.innerHTML = `
-                    <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                        Se Connecter
-                    </a>
-                `;
-
-                // 2. Mobile Actions
-                mobileActions.innerHTML = `
-                    <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
-                `;
-            }
-        }
-
-        // --- GESTIONNAIRE DU MENU MOBILE (Off-Canvas) ---
-        const elements = {
-            mobileMenu: document.getElementById('mobile-menu'),
-            overlay: document.getElementById('mobile-menu-overlay'),
-            menuButton: document.getElementById('menu-button'),
-            closeMenuButton: document.getElementById('close-menu-button'),
-        };
-
-        function toggleMobileMenu(isOpen) {
-            const isOpening = isOpen === undefined ? !elements.mobileMenu.classList.contains('open') : isOpen;
-            if (isOpening) {
-                elements.mobileMenu.classList.add('open');
-                elements.overlay.classList.add('open');
-                document.body.style.overflow = 'hidden'; 
-            } else {
-                elements.mobileMenu.classList.remove('open');
-                elements.overlay.classList.remove('open');
+                mobileMenu.classList.remove('open');
+                overlay.classList.remove('open');
                 document.body.style.overflow = '';
             }
         }
-        elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
-        elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
-        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
 
-        // --- Exécution principale ---
-        document.addEventListener('DOMContentLoaded', checkSessionAndRenderHeader);
+        menuBtn.addEventListener('click', () => toggleMenu(true));
+        closeMenuBtn.addEventListener('click', () => toggleMenu(false));
+        overlay.addEventListener('click', () => toggleMenu(false));
 
+        // --- Récupération des infos de contact ---
+        onSnapshot(configDocRef, (snap) => {
+            if (snap.exists()) {
+                const data = snap.data();
+                document.getElementById('display-address').innerText = data.address || "Non configurée";
+                document.getElementById('display-phone').innerText = data.phone || "Non configuré";
+                document.getElementById('display-email').innerText = data.email || "Non configuré";
+                
+                if(document.getElementById('input-address')) {
+                    document.getElementById('input-address').value = data.address || "";
+                    document.getElementById('input-phone').value = data.phone || "";
+                    document.getElementById('input-email').value = data.email || "";
+                }
+            }
+        });
+
+        // --- Authentification et Interface ---
+        onAuthStateChanged(auth, async (user) => {
+            const desktopActions = document.getElementById('auth-actions-desktop');
+            const mobileActions = document.getElementById('auth-actions-mobile');
+            const adminPanel = document.getElementById('admin-info-panel');
+
+            if (user) {
+                const isAdmin = user.uid === ADMIN_UID;
+                if (isAdmin) adminPanel.classList.remove('hidden');
+
+                const logoutHtml = `<button id="logout-btn" class="bg-red-500 py-1 px-4 text-xs rounded-full text-white hover:bg-red-600 transition">Quitter</button>`;
+                
+                desktopActions.innerHTML = `
+                    <span class="text-accent text-xs font-bold uppercase">Mode Admin</span>
+                    ${logoutHtml}
+                `;
+                mobileActions.innerHTML = `
+                    <p class="text-accent font-bold text-sm mb-4">Connecté : Josué</p>
+                    <button id="logout-mobile-btn" class="w-full bg-red-500 py-3 rounded-lg font-bold">Déconnexion</button>
+                `;
+
+                const logout = () => signOut(auth).then(() => location.reload());
+                document.getElementById('logout-btn')?.addEventListener('click', logout);
+                document.getElementById('logout-mobile-btn')?.addEventListener('click', logout);
+            } else {
+                desktopActions.innerHTML = `<a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full text-brand-dark shadow-lg">Connexion</a>`;
+                mobileActions.innerHTML = `<a href="login.html" class="mobile-link bg-accent text-center text-brand-dark font-bold">Se Connecter</a>`;
+            }
+        });
+
+        // --- Mise à jour Admin ---
+        document.getElementById('update-info-btn').onclick = async () => {
+            const btn = document.getElementById('update-info-btn');
+            const status = document.getElementById('update-status');
+            btn.disabled = true;
+            btn.innerText = "Enregistrement...";
+
+            try {
+                await setDoc(configDocRef, {
+                    address: document.getElementById('input-address').value,
+                    phone: document.getElementById('input-phone').value,
+                    email: document.getElementById('input-email').value,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+
+                status.innerText = "Modifications enregistrées !";
+                status.className = "text-sm font-semibold text-green-600";
+                status.classList.remove('hidden');
+            } catch (err) {
+                status.innerText = "Erreur Firestore.";
+                status.className = "text-sm font-semibold text-red-600";
+                status.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Enregistrer les modifications";
+                setTimeout(() => status.classList.add('hidden'), 3000);
+            }
+        };
     </script>
 </body>
 </html>
