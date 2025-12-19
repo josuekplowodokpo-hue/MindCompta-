@@ -3,173 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCompta Finance - Conseil OHADA et Fiscalité</title>
+    <title>MindCompta Finance - Accueil</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
         :root {
             --brand-dark: #1E3A8A;
             --accent: #F59E0B;
-            --vibrant-green: #10B981;
             font-family: 'Inter', sans-serif;
         }
-
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-        .hover-accent:hover { background-color: #D97706; } 
-
-        /* --- MAGNETIC NOTIFICATION BELL STYLES --- */
-        #notification-bell {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            z-index: 100;
-            cursor: grab;
-            touch-action: none;
-            transition: transform 0.2s, left 0.3s ease-out, right 0.3s ease-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 56px;
-            height: 56px;
-        }
-        #notification-bell:active { cursor: grabbing; }
         
-        .bell-dot {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            height: 14px;
-            width: 14px;
-            background-color: #EF4444;
-            border: 2px solid white;
-            border-radius: 50%;
-            display: none;
-            animation: pulse 2s infinite;
+        #notification-bell {
+            position: fixed; bottom: 100px; right: 20px; z-index: 100;
+            cursor: grab; touch-action: none;
+            transition: transform 0.2s, left 0.3s ease-out, right 0.3s ease-out;
+            display: flex; align-items: center; justify-content: center;
+            width: 56px; height: 56px;
         }
-
+        .bell-dot {
+            position: absolute; top: 2px; right: 2px; height: 14px; width: 14px;
+            background-color: #EF4444; border: 2px solid white; border-radius: 50%;
+            display: none; animation: pulse 2s infinite;
+        }
         @keyframes pulse {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
             70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
-
         #notif-panel {
-            position: fixed;
-            width: 300px;
-            max-height: 400px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 101;
+            position: fixed; width: 300px; max-height: 400px;
+            background: white; border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            display: none; flex-direction: column; overflow: hidden; z-index: 101;
             border: 1px solid #e5e7eb;
         }
-
-        /* Nav & Mobile Menu */
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: all 0.2s; }
         .nav-link:hover { background-color: #345b85; }
-        .active-link-desktop { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
-        
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-50 min-h-screen flex flex-col font-inter">
 
     <!-- Header -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center group">
                 <img src="logo.jpg" alt="[Logo MindCompta]" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
-                <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
+                <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
             </a>
             <nav class="hidden sm:flex items-center space-x-4">
-                <a href="index.html" class="nav-link active-link-desktop text-brand-dark">Accueil</a>
+                <a href="index.html" class="nav-link bg-accent text-brand-dark font-bold">Accueil</a>
                 <a href="services.html" class="nav-link">Services</a>
                 <a href="about.html" class="nav-link">À Propos</a>
                 <a href="youtube.html" class="nav-link">YouTube</a>
+                <div id="admin-link-desktop" class="hidden">
+                    <a href="admin.html" class="nav-link border border-accent text-accent font-bold">Tableau de Bord</a>
+                </div>
                 <div id="auth-actions-desktop"></div>
             </nav>
             <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
         </div>
     </header>
 
-    <!-- Mobile Menu Overlay -->
+    <!-- Mobile Menu -->
     <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
     <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark text-white p-8 shadow-2xl">
         <div class="flex justify-between items-center mb-10">
-            <h2 class="text-xs font-black uppercase tracking-[0.2em] text-white">Navigation</h2>
+            <h2 class="text-xs font-black uppercase tracking-[0.2em] text-white">NAVIGATION</h2>
             <button id="close-menu-button" class="text-3xl text-white/50 hover:text-white transition">&times;</button>
         </div>
-        
         <div class="flex flex-col space-y-3">
             <a href="index.html" class="p-4 bg-accent text-brand-dark rounded-2xl font-black uppercase text-sm shadow-lg">Accueil</a>
             <a href="services.html" class="p-4 hover:bg-white/5 rounded-2xl font-medium transition text-gray-200">Services</a>
+            <a id="admin-link-mobile" href="admin.html" class="p-4 border border-accent text-accent rounded-2xl font-bold hidden text-center uppercase text-sm">Tableau de Bord</a>
             <a href="about.html" class="p-4 hover:bg-white/5 rounded-2xl font-medium transition text-gray-200">À Propos</a>
             <a href="youtube.html" class="p-4 hover:bg-white/5 rounded-2xl font-medium transition text-gray-200">YouTube</a>
-            
-            <div id="auth-actions-mobile" class="pt-8 mt-4 border-t border-white/10 flex flex-col space-y-4">
-                <!-- Chargé via JS -->
-            </div>
+            <div id="auth-actions-mobile" class="pt-8 mt-4 border-t border-white/10 flex flex-col space-y-4"></div>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="w-full max-w-6xl mx-auto mt-6 px-4">
-        <div class="relative bg-brand-dark rounded-3xl h-96 flex items-center justify-center p-10 shadow-2xl overflow-hidden">
-            <img src="compta.jpg" alt="[Image de bureau comptable]" class="w-full h-full object-cover absolute inset-0 opacity-40" onerror="this.style.display='none'">
+        <div class="relative bg-brand-dark rounded-3xl h-80 flex items-center justify-center p-10 shadow-2xl overflow-hidden">
+            <img src="compta.jpg" alt="[Image de Bureau comptable]" class="w-full h-full object-cover absolute inset-0 opacity-40" onerror="this.style.display='none'">
             <div class="relative z-10 text-center text-white max-w-3xl">
-                <h1 class="text-4xl sm:text-6xl font-black mb-4 uppercase italic tracking-tighter">Expertise OHADA</h1>
-                <p class="text-lg font-light mb-8 text-blue-100">Optimisez votre gestion fiscale et comptable avec MindCompta.</p>
-                <a href="services.html" class="bg-accent text-brand-dark font-black py-4 px-10 rounded-full shadow-lg hover:scale-105 transition inline-block">NOS SERVICES</a>
+                <h1 class="text-3xl sm:text-5xl font-black mb-4 uppercase italic tracking-tighter">Votre Partenaire Finance</h1>
+                <p class="text-md font-light mb-6 text-blue-100 italic">L'expertise OHADA au service de votre réussite.</p>
+                <a href="services.html" class="bg-accent text-brand-dark font-black py-3 px-8 rounded-full shadow-lg hover:scale-105 transition inline-block text-sm">NOS SERVICES</a>
             </div>
         </div>
     </section>
 
-    <!-- Advantages Section -->
-    <section class="py-16 max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-white p-8 rounded-2xl shadow-sm border-b-4 border-accent hover:shadow-md transition">
-            <div class="text-4xl mb-4">📜</div>
-            <h3 class="font-bold text-brand-dark mb-2 text-xl">Conformité</h3>
-            <p class="text-gray-500 text-sm">Garantissez que vos pratiques respectent la législation régionale UEMOA.</p>
+    <!-- Nouveautés Section -->
+    <section class="w-full max-w-6xl mx-auto py-12 px-4">
+        <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+            <h2 class="text-2xl font-black text-brand-dark uppercase tracking-tight">Dernières Mises à Jour</h2>
+            <span class="text-[10px] font-bold text-accent uppercase tracking-widest bg-accent/10 px-3 py-1 rounded-full">Actualité</span>
         </div>
-        <div class="bg-white p-8 rounded-2xl shadow-sm border-b-4 border-accent hover:shadow-md transition">
-            <div class="text-4xl mb-4">📈</div>
-            <h3 class="font-bold text-brand-dark mb-2 text-xl">Croissance</h3>
-            <p class="text-gray-500 text-sm">Maximisez votre potentiel avec des plans financiers personnalisés.</p>
-        </div>
-        <div class="bg-white p-8 rounded-2xl shadow-sm border-b-4 border-accent hover:shadow-md transition">
-            <div class="text-4xl mb-4">🌍</div>
-            <h3 class="font-bold text-brand-dark mb-2 text-xl">Proximité</h3>
-            <p class="text-gray-500 text-sm">Une expertise locale profonde pour des conseils d'affaires efficaces.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="recent-updates-grid">
+            <div class="col-span-full py-10 text-center text-gray-400 italic">Chargement des nouveautés...</div>
         </div>
     </section>
 
-    <!-- MAGNETIC NOTIFICATION BELL -->
+    <!-- Floating Bell -->
     <div id="notification-bell" class="bg-brand-dark rounded-full shadow-2xl border-2 border-white/20 select-none">
         <span class="text-2xl">🔔</span>
         <div id="bell-dot" class="bell-dot"></div>
     </div>
 
-    <!-- NOTIFICATION PANEL -->
+    <!-- Notifications Panel -->
     <div id="notif-panel">
         <div class="bg-brand-dark p-4 text-white flex justify-between items-center">
             <h3 class="font-black text-[10px] uppercase tracking-widest">Notifications</h3>
             <button id="close-notif" class="text-white/50 text-xl hover:text-white transition">&times;</button>
         </div>
-        <div id="notif-content" class="p-4 space-y-4 overflow-y-auto bg-gray-50 flex-grow max-h-[300px]">
-            <div class="text-center py-8 text-gray-400 text-xs italic">Chargement des nouvelles...</div>
-        </div>
+        <div id="notif-content" class="p-4 space-y-4 overflow-y-auto bg-gray-50 flex-grow max-h-[300px]"></div>
     </div>
 
-    <footer class="mt-auto bg-brand-dark py-8 text-center text-gray-500 text-[10px] uppercase font-bold tracking-widest">
-        &copy; 2025 MindCompta Finance - Tous droits réservés.
+    <!-- Updated Footer -->
+    <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-12 space-y-8 md:space-y-0 text-center md:text-left">
+                <!-- Brand Info -->
+                <div class="max-w-xs">
+                    <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic">MindCompta Finance</h2>
+                    <p class="text-sm text-gray-400 font-medium">L'expertise comptable et financière simplifiée pour tous. Votre réussite, notre priorité.</p>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="flex flex-col space-y-3">
+                    <h3 class="text-accent font-black text-[10px] uppercase tracking-[0.2em] mb-2">Navigation</h3>
+                    <a href="index.html" class="text-sm hover:text-accent transition">Accueil</a>
+                    <a href="services.html" class="text-sm hover:text-accent transition">Services</a>
+                    <a href="youtube.html" class="text-sm hover:text-accent transition">Vidéos</a>
+                </div>
+
+                <!-- Contact & Social -->
+                <div class="flex flex-col space-y-4 items-center md:items-start">
+                    <h3 class="text-accent font-black text-[10px] uppercase tracking-[0.2em] mb-2">Communauté</h3>
+                    <div class="flex space-x-6">
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent hover:text-brand-dark transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent hover:text-brand-dark transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-500">
+                <p>&copy; 2025 MindCompta Finance. Tous droits réservés.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition">Confidentialité</a>
+                    <a href="#" class="hover:text-white transition">CGU</a>
+                </div>
+            </div>
+        </div>
     </footer>
 
     <script type="module">
@@ -181,132 +178,132 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
-        // --- MAGNETIC BELL LOGIC ---
-        const bell = document.getElementById('notification-bell');
-        const panel = document.getElementById('notif-panel');
-        const bellDot = document.getElementById('bell-dot');
-        let isDragging = false, hasMoved = false;
-        let startX, startY, currentX, currentY;
-
-        const handleStart = (e) => {
-            isDragging = true;
-            hasMoved = false;
-            bell.style.transition = 'none';
-            const touch = e.type.includes('touch') ? e.touches[0] : e;
-            startX = touch.clientX - bell.offsetLeft;
-            startY = touch.clientY - bell.offsetTop;
-        };
-
-        const handleMove = (e) => {
-            if (!isDragging) return;
-            hasMoved = true;
-            const touch = e.type.includes('touch') ? e.touches[0] : e;
-            currentX = touch.clientX - startX;
-            currentY = touch.clientY - startY;
-            
-            currentX = Math.max(10, Math.min(window.innerWidth - 66, currentX));
-            currentY = Math.max(80, Math.min(window.innerHeight - 66, currentY));
-            
-            bell.style.left = `${currentX}px`;
-            bell.style.top = `${currentY}px`;
-            bell.style.right = 'auto';
-            bell.style.bottom = 'auto';
-            panel.style.display = 'none'; 
-        };
-
-        const handleEnd = () => {
-            if (!isDragging) return;
-            isDragging = false;
-            bell.style.transition = 'left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.3s';
-            if (currentX + 28 < window.innerWidth / 2) {
-                bell.style.left = '10px';
-            } else {
-                bell.style.left = `${window.innerWidth - 66}px`;
-            }
-        };
-
-        bell.addEventListener('mousedown', handleStart);
-        window.addEventListener('mousemove', handleMove);
-        window.addEventListener('mouseup', handleEnd);
-        bell.addEventListener('touchstart', handleStart, {passive: false});
-        window.addEventListener('touchmove', handleMove, {passive: false});
-        window.addEventListener('touchend', handleEnd);
-
-        bell.onclick = () => {
-            if (hasMoved) return;
-            const rect = bell.getBoundingClientRect();
-            const isOpen = panel.style.display === 'flex';
-            
-            if (!isOpen) {
-                if (rect.top > window.innerHeight / 2) {
-                    panel.style.bottom = `${window.innerHeight - rect.top + 10}px`;
-                    panel.style.top = 'auto';
-                } else {
-                    panel.style.top = `${rect.bottom + 10}px`;
-                    panel.style.bottom = 'auto';
-                }
-
-                if (rect.left < window.innerWidth / 2) {
-                    panel.style.left = '20px';
-                    panel.style.right = 'auto';
-                } else {
-                    panel.style.right = '20px';
-                    panel.style.left = 'auto';
-                }
-                panel.style.display = 'flex';
-                bellDot.style.display = 'none'; 
-            } else {
-                panel.style.display = 'none';
-            }
-        };
-
-        document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
-
-        // --- FIREBASE ---
-        function listenToAnnouncements() {
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'mindcompta-a61ef';
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'announcements'), orderBy('createdAt', 'desc'), limit(5));
-            
-            onSnapshot(q, (snap) => {
-                const content = document.getElementById('notif-content');
-                if (snap.empty) {
-                    content.innerHTML = '<div class="text-center py-8 text-gray-400 text-xs italic">Aucune annonce.</div>';
-                    return;
-                }
-                
-                content.innerHTML = '';
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    const date = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString('fr-FR') : 'Récemment';
-                    content.innerHTML += `
-                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent">
-                            <p class="text-[10px] text-gray-400 font-bold mb-1">${date}</p>
-                            <h4 class="font-bold text-brand-dark text-sm mb-1">${data.title || 'Note'}</h4>
-                            <p class="text-xs text-gray-600 leading-relaxed">${data.message || data.content}</p>
-                        </div>
-                    `;
-                });
-                bellDot.style.display = 'block'; 
-            }, (err) => console.error("Firestore Error:", err));
-        }
+        
+        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
+        const appId = "mindcompta-a61ef";
 
         onAuthStateChanged(auth, (user) => {
             if (!user) signInAnonymously(auth);
-            const d = document.getElementById('auth-actions-desktop');
-            const m = document.getElementById('auth-actions-mobile');
-            if (user && user.email) {
-                const btn = `<button id="logout-btn" class="bg-red-500/10 text-red-400 px-6 py-3 rounded-2xl text-[10px] font-bold uppercase border border-red-500/20 tracking-widest">Se Déconnecter</button>`;
-                d.innerHTML = `<button id="logout-btn" class="bg-white/10 px-4 py-2 rounded-full text-[10px] font-bold uppercase border border-white/20">Quitter</button>`; 
-                m.innerHTML = btn;
+            const adminDesktop = document.getElementById('admin-link-desktop');
+            const adminMobile = document.getElementById('admin-link-mobile');
+            const authDesktop = document.getElementById('auth-actions-desktop');
+            const authMobile = document.getElementById('auth-actions-mobile');
+
+            if (user && !user.isAnonymous) {
+                if (user.uid === ADMIN_UID) {
+                    adminDesktop.classList.remove('hidden');
+                    adminMobile.classList.remove('hidden');
+                }
+                const btn = `<button id="logout-btn" class="text-xs font-bold text-red-400 hover:text-red-300">Quitter</button>`;
+                authDesktop.innerHTML = btn;
+                authMobile.innerHTML = `<button id="logout-btn" class="p-4 bg-red-500/10 text-red-400 rounded-2xl text-sm font-bold">Déconnexion</button>`;
                 document.querySelectorAll('#logout-btn').forEach(b => b.onclick = () => signOut(auth));
             } else {
-                const dBtn = `<a href="login.html" class="bg-accent px-6 py-2 rounded-full text-brand-dark font-black text-[11px] uppercase shadow-lg">Connexion</a>`;
-                const mBtn = `<a href="login.html" class="bg-accent px-6 py-4 rounded-2xl text-brand-dark font-black text-sm text-center uppercase shadow-xl">Se Connecter</a>`;
-                d.innerHTML = dBtn; m.innerHTML = mBtn;
+                authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold uppercase">Connexion</a>`;
+                authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center font-bold">Se Connecter</a>`;
             }
+            loadRecentContent();
             listenToAnnouncements();
         });
+
+        async function loadRecentContent() {
+            const grid = document.getElementById('recent-updates-grid');
+            const qVids = query(collection(db, 'artifacts', appId, 'public', 'data', 'videos'), orderBy('createdAt', 'desc'), limit(1));
+            const qBooks = query(collection(db, 'artifacts', appId, 'public', 'data', 'books'), orderBy('createdAt', 'desc'), limit(2));
+
+            let videos = [];
+            let books = [];
+
+            const render = () => {
+                const all = [...videos, ...books].sort((a,b) => b.createdAt - a.createdAt).slice(0, 3);
+                if (all.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full py-10 text-center text-gray-400 italic">Aucune publication récente.</div>';
+                    return;
+                }
+                grid.innerHTML = '';
+                all.forEach(item => {
+                    const isVid = item.type === 'video';
+                    grid.innerHTML += `
+                        <div class="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition group">
+                            <div class="h-48 bg-gray-200 relative overflow-hidden">
+                                <img src="${item.thumbnail || (isVid ? 'https://placehold.co/600x400/1E3A8A/ffffff?text=Video' : 'https://placehold.co/600x400/F59E0B/ffffff?text=Livre')}" 
+                                     class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                                <div class="absolute top-4 left-4">
+                                    <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm ${isVid ? 'bg-red-500 text-white' : 'bg-accent text-brand-dark'}">
+                                        ${isVid ? 'Vidéo' : 'Livre'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="font-bold text-brand-dark mb-2 line-clamp-2">${item.title}</h3>
+                                <p class="text-xs text-gray-500 mb-4 line-clamp-2">${item.description || ''}</p>
+                                <a href="${isVid ? 'youtube.html' : 'services.html'}" class="text-brand-dark font-black text-[10px] uppercase tracking-tighter border-b-2 border-accent pb-1">En savoir plus &rarr;</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            };
+
+            onSnapshot(qVids, (s) => { videos = s.docs.map(d => ({...d.data(), type: 'video'})); render(); });
+            onSnapshot(qBooks, (s) => { books = s.docs.map(d => ({...d.data(), type: 'book'})); render(); });
+        }
+
+        const bell = document.getElementById('notification-bell');
+        const panel = document.getElementById('notif-panel');
+        const bellDot = document.getElementById('bell-dot');
+        let isDragging = false, hasMoved = false, startX, startY, currentX, currentY;
+
+        const handleStart = (e) => {
+            isDragging = true; hasMoved = false; bell.style.transition = 'none';
+            const t = e.type.includes('touch') ? e.touches[0] : e;
+            startX = t.clientX - bell.offsetLeft; startY = t.clientY - bell.offsetTop;
+        };
+        const handleMove = (e) => {
+            if (!isDragging) return; hasMoved = true;
+            const t = e.type.includes('touch') ? e.touches[0] : e;
+            currentX = Math.max(10, Math.min(window.innerWidth - 66, t.clientX - startX));
+            currentY = Math.max(80, Math.min(window.innerHeight - 66, t.clientY - startY));
+            bell.style.left = `${currentX}px`; bell.style.top = `${currentY}px`;
+            bell.style.right = 'auto'; bell.style.bottom = 'auto';
+            panel.style.display = 'none';
+        };
+        const handleEnd = () => {
+            if (!isDragging) return; isDragging = false;
+            bell.style.transition = 'left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.3s';
+            if (currentX + 28 < window.innerWidth / 2) bell.style.left = '10px'; else bell.style.left = `${window.innerWidth - 66}px`;
+        };
+        bell.addEventListener('mousedown', handleStart); window.addEventListener('mousemove', handleMove); window.addEventListener('mouseup', handleEnd);
+        bell.addEventListener('touchstart', handleStart); window.addEventListener('touchmove', handleMove); window.addEventListener('touchend', handleEnd);
+
+        bell.onclick = () => {
+            if (hasMoved) return;
+            if (panel.style.display !== 'flex') {
+                const r = bell.getBoundingClientRect();
+                panel.style.top = r.top > window.innerHeight/2 ? 'auto' : `${r.bottom+10}px`;
+                panel.style.bottom = r.top > window.innerHeight/2 ? `${window.innerHeight-r.top+10}px` : 'auto';
+                panel.style.left = r.left < window.innerWidth/2 ? '20px' : 'auto';
+                panel.style.right = r.left < window.innerWidth/2 ? 'auto' : '20px';
+                panel.style.display = 'flex'; bellDot.style.display = 'none';
+            } else panel.style.display = 'none';
+        };
+        document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
+
+        function listenToAnnouncements() {
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'announcements'), orderBy('createdAt', 'desc'), limit(5));
+            onSnapshot(q, (snap) => {
+                const c = document.getElementById('notif-content');
+                if (snap.empty) { c.innerHTML = '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>'; return; }
+                c.innerHTML = '';
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent">
+                        <h4 class="font-bold text-brand-dark text-[10px] uppercase">${d.title || 'Annonce'}</h4>
+                        <p class="text-xs text-gray-600 mt-1">${d.message || d.content}</p>
+                    </div>`;
+                });
+                bellDot.style.display = 'block';
+            });
+        }
 
         const menu = document.getElementById('mobile-menu');
         const ov = document.getElementById('mobile-menu-overlay');
@@ -316,4 +313,3 @@
     </script>
 </body>
 </html>
-
