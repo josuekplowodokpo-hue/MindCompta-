@@ -62,15 +62,15 @@
     </header>
 
     <div id="mobile-menu-overlay"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
-        <button id="close-menu-button" class="text-4xl absolute top-4 right-4 focus:outline-none">&times;</button>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-brand-dark text-white shadow-2xl z-50 p-6 flex flex-col">
+        <button id="close-menu-button" class="absolute top-4 right-4 text-4xl hover:text-accent focus:outline-none">&times;</button>
         <div class="pt-12 flex flex-col h-full">
             <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent uppercase text-sm tracking-widest">Navigation</h3>
             <div class="space-y-2 flex-grow">
-                <a href="index.html" class="mobile-link hover:bg-blue-800">Accueil</a>
+                <a href="index.html" class="mobile-link">Accueil</a>
                 <a href="services.html" class="mobile-link bg-accent text-brand-dark font-bold">Services</a>
-                <a href="about.html" class="mobile-link hover:bg-blue-800">À Propos</a>
-                <a href="youtube.html" class="mobile-link hover:bg-blue-800">Vidéos YouTube</a>
+                <a href="about.html" class="mobile-link">À Propos</a>
+                <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
                 <hr class="border-gray-700 my-4">
                 <div id="auth-actions-mobile"></div>
             </div>
@@ -95,7 +95,6 @@
 
         <div id="login-required" class="hidden text-center py-20 bg-white rounded-3xl shadow">
             <h3 class="text-xl font-bold mb-4 text-brand-dark">Accès réservé aux membres</h3>
-            <p class="text-gray-500 mb-6">Connectez-vous pour accéder aux ressources exclusives.</p>
             <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold uppercase">Se connecter / S'inscrire</a>
         </div>
 
@@ -106,12 +105,8 @@
         </div>
     </main>
 
-    <footer class="w-full bg-brand-dark border-t border-gray-700 py-8 mt-auto text-center text-gray-400">
-        <div class="max-w-6xl mx-auto px-4">
-            <p class="font-bold text-white mb-2 uppercase tracking-widest">MindCompta Finance</p>
-            <p class="text-sm mb-4">Expertise OHADA & Comptabilité</p>
-            <p class="text-[10px] uppercase">© 2025 MindCompta - Tous droits réservés.</p>
-        </div>
+    <footer class="w-full bg-brand-dark border-t border-gray-700 py-8 mt-auto text-center text-gray-400 text-sm">
+        © 2025 MindCompta - Tous droits réservés.
     </footer>
 
     <script type="module">
@@ -119,15 +114,7 @@
         import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
-            authDomain: "mindcompta-a61ef.firebaseapp.com",
-            projectId: "mindcompta-a61ef",
-            storageBucket: "mindcompta-a61ef.firebasestorage.app",
-            messagingSenderId: "578389020450",
-            appId: "1:578389020450:web:edf9dd48e394cff7601f7b"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -135,7 +122,6 @@
 
         setPersistence(auth, browserSessionPersistence);
 
-        // Partager
         window.shareArticle = async (title, content) => {
             const shareData = { title: title, text: content.substring(0, 100) + "...", url: window.location.href };
             try {
@@ -144,7 +130,6 @@
             } catch (err) { }
         };
 
-        // Lire la suite
         window.toggleReadMore = (btn) => {
             const container = btn.parentElement.querySelector('.content-text');
             const isCollapsed = container.classList.contains('content-collapsed');
@@ -153,7 +138,6 @@
             btn.innerText = isCollapsed ? "Voir moins" : "Lire la suite";
         };
 
-        // Like logic
         window.handleLike = async (docId) => {
             const user = auth.currentUser;
             if (!user) return alert("Veuillez vous connecter !");
@@ -175,23 +159,8 @@
             } catch (e) { }
         };
 
-        // Admin Edit/Delete
         window.deletePublication = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "resources", id)); };
-        window.editPublication = (id) => {
-            const card = document.querySelector(`[data-id="${id}"]`);
-            const titleEl = card.querySelector('.post-title');
-            const contentEl = card.querySelector('.content-text');
-            titleEl.innerHTML = `<input type="text" class="edit-title w-full p-2 border border-accent rounded mb-2" value="${titleEl.innerText}">`;
-            contentEl.innerHTML = `<textarea class="edit-content w-full p-2 border border-accent rounded h-40">${contentEl.innerText}</textarea>`;
-            card.querySelector('.admin-controls').innerHTML = `<button onclick="saveEdit('${id}')" class="bg-green-600 text-white px-3 py-1 rounded text-xs">OK</button>`;
-        };
-        window.saveEdit = async (id) => {
-            const card = document.querySelector(`[data-id="${id}"]`);
-            await updateDoc(doc(db, "resources", id), { title: card.querySelector('.edit-title').value, content: card.querySelector('.edit-content').value });
-            window.location.reload();
-        };
 
-        // Auth Listener
         onAuthStateChanged(auth, (user) => {
             document.getElementById('loader').classList.add('hidden');
             const dAuth = document.getElementById('auth-actions-desktop');
@@ -201,13 +170,14 @@
                 document.getElementById('documents-list').classList.remove('hidden');
                 const userName = user.email.split('@')[0];
                 const isAdmin = user.uid === ADMIN_UID;
-                const logoutBtn = `<button id="logout" class="bg-red-600/20 border border-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase">Déconnexion</button>`;
-                dAuth.innerHTML = `<span class="text-xs mr-4 text-gray-300 font-bold uppercase">${userName}</span>` + logoutBtn;
-                mAuth.innerHTML = `<div class="p-3 bg-blue-900/30 rounded mb-2 text-xs font-bold uppercase text-accent">Connecté: ${userName}</div>` + logoutBtn;
+                const logoutHTML = `<button id="logout" class="bg-red-600/20 border border-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase">Déconnexion</button>`;
                 
-                const handleOut = () => signOut(auth).then(() => window.location.reload());
-                document.getElementById('logout').onclick = handleOut;
-                if(document.querySelector('#auth-actions-mobile #logout')) document.querySelector('#auth-actions-mobile #logout').onclick = handleOut;
+                dAuth.innerHTML = `<span class="text-xs mr-4 text-gray-300 font-bold uppercase">${userName}</span>` + logoutHTML;
+                mAuth.innerHTML = `<div class="p-3 bg-blue-900/30 rounded mb-2 text-xs font-bold text-accent uppercase">Connecté: ${userName}</div>` + logoutHTML;
+
+                const logoff = () => signOut(auth).then(() => window.location.reload());
+                document.getElementById('logout').onclick = logoff;
+                if(document.querySelector('#auth-actions-mobile #logout')) document.querySelector('#auth-actions-mobile #logout').onclick = logoff;
 
                 if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
                 loadDocs(isAdmin, user.uid);
@@ -225,22 +195,43 @@
                 snap.forEach(async (docSnap) => {
                     const data = docSnap.data(); const docId = docSnap.id;
                     const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString('fr-FR') : '...';
+                    
+                    // Vérification du Like (pour la couleur de l'icône)
+                    const userLikeRef = doc(db, "resources", docId, "likes", currentUid);
+                    const userLikeSnap = await getDoc(userLikeRef);
+                    const isLiked = userLikeSnap.exists();
+
                     const article = document.createElement('article');
                     article.className = "post-card bg-white p-6 rounded-2xl shadow-sm relative mb-4";
                     article.setAttribute('data-id', docId);
                     article.innerHTML = `
                         <div class="flex justify-between items-center mb-4">
                             <span class="bg-blue-50 text-brand-dark text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-blue-100">${date}</span>
-                            <div class="admin-controls">${isAdmin ? `<button onclick="editPublication('${docId}')" class="text-blue-600 text-xs mr-2">Modifier</button><button onclick="deletePublication('${docId}')" class="text-red-500 text-xs">Supprimer</button>` : ''}</div>
+                            <div>${isAdmin ? `<button onclick="deletePublication('${docId}')" class="text-red-500 text-xs font-bold uppercase">Supprimer</button>` : ''}</div>
                         </div>
                         <h3 class="post-title text-2xl font-black text-brand-dark mb-4">${data.title}</h3>
                         <div class="content-text text-gray-600 whitespace-pre-wrap leading-relaxed content-collapsed">${data.content}</div>
-                        <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2">Lire la suite</button>
+                        <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2 hover:underline">Lire la suite</button>
+                        
                         <div class="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between">
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">MindCompta</span>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center text-[10px] font-bold text-white uppercase">MC</div>
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">MindCompta</span>
+                            </div>
+                            
                             <div class="flex items-center gap-4">
-                                <button onclick="shareArticle('${data.title}', '${data.content}')" class="text-gray-400">🔗</button>
-                                <button onclick="handleLike('${docId}')" class="flex items-center gap-1.5 font-bold text-gray-500">❤️ ${data.likesCount || 0}</button>
+                                <button onclick="shareArticle('${data.title.replace(/'/g, "\\'")}', '${data.content.substring(0,50).replace(/'/g, "\\'")}')" class="text-gray-400 hover:text-brand-dark transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                    </svg>
+                                </button>
+                                
+                                <button onclick="handleLike('${docId}')" class="flex items-center gap-1.5 group">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-colors ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                    <span class="text-sm font-bold ${isLiked ? 'text-red-500' : 'text-gray-500'}">${data.likesCount || 0}</span>
+                                </button>
                             </div>
                         </div>`;
                     list.appendChild(article);
@@ -250,11 +241,10 @@
 
         document.getElementById('add-doc-form').onsubmit = async (e) => {
             e.preventDefault();
-            await addDoc(collection(db, "resources"), { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null, likesCount: 0, createdAt: serverTimestamp() });
+            await addDoc(collection(db, "resources"), { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, likesCount: 0, createdAt: serverTimestamp() });
             e.target.reset();
         };
 
-        // Menu Logic
         const menuBtn = document.getElementById('menu-button');
         const closeBtn = document.getElementById('close-menu-button');
         const overlay = document.getElementById('mobile-menu-overlay');
