@@ -11,92 +11,118 @@
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
+        
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
-        .nav-link:hover { background-color: #345b85; }
-        .active-link-desktop { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
+        .active-link { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
 
+        /* MENU MOBILE */
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
-        #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
-        #mobile-menu-overlay.open { display: block; }
 
-        .mobile-link { display: block; padding: 0.75rem 1rem; color: white; font-weight: 500; border-radius: 0.5rem; }
-        .active-link-mobile { background-color: var(--accent); color: var(--brand-dark); font-weight: 700; }
+        /* AUTH BUTTONS MOBILE */
+        .btn-auth-mobile { padding: 1rem; border-radius: 1rem; font-weight: 800; text-transform: uppercase; text-align: center; font-size: 0.875rem; transition: all 0.2s; width: 100%; }
+        .btn-logout { background-color: rgba(239, 68, 68, 0.1); color: #F87171; }
+        .btn-login { background-color: var(--accent); color: var(--brand-dark); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+
+        /* NOTIFICATIONS */
+        #notification-bell { position: fixed; bottom: 100px; right: 20px; z-index: 100; cursor: grab; touch-action: none; display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; }
+        .bell-dot { position: absolute; top: 2px; right: 2px; height: 14px; width: 14px; background-color: #EF4444; border: 2px solid white; border-radius: 50%; display: none; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        #notif-panel { position: fixed; width: 300px; max-height: 400px; background: white; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); display: none; flex-direction: column; overflow: hidden; z-index: 101; border: 1px solid #e5e7eb; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-50 min-h-screen flex flex-col">
 
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center group">
-                <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
+                <img src="logo.jpg" alt="MC" class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
                 <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
             </a>
             <nav class="hidden sm:flex items-center space-x-4">
                 <a href="index.html" class="nav-link">Accueil</a>
                 <a href="services.html" class="nav-link">Services</a>
                 <a href="about.html" class="nav-link">À Propos</a>
-                <a href="youtube.html" class="nav-link active-link-desktop">Vidéos YouTube</a>
+                <a href="youtube.html" class="nav-link active-link">YouTube</a>
                 <div id="admin-link-desktop" class="hidden">
-                    <a href="admin.html" class="nav-link border-2 border-accent text-accent font-bold">Admin</a>
+                    <a href="admin.html" class="nav-link border border-accent text-accent font-bold">Admin</a>
                 </div>
-                <div id="auth-actions-desktop" class="flex items-center ml-4 pl-4 border-l border-blue-800"></div>
+                <div id="auth-actions-desktop"></div>
             </nav>
             <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
         </div>
     </header>
 
-    <div id="mobile-menu-overlay"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
-        <button id="close-menu-button" class="text-4xl absolute top-4 right-4">&times;</button>
-        <div class="pt-12 flex flex-col h-full">
-            <div class="space-y-2">
-                <a href="index.html" class="mobile-link">Accueil</a>
-                <a href="services.html" class="mobile-link">Services</a>
-                <a href="about.html" class="mobile-link">À Propos</a>
-                <a href="youtube.html" class="mobile-link active-link-mobile">Vidéos YouTube</a>
-                <a id="admin-link-mobile" href="admin.html" class="mobile-link text-accent font-bold border border-accent hidden">Admin</a>
-                <div id="auth-actions-mobile" class="pt-4 border-t border-blue-800 mt-4 space-y-3"></div>
-            </div>
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark text-white p-8 shadow-2xl">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-xs font-black uppercase tracking-[0.2em] text-white">NAVIGATION</h2>
+            <button id="close-menu-button" class="text-3xl text-white/50 hover:text-white transition">&times;</button>
+        </div>
+        <div class="flex flex-col space-y-3">
+            <a href="index.html" class="p-4 hover:bg-white/5 rounded-2xl">Accueil</a>
+            <a href="services.html" class="p-4 hover:bg-white/5 rounded-2xl">Services</a>
+            <a href="youtube.html" class="p-4 bg-accent text-brand-dark rounded-2xl font-black uppercase text-sm shadow-lg">YouTube</a>
+            <a id="admin-link-mobile" href="admin.html" class="p-4 border border-accent text-accent rounded-2xl font-bold hidden text-center uppercase text-sm">Tableau de Bord</a>
+            <a href="about.html" class="p-4 hover:bg-white/5 rounded-2xl">À Propos</a>
+            <div id="auth-actions-mobile" class="pt-8 mt-4 border-t border-white/10 flex flex-col space-y-4"></div>
         </div>
     </nav>
 
+    <div id="notification-bell" class="bg-brand-dark rounded-full shadow-2xl border-2 border-white/20 select-none">
+        <span class="text-2xl">🔔</span>
+        <div id="bell-dot" class="bell-dot"></div>
+    </div>
+
+    <div id="notif-panel">
+        <div class="bg-brand-dark p-4 text-white flex justify-between items-center">
+            <h3 class="font-black text-[10px] uppercase tracking-widest">Notifications</h3>
+            <button id="close-notif" class="text-white/50 text-xl hover:text-white transition">&times;</button>
+        </div>
+        <div id="notif-content" class="p-4 space-y-4 overflow-y-auto bg-gray-50 flex-grow max-h-[300px]"></div>
+    </div>
+
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-12">
-        <div class="text-center mb-6">
-            <h1 class="text-4xl font-extrabold text-brand-dark mb-4">Vidéos YouTube</h1>
-            <a href="https://youtube.com/@mindcompta-info?si=E45uoy_v5xDGrtfp" target="_blank" class="inline-flex items-center bg-red-600 text-white px-6 py-2 rounded-full font-bold hover:bg-red-700 transition shadow-lg uppercase text-sm">
-                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 4-8 4z"/></svg>
-                Suivez notre chaîne
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-black text-brand-dark mb-4 uppercase tracking-tighter">Vidéos YouTube</h1>
+            <a href="https://youtube.com/@mindcompta-info" target="_blank" class="inline-flex items-center bg-red-600 text-white px-8 py-3 rounded-full font-bold hover:bg-red-700 transition shadow-lg uppercase text-xs">
+                S'abonner à la chaîne
             </a>
         </div>
 
-        <div id="admin-section" class="bg-white p-6 rounded-2xl shadow-lg mb-12 border-2 border-accent hidden">
-            <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase text-center">Publier une vidéo</h2>
+        <div id="admin-section" class="bg-white p-8 rounded-2xl shadow-xl mb-12 border-2 border-accent hidden">
+            <h2 class="text-xl font-black text-brand-dark mb-6 text-center underline uppercase">Ajouter une Vidéo</h2>
             <form id="add-video-form" class="space-y-4 max-w-2xl mx-auto">
-                <input type="text" id="v-title" required class="w-full border p-3 rounded-lg" placeholder="Titre de la vidéo">
-                <input type="url" id="v-url" required class="w-full border p-3 rounded-lg" placeholder="Lien YouTube complet">
-                <textarea id="v-desc" rows="2" class="w-full border p-3 rounded-lg" placeholder="Description de la vidéo..."></textarea>
-                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg uppercase hover:bg-blue-900 transition">Publier</button>
+                <input type="text" id="v-title" required class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark font-semibold" placeholder="Titre de la vidéo">
+                <input type="url" id="v-url" required class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Lien YouTube (URL)">
+                <textarea id="v-desc" rows="2" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Petite description..."></textarea>
+                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg uppercase">Publier la vidéo</button>
             </form>
         </div>
 
         <div id="videos-list" class="grid md:grid-cols-2 gap-8">
-            <div id="loader" class="col-span-2 flex justify-center py-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div></div>
+            <div id="loader" class="col-span-full flex justify-center py-20">
+                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div>
+            </div>
         </div>
     </main>
 
-    <footer class="w-full bg-brand-dark py-8 text-center">
-        <p class="text-gray-500 text-[10px] tracking-widest uppercase">&copy; 2025 MindCompta. Tous droits réservés.</p>
+    <footer class="bg-brand-dark text-white py-12 px-4 mt-auto">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest">&copy; 2025 MindCompta Finance.</p>
+        </div>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, runTransaction, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const fb = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
         const app = initializeApp(fb); const auth = getAuth(app); const db = getFirestore(app);
         const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
+        const APP_ID = "mindcompta-finance";
+
         setPersistence(auth, browserSessionPersistence);
 
         function extractID(url) {
@@ -105,122 +131,140 @@
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
+        // MENU LOGIC
+        const toggleMenu = () => {
+            document.getElementById('mobile-menu').classList.toggle('open');
+            document.getElementById('mobile-menu-overlay').classList.toggle('hidden');
+        };
+        document.getElementById('menu-button').onclick = toggleMenu;
+        document.getElementById('close-menu-button').onclick = toggleMenu;
+        document.getElementById('mobile-menu-overlay').onclick = toggleMenu;
+
         onAuthStateChanged(auth, (user) => {
-            const dActions = document.getElementById('auth-actions-desktop');
-            const mActions = document.getElementById('auth-actions-mobile');
+            document.getElementById('loader')?.remove();
+            const dAuth = document.getElementById('auth-actions-desktop');
+            const mAuth = document.getElementById('auth-actions-mobile');
+            
             if (user) {
                 const isAdmin = user.uid === ADMIN_UID;
-                const name = user.email.split('@')[0];
-                const logoutBtn = `<button id="lo-btn" class="bg-red-600 px-3 py-1 rounded text-white text-[10px] font-bold uppercase ml-2">Déconnexion</button>`;
-                dActions.innerHTML = `<span class="text-accent text-[10px] font-bold">${name}</span>` + logoutBtn;
-                mActions.innerHTML = `<span class="text-accent text-sm font-bold block">Connecté: ${name}</span><button id="lo-btn-m" class="bg-red-600 w-full py-2 rounded text-white font-bold text-xs uppercase">Déconnexion</button>`;
-                document.getElementById('lo-btn')?.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
-                document.getElementById('lo-btn-m')?.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
+                dAuth.innerHTML = `<button onclick="window.handleLogout()" class="nav-link border border-red-400 text-red-400 font-bold">Déconnexion</button>`;
+                mAuth.innerHTML = `<button onclick="window.handleLogout()" class="btn-auth-mobile btn-logout">Déconnexion</button>`;
                 if (isAdmin) {
                     document.getElementById('admin-section').classList.remove('hidden');
                     document.getElementById('admin-link-desktop').classList.remove('hidden');
                     document.getElementById('admin-link-mobile').classList.remove('hidden');
                 }
                 loadVideos(isAdmin, user.uid);
+                listenToAnnouncements();
             } else {
-                const loginBtn = `<a href="login.html" class="bg-accent py-2 px-5 text-sm font-bold rounded-full text-white">Connexion</a>`;
-                dActions.innerHTML = loginBtn;
-                mActions.innerHTML = `<a href="login.html" class="mobile-link bg-accent text-brand-dark text-center font-bold">Connexion</a>`;
+                dAuth.innerHTML = `<a href="login.html" class="nav-link bg-accent text-brand-dark font-bold">Connexion</a>`;
+                mAuth.innerHTML = `<a href="login.html" class="btn-auth-mobile btn-login">Connexion</a>`;
                 loadVideos(false, null);
             }
         });
 
+        window.handleLogout = () => signOut(auth).then(() => window.location.reload());
+
         function loadVideos(isAdmin, currentUid) {
             onSnapshot(query(collection(db, "youtube_videos"), orderBy("createdAt", "desc")), (snap) => {
                 const list = document.getElementById('videos-list'); list.innerHTML = '';
-                document.getElementById('loader')?.remove();
-                
                 snap.forEach((ds, index) => {
-                    if (!currentUid && index > 0) return;
+                    if (!currentUid && index > 0) return; // Limite à 1 vidéo pour non-connectés
                     const v = ds.data(); const id = ds.id;
                     const card = document.createElement('div');
-                    card.className = "bg-white rounded-xl shadow-lg overflow-hidden border flex flex-col";
+                    card.className = "bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col border border-gray-100";
                     card.innerHTML = `
                         <div class="aspect-video"><iframe class="w-full h-full" src="https://www.youtube.com/embed/${v.youtubeId}" frameborder="0" allowfullscreen></iframe></div>
-                        <div class="p-5 flex-grow">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-bold text-brand-dark leading-tight">${v.title}</h3>
-                                <button onclick="window.handleLike('${id}')" id="like-btn-${id}" class="flex items-center space-x-1 transition group">
-                                    <svg id="like-icon-${id}" class="h-6 w-6 text-gray-400 group-hover:scale-110 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                                    <span id="like-count-${id}" class="text-xs font-bold text-gray-500">${v.likesCount || 0}</span>
+                        <div class="p-6 flex-grow">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="font-black text-brand-dark leading-tight">${v.title}</h3>
+                                <button onclick="window.handleLike('${id}')" class="flex items-center gap-1.5">
+                                    <svg id="like-icon-${id}" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                                    <span id="like-count-${id}" class="text-sm font-bold text-gray-500">${v.likesCount || 0}</span>
                                 </button>
                             </div>
-                            <div class="mt-3">
-                                ${isAdmin ? `<textarea onblur="window.updateDesc('${id}', this.value)" class="w-full text-sm border p-2 rounded bg-blue-50" rows="2">${v.description || ''}</textarea>` : `<p class="text-sm text-gray-600 line-clamp-3">${v.description || 'Pas de description.'}</p>`}
-                            </div>
-                            ${isAdmin ? `<button onclick="window.delVideo('${id}')" class="text-red-500 text-[10px] font-bold mt-4 uppercase">Supprimer</button>` : ''}
+                            <p class="text-sm text-gray-600 mb-4">${v.description || 'Pas de description.'}</p>
+                            ${isAdmin ? `<button onclick="window.delVideo('${id}')" class="text-red-500 text-[10px] font-bold uppercase hover:underline">Supprimer</button>` : ''}
                         </div>`;
                     list.appendChild(card);
-
-                    // Real-time Like State
                     if (currentUid) {
                         onSnapshot(doc(db, "youtube_videos", id, "likes", currentUid), (lSnap) => {
                             const icon = document.getElementById(`like-icon-${id}`);
-                            const count = document.getElementById(`like-count-${id}`);
-                            if (lSnap.exists()) {
-                                icon.classList.replace('text-gray-400', 'text-red-500');
-                                icon.setAttribute('fill', 'currentColor');
-                                count.classList.replace('text-gray-500', 'text-red-500');
-                            } else {
-                                icon.classList.replace('text-red-500', 'text-gray-400');
-                                icon.setAttribute('fill', 'none');
-                                count.classList.replace('text-red-500', 'text-gray-500');
+                            if(icon) {
+                                if (lSnap.exists()) { icon.classList.replace('text-gray-400', 'text-red-500'); icon.setAttribute('fill', 'currentColor'); }
+                                else { icon.classList.replace('text-red-500', 'text-gray-400'); icon.setAttribute('fill', 'none'); }
                             }
                         });
                     }
                 });
+            });
+        }
 
-                if (!currentUid && snap.size > 1) {
-                    const invite = document.createElement('div');
-                    invite.className = "col-span-full text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 mt-4";
-                    invite.innerHTML = `<p class="text-gray-500 font-bold mb-4 italic">Connectez-vous pour voir l'intégralité du contenu !</p><a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold uppercase text-xs">Se connecter</a>`;
-                    list.appendChild(invite);
+        // LOGIQUE NOTIFICATIONS (CORRIGÉE)
+        const bell = document.getElementById('notification-bell');
+        const panel = document.getElementById('notif-panel');
+        const bellDot = document.getElementById('bell-dot');
+        let isDragging = false, hasMoved = false, startX, startY;
+
+        if (bell && panel) {
+            bell.addEventListener('mousedown', (e) => { isDragging = true; hasMoved = false; startX = e.clientX - bell.offsetLeft; startY = e.clientY - bell.offsetTop; });
+            window.addEventListener('mousemove', (e) => { 
+                if (!isDragging) return; hasMoved = true;
+                bell.style.left = `${e.clientX - startX}px`; bell.style.top = `${e.clientY - startY}px`;
+                bell.style.right = 'auto'; bell.style.bottom = 'auto';
+                panel.style.display = 'none';
+            });
+            window.addEventListener('mouseup', () => isDragging = false);
+
+            bell.onclick = () => {
+                if (hasMoved) return;
+                if (panel.style.display === 'flex') { panel.style.display = 'none'; }
+                else {
+                    panel.style.display = 'flex';
+                    const rect = bell.getBoundingClientRect();
+                    panel.style.left = `${Math.max(10, rect.left - 250)}px`;
+                    panel.style.top = `${rect.top - panel.offsetHeight - 15}px`;
+                    if (rect.top < 400) panel.style.top = `${rect.bottom + 15}px`;
+                    if (bellDot) bellDot.style.display = 'none';
                 }
+            };
+        }
+        document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
+
+        function listenToAnnouncements() {
+            const q = query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
+            onSnapshot(q, (snap) => {
+                const c = document.getElementById('notif-content'); if (!c) return;
+                c.innerHTML = snap.empty ? '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>' : '';
+                snap.forEach(docSnap => { 
+                    const d = docSnap.data(); 
+                    c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`; 
+                });
+                if (!snap.empty && bellDot) bellDot.style.display = 'block';
             });
         }
 
         window.handleLike = async (videoId) => {
-            const user = auth.currentUser; if (!user) return alert("Veuillez vous connecter pour liker.");
+            const user = auth.currentUser; if (!user) return alert("Connectez-vous pour aimer !");
             const likeRef = doc(db, "youtube_videos", videoId, "likes", user.uid);
             const videoRef = doc(db, "youtube_videos", videoId);
-            
             await runTransaction(db, async (t) => {
-                const vSnap = await t.get(videoRef);
-                const lSnap = await t.get(likeRef);
-                let currentLikes = vSnap.data().likesCount || 0;
-                
-                if (lSnap.exists()) {
-                    t.delete(likeRef);
-                    t.update(videoRef, { likesCount: Math.max(0, currentLikes - 1) });
-                } else {
-                    t.set(likeRef, { uid: user.uid });
-                    t.update(videoRef, { likesCount: currentLikes + 1 });
-                }
+                const vSnap = await t.get(videoRef); const lSnap = await t.get(likeRef);
+                let count = vSnap.data().likesCount || 0;
+                if (lSnap.exists()) { t.delete(likeRef); t.update(videoRef, { likesCount: Math.max(0, count - 1) }); }
+                else { t.set(likeRef, { uid: user.uid }); t.update(videoRef, { likesCount: count + 1 }); }
             });
         };
 
-        window.updateDesc = async (id, val) => { await updateDoc(doc(db, "youtube_videos", id), { description: val }); };
         window.delVideo = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "youtube_videos", id)); };
 
         document.getElementById('add-video-form').onsubmit = async (e) => {
             e.preventDefault();
             const yId = extractID(document.getElementById('v-url').value);
-            if(!yId) return alert("Lien YouTube invalide !");
+            if(!yId) return alert("Lien invalide !");
             await addDoc(collection(db, "youtube_videos"), { title: document.getElementById('v-title').value, youtubeId: yId, description: document.getElementById('v-desc').value, likesCount: 0, createdAt: serverTimestamp() });
             e.target.reset();
         };
-
-        const menu = document.getElementById('mobile-menu');
-        const overlay = document.getElementById('mobile-menu-overlay');
-        document.getElementById('menu-button').onclick = () => { menu.classList.add('open'); overlay.classList.add('open'); };
-        document.getElementById('close-menu-button').onclick = () => { menu.classList.remove('open'); overlay.classList.remove('open'); };
-        overlay.onclick = () => { menu.classList.remove('open'); overlay.classList.remove('open'); };
     </script>
 </body>
 </html>
-
