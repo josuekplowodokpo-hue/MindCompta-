@@ -29,6 +29,7 @@
         <div class="w-full max-w-sm bg-white rounded-xl shadow-2xl p-8 border border-gray-100"> 
             <h2 id="form-title" class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
 
+            <!-- BOUTON GOOGLE RESTAURÉ -->
             <button id="google-btn" type="button" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3 rounded-lg mb-6 hover:bg-gray-50 transition shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
                     <path fill="#fbc02d" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
@@ -75,7 +76,6 @@
         </div>
     </main>
 
-    <!-- Modal d'information (Vérification Mail) -->
     <div id="verify-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
         <div class="bg-white p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl">
             <div class="text-4xl mb-4 text-brand-dark">✉️</div>
@@ -94,19 +94,12 @@
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
-            authDomain: "mindcompta-a61ef.firebaseapp.com",
-            projectId: "mindcompta-a61ef",
-            storageBucket: "mindcompta-a61ef.firebasestorage.app",
-            messagingSenderId: "578389020450",
-            appId: "1:578389020450:web:edf9dd48e394cff7601f7b"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
         let isSignInMode = true;
 
         const formTitle = document.getElementById('form-title');
@@ -131,19 +124,16 @@
             authMessage.classList.add('hidden');
         };
 
-        // MOT DE PASSE OUBLIÉ
         document.getElementById('forgot-password').onclick = async () => {
             const email = document.getElementById('auth-email').value.trim();
             if (!email) return showMsg("Veuillez saisir votre email d'abord.", false);
             try {
                 await sendPasswordResetEmail(auth, email);
-                document.getElementById('modal-title').innerText = "Réinitialisation envoyée";
-                document.getElementById('modal-text').innerText = "Un lien pour changer votre mot de passe vous a été envoyé par email.";
-                document.getElementById('verify-modal').classList.remove('hidden');
+                showMsg("Lien de réinitialisation envoyé !", true);
             } catch (err) { showMsg("Erreur : " + err.message, false); }
         };
 
-        // GOOGLE
+        // CONNEXION GOOGLE RESTAURÉE
         document.getElementById('google-btn').onclick = async () => {
             const provider = new GoogleAuthProvider();
             try {
@@ -160,7 +150,6 @@
             } catch (err) { showMsg(err.message, false); }
         };
 
-        // VALIDATION DU FORMULAIRE
         document.getElementById('auth-form').onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('auth-email').value.trim();
@@ -174,17 +163,17 @@
                 
                 if (isSignInMode) {
                     const res = await signInWithEmailAndPassword(auth, email, password);
-                    
-                    // Bloquer si l'email n'est pas vérifié
-                    if (!res.user.emailVerified) {
+                    const user = res.user;
+
+                    if (!user.emailVerified && user.uid !== ADMIN_UID) {
                         await signOut(auth);
-                        showMsg("Email non vérifié. Veuillez consulter votre boîte de réception.", false);
+                        showMsg("Email non vérifié. Veuillez consulter votre boîte mail.", false);
                         authButton.disabled = false;
                         authButton.innerText = "Se Connecter";
                         return;
                     }
 
-                    await setDoc(doc(db, "artifacts", res.user.uid), { 
+                    await setDoc(doc(db, "artifacts", user.uid), { 
                         status: "EN LIGNE", 
                         lastLogin: serverTimestamp() 
                     }, { merge: true });
@@ -192,10 +181,7 @@
 
                 } else {
                     const res = await createUserWithEmailAndPassword(auth, email, password);
-                    
-                    // ENVOI AUTOMATIQUE DE L'EMAIL DE VÉRIFICATION APRÈS INSCRIPTION
                     await sendEmailVerification(res.user);
-                    
                     await setDoc(doc(db, "artifacts", res.user.uid), {
                         uid: res.user.uid,
                         email: email,
@@ -203,8 +189,7 @@
                         createdAt: serverTimestamp(),
                         status: "HORS LIGNE"
                     });
-
-                    await signOut(auth); // Déconnecte pour forcer la validation
+                    await signOut(auth);
                     document.getElementById('verify-modal').classList.remove('hidden');
                 }
             } catch (err) { 
