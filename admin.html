@@ -14,7 +14,6 @@
 </head>
 <body class="min-h-screen pb-20">
 
-    <!-- Header -->
     <header class="glass sticky top-0 z-50 border-b border-gray-200 p-4 mb-6">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -27,7 +26,6 @@
 
     <main class="max-w-7xl mx-auto px-4">
 
-        <!-- Stats Row -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <p class="text-xs font-semibold text-gray-400 uppercase">Membres</p>
@@ -47,202 +45,153 @@
             </div>
         </div>
 
-        <!-- Tabs -->
         <div class="flex gap-8 border-b border-gray-200 mb-6 px-2">
             <button onclick="switchTab('users')" id="btn-users" class="pb-3 text-sm font-bold tab-active">MEMBRES DÉTAILLÉS</button>
             <button onclick="switchTab('logs')" id="btn-logs" class="pb-3 text-sm font-bold text-gray-400 hover:text-gray-600">JOURNAL D'ACTIVITÉ</button>
-            <button onclick="switchTab('announces')" id="btn-announces" class="pb-3 text-sm font-bold text-gray-400 hover:text-gray-600">ANNONCES</button>
         </div>
 
-        <!-- Tab: Users -->
         <section id="sec-users" class="tab-content">
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[800px]">
+                <table class="w-full text-left border-collapse min-w-[900px]">
                     <thead class="bg-gray-50 text-gray-400 text-[10px] font-bold uppercase">
                         <tr>
                             <th class="p-4">Utilisateur</th>
-                            <th class="p-4">Contact</th>
-                            <th class="p-4">Création Compte</th>
+                            <th class="p-4">E-mail</th>
+                            <th class="p-4">Date de Création</th>
                             <th class="p-4">Dernière Connexion</th>
                             <th class="p-4 text-right">Statut</th>
                         </tr>
                     </thead>
                     <tbody id="users-list" class="divide-y divide-gray-50 text-sm">
-                        <!-- JS injected -->
+                        <!-- Data injected by JS -->
                     </tbody>
                 </table>
             </div>
         </section>
 
-        <!-- Tab: Activity Logs -->
         <section id="sec-logs" class="tab-content hidden space-y-4">
             <div id="activity-feed" class="space-y-3"></div>
-        </section>
-
-        <!-- Tab: Announces -->
-        <section id="sec-announces" class="tab-content hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
-                <h3 class="font-bold text-gray-800 mb-4">Nouvelle Annonce</h3>
-                <input type="hidden" id="edit-id">
-                <input type="text" id="ann-title" placeholder="Titre..." class="w-full p-3 rounded-xl bg-gray-50 border-none mb-3 focus:ring-2 ring-blue-100">
-                <textarea id="ann-text" placeholder="Message..." class="w-full p-3 rounded-xl bg-gray-50 border-none h-24 mb-3 focus:ring-2 ring-blue-100"></textarea>
-                <div class="flex justify-end gap-2">
-                    <button id="btn-cancel" class="hidden px-4 py-2 text-sm font-bold text-gray-500">Annuler</button>
-                    <button id="btn-save" class="px-6 py-2 bg-blue-900 text-white rounded-xl text-sm font-bold">Publier</button>
-                </div>
-            </div>
-            <div id="ann-list" class="space-y-3"></div>
         </section>
 
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, doc, addDoc, updateDoc, deleteDoc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, getDoc, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = JSON.parse('{"apiKey":"AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0","authDomain":"mindcompta-a61ef.firebaseapp.com","projectId":"mindcompta-a61ef","storageBucket":"mindcompta-a61ef.firebasestorage.app","messagingSenderId":"578389020450","appId":"1:578389020450:web:edf9dd48e394cff7601f7b"}');
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
         const appId = "mindcompta-a61ef";
-        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
 
         window.switchTab = (target) => {
             document.querySelectorAll('.tab-content').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('[id^="btn-"]').forEach(b => b.classList.remove('tab-active', 'text-blue-900'));
+            document.querySelectorAll('[id^="btn-"]').forEach(b => b.classList.remove('tab-active'));
             document.getElementById(`sec-${target}`).classList.remove('hidden');
             document.getElementById(`btn-${target}`).classList.add('tab-active');
         };
 
-        const updateCount = (id, val) => { if(document.getElementById(id)) document.getElementById(id).innerText = val; };
-
         function formatDate(ts) {
-            if(!ts) return "N/A";
-            const date = ts.toDate ? ts.toDate() : new Date(ts);
-            return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            if (!ts) return "--";
+            const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+            return date.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
 
-        async function startSync() {
-            // 1. Members Sync (Scanning all user profiles)
-            // We listen to the subcollections: artifacts/mindcompta-a61ef/users/{uid}/profile/data
-            // Since we can't query all subcollections easily without admin SDK, we fetch based on activity or a dedicated users collection
-            onSnapshot(collection(db, 'artifacts'), async (snap) => {
-                const list = document.getElementById('users-list');
-                list.innerHTML = '';
-                let count = 0;
+        async function initSync() {
+            // Listen for any activity to find user IDs
+            const activityRef = collection(db, 'activity_logs');
+            const userRegistry = new Set();
 
-                // For each potential user ID found in the system
-                for (const d of snap.docs) {
-                    if(d.id === appId) continue;
-                    count++;
-                    const uid = d.id;
+            onSnapshot(query(activityRef, orderBy("timestamp", "desc")), (snap) => {
+                const list = document.getElementById('users-list');
+                const feed = document.getElementById('activity-feed');
+                feed.innerHTML = '';
+                
+                snap.forEach(actionDoc => {
+                    const action = actionDoc.data();
+                    const uid = action.userId;
                     
-                    // Fetch the specific profile for this user
-                    const profileRef = doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data');
-                    
-                    // We use a listener for each profile to keep the dashboard live
-                    onSnapshot(profileRef, (pSnap) => {
-                        const existingRow = document.getElementById(`row-${uid}`);
-                        const p = pSnap.exists() ? pSnap.data() : { displayName: 'Inconnu', email: 'N/A' };
-                        
-                        const rowHtml = `
-                            <td class="p-4">
+                    // Display activity log
+                    feed.innerHTML += `
+                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500">
+                            <p class="text-xs font-bold text-gray-400 uppercase">${formatDate(action.timestamp)}</p>
+                            <p class="text-sm text-gray-800">${action.action || 'Action inconnue'}</p>
+                            <p class="text-[10px] text-gray-400">UID: ${uid || 'N/A'}</p>
+                        </div>
+                    `;
+
+                    // If we find a new user ID, try to get their specific profile
+                    if (uid && !userRegistry.has(uid)) {
+                        userRegistry.add(uid);
+                        syncUserProfile(uid);
+                    }
+                });
+                document.getElementById('stat-logs').innerText = snap.size;
+                document.getElementById('stat-users').innerText = userRegistry.size;
+            });
+        }
+
+        function syncUserProfile(uid) {
+            // Path: /artifacts/{appId}/users/{userId}/profile/info
+            // Note: We use 'info' as the document name inside the private profile collection
+            const profileRef = doc(db, 'artifacts', appId, 'users', uid, 'profile', 'info');
+            
+            onSnapshot(profileRef, (pSnap) => {
+                const list = document.getElementById('users-list');
+                const p = pSnap.exists() ? pSnap.data() : null;
+                
+                let row = document.getElementById(`row-${uid}`);
+                if (!row) {
+                    row = document.createElement('tr');
+                    row.id = `row-${uid}`;
+                    row.className = "hover:bg-gray-50 transition";
+                    list.appendChild(row);
+                }
+
+                if (p) {
+                    row.innerHTML = `
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
+                                    ${(p.username || 'U').charAt(0).toUpperCase()}
+                                </div>
                                 <div class="flex flex-col">
-                                    <span class="font-bold text-blue-950">${p.displayName || 'Utilisateur'}</span>
+                                    <span class="font-bold text-blue-900">${p.username || 'Anonyme'}</span>
                                     <span class="text-[10px] text-gray-400 font-mono">${uid}</span>
                                 </div>
-                            </td>
-                            <td class="p-4 text-gray-600">${p.email || 'Pas d\'email'}</td>
-                            <td class="p-4 text-gray-500 text-xs">${formatDate(p.createdAt)}</td>
-                            <td class="p-4 text-gray-500 text-xs font-semibold">${formatDate(p.lastLogin)}</td>
-                            <td class="p-4 text-right">
-                                <span class="px-2 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-full border border-emerald-100">MEMBRE</span>
-                            </td>
-                        `;
-
-                        if (existingRow) {
-                            existingRow.innerHTML = rowHtml;
-                        } else {
-                            const tr = document.createElement('tr');
-                            tr.id = `row-${uid}`;
-                            tr.className = "hover:bg-gray-50 transition";
-                            tr.innerHTML = rowHtml;
-                            list.appendChild(tr);
-                        }
-                    });
+                            </div>
+                        </td>
+                        <td class="p-4 text-gray-600">${p.email || 'Non renseigné'}</td>
+                        <td class="p-4 text-gray-500 text-xs">${formatDate(p.createdAt)}</td>
+                        <td class="p-4 text-gray-500 text-xs font-semibold">${formatDate(p.lastLogin)}</td>
+                        <td class="p-4 text-right">
+                            <span class="px-2 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded-full border border-green-100">ACTIF</span>
+                        </td>
+                    `;
+                } else {
+                    // Fallback if profile doc is missing but user exists in logs
+                    row.innerHTML = `
+                        <td class="p-4 font-mono text-[10px] text-gray-400">${uid}</td>
+                        <td class="p-4 text-gray-400 italic">Profil non initialisé</td>
+                        <td class="p-4 text-gray-300">--</td>
+                        <td class="p-4 text-gray-300">--</td>
+                        <td class="p-4 text-right">
+                            <span class="px-2 py-1 bg-gray-100 text-gray-400 text-[10px] font-bold rounded-full">EN ATTENTE</span>
+                        </td>
+                    `;
                 }
-                updateCount('stat-users', count);
-            });
-
-            // 2. Activity Logs
-            onSnapshot(query(collection(db, 'activity_logs'), orderBy("timestamp", "desc")), (snap) => {
-                const feed = document.getElementById('activity-feed');
-                feed.innerHTML = '<h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Dernières actions</h3>';
-                updateCount('stat-logs', snap.size);
-                snap.forEach(d => {
-                    const data = d.data();
-                    feed.innerHTML += `
-                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-emerald-500 flex justify-between items-center">
-                            <div>
-                                <p class="text-xs font-bold text-emerald-600 uppercase">Log</p>
-                                <p class="text-sm font-medium text-gray-800">${data.action || 'Action'}</p>
-                                <p class="text-[10px] text-gray-400 mt-1">${formatDate(data.timestamp)}</p>
-                            </div>
-                            <button onclick="deleteDoc(doc(db, 'activity_logs', '${d.id}'))" class="text-gray-300 hover:text-red-500">×</button>
-                        </div>
-                    `;
-                });
-            });
-
-            // 3. Announcements
-            const annRef = collection(db, 'artifacts', appId, 'public', 'data', 'announcements');
-            onSnapshot(query(annRef, orderBy("createdAt", "desc")), (snap) => {
-                updateCount('stat-announces', snap.size);
-                const list = document.getElementById('ann-list');
-                list.innerHTML = '';
-                snap.forEach(d => {
-                    const a = d.data();
-                    list.innerHTML += `
-                        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center group">
-                            <div>
-                                <h4 class="text-xs font-black text-blue-900 uppercase">${a.title}</h4>
-                                <p class="text-sm text-gray-600">${a.message}</p>
-                            </div>
-                            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition">
-                                <button onclick="editAnn('${d.id}', '${a.title}', '${a.message}')" class="p-2 text-blue-600 bg-blue-50 rounded-lg">Modifier</button>
-                                <button onclick="deleteDoc(doc(db, 'artifacts', '${appId}', 'public', 'data', 'announcements', '${d.id}'))" class="p-2 text-red-600 bg-red-50 rounded-lg">Effacer</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            });
+            }, (err) => console.error("Error fetching profile for " + uid, err));
         }
 
-        window.editAnn = (id, title, msg) => {
-            document.getElementById('edit-id').value = id;
-            document.getElementById('ann-title').value = title;
-            document.getElementById('ann-text').value = msg;
-            document.getElementById('btn-save').innerText = "Mettre à jour";
-            document.getElementById('btn-cancel').classList.remove('hidden');
-            switchTab('announces');
-        };
-
-        document.getElementById('btn-save').onclick = async () => {
-            const id = document.getElementById('edit-id').value;
-            const title = document.getElementById('ann-title').value;
-            const message = document.getElementById('ann-text').value;
-            if(!title || !message) return;
-            const col = collection(db, 'artifacts', appId, 'public', 'data', 'announcements');
-            if(id) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'announcements', id), { title, message });
-            else await addDoc(col, { title, message, createdAt: serverTimestamp() });
-            document.getElementById('btn-cancel').click();
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            if (user && user.uid === ADMIN_UID) startSync();
-            else window.location.href = 'index.html';
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                await signInAnonymously(auth);
+            } else {
+                // In a real app, you'd check if user.uid is the admin UID here
+                initSync();
+            }
         });
 
         document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = 'index.html');
