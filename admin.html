@@ -26,11 +26,11 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4">
-        
+
         <!-- Stats Row -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                <p class="text-xs font-semibold text-gray-400 uppercase">Utilisateurs</p>
+                <p class="text-xs font-semibold text-gray-400 uppercase">Membres</p>
                 <p id="stat-users" class="text-2xl font-black text-blue-900">0</p>
             </div>
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
@@ -38,8 +38,8 @@
                 <p id="stat-comments" class="text-2xl font-black text-blue-600">0</p>
             </div>
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                <p class="text-xs font-semibold text-gray-400 uppercase">Téléchargements</p>
-                <p id="stat-downloads" class="text-2xl font-black text-emerald-600">0</p>
+                <p class="text-xs font-semibold text-gray-400 uppercase">Journal</p>
+                <p id="stat-logs" class="text-2xl font-black text-emerald-600">0</p>
             </div>
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <p class="text-xs font-semibold text-gray-400 uppercase">Annonces</p>
@@ -49,20 +49,22 @@
 
         <!-- Tabs -->
         <div class="flex gap-8 border-b border-gray-200 mb-6 px-2">
-            <button onclick="switchTab('users')" id="btn-users" class="pb-3 text-sm font-bold tab-active">MEMBRES</button>
+            <button onclick="switchTab('users')" id="btn-users" class="pb-3 text-sm font-bold tab-active">MEMBRES DÉTAILLÉS</button>
             <button onclick="switchTab('logs')" id="btn-logs" class="pb-3 text-sm font-bold text-gray-400 hover:text-gray-600">JOURNAL D'ACTIVITÉ</button>
             <button onclick="switchTab('announces')" id="btn-announces" class="pb-3 text-sm font-bold text-gray-400 hover:text-gray-600">ANNONCES</button>
         </div>
 
         <!-- Tab: Users -->
         <section id="sec-users" class="tab-content">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <table class="w-full text-left border-collapse">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[800px]">
                     <thead class="bg-gray-50 text-gray-400 text-[10px] font-bold uppercase">
                         <tr>
                             <th class="p-4">Utilisateur</th>
-                            <th class="p-4">Contact Email</th>
-                            <th class="p-4 text-right">Actions</th>
+                            <th class="p-4">Contact</th>
+                            <th class="p-4">Création Compte</th>
+                            <th class="p-4">Dernière Connexion</th>
+                            <th class="p-4 text-right">Statut</th>
                         </tr>
                     </thead>
                     <tbody id="users-list" class="divide-y divide-gray-50 text-sm">
@@ -72,11 +74,9 @@
             </div>
         </section>
 
-        <!-- Tab: Activity Logs (The Missing Part) -->
+        <!-- Tab: Activity Logs -->
         <section id="sec-logs" class="tab-content hidden space-y-4">
-            <div id="activity-feed" class="space-y-3">
-                <!-- Activity cards will appear here -->
-            </div>
+            <div id="activity-feed" class="space-y-3"></div>
         </section>
 
         <!-- Tab: Announces -->
@@ -84,8 +84,8 @@
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
                 <h3 class="font-bold text-gray-800 mb-4">Nouvelle Annonce</h3>
                 <input type="hidden" id="edit-id">
-                <input type="text" id="ann-title" placeholder="Titre (ex: Maintenance)" class="w-full p-3 rounded-xl bg-gray-50 border-none mb-3 focus:ring-2 ring-blue-100">
-                <textarea id="ann-text" placeholder="Message aux utilisateurs..." class="w-full p-3 rounded-xl bg-gray-50 border-none h-24 mb-3 focus:ring-2 ring-blue-100"></textarea>
+                <input type="text" id="ann-title" placeholder="Titre..." class="w-full p-3 rounded-xl bg-gray-50 border-none mb-3 focus:ring-2 ring-blue-100">
+                <textarea id="ann-text" placeholder="Message..." class="w-full p-3 rounded-xl bg-gray-50 border-none h-24 mb-3 focus:ring-2 ring-blue-100"></textarea>
                 <div class="flex justify-end gap-2">
                     <button id="btn-cancel" class="hidden px-4 py-2 text-sm font-bold text-gray-500">Annuler</button>
                     <button id="btn-save" class="px-6 py-2 bg-blue-900 text-white rounded-xl text-sm font-bold">Publier</button>
@@ -99,16 +99,16 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, doc, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, addDoc, updateDoc, deleteDoc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = JSON.parse('{"apiKey":"AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0","authDomain":"mindcompta-a61ef.firebaseapp.com","projectId":"mindcompta-a61ef","storageBucket":"mindcompta-a61ef.firebasestorage.app","messagingSenderId":"578389020450","appId":"1:578389020450:web:edf9dd48e394cff7601f7b"}');
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        
         const appId = "mindcompta-a61ef";
         const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
 
-        // Navigation
         window.switchTab = (target) => {
             document.querySelectorAll('.tab-content').forEach(s => s.classList.add('hidden'));
             document.querySelectorAll('[id^="btn-"]').forEach(b => b.classList.remove('tab-active', 'text-blue-900'));
@@ -116,61 +116,89 @@
             document.getElementById(`btn-${target}`).classList.add('tab-active');
         };
 
-        // UI Updates
         const updateCount = (id, val) => { if(document.getElementById(id)) document.getElementById(id).innerText = val; };
 
-        // Data Management
-        function startSync() {
-            // 1. Members
-            onSnapshot(collection(db, 'artifacts', appId, 'users'), (snap) => {
-                updateCount('stat-users', snap.size);
+        function formatDate(ts) {
+            if(!ts) return "N/A";
+            const date = ts.toDate ? ts.toDate() : new Date(ts);
+            return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
+        async function startSync() {
+            // 1. Members Sync (Scanning all user profiles)
+            // We listen to the subcollections: artifacts/mindcompta-a61ef/users/{uid}/profile/data
+            // Since we can't query all subcollections easily without admin SDK, we fetch based on activity or a dedicated users collection
+            onSnapshot(collection(db, 'artifacts'), async (snap) => {
                 const list = document.getElementById('users-list');
                 list.innerHTML = '';
-                snap.forEach(d => {
-                    const u = d.data();
-                    list.innerHTML += `
-                        <tr class="hover:bg-gray-50 transition">
-                            <td class="p-4 font-bold text-blue-950">${u.displayName || 'Membres sans nom'}</td>
-                            <td class="p-4 text-gray-500 font-medium">${u.email || 'Email non fourni'}</td>
-                            <td class="p-4 text-right">
-                                <button onclick="deleteData('users', '${d.id}')" class="text-red-400 hover:text-red-600">Retirer</button>
+                let count = 0;
+
+                // For each potential user ID found in the system
+                for (const d of snap.docs) {
+                    if(d.id === appId) continue;
+                    count++;
+                    const uid = d.id;
+                    
+                    // Fetch the specific profile for this user
+                    const profileRef = doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data');
+                    
+                    // We use a listener for each profile to keep the dashboard live
+                    onSnapshot(profileRef, (pSnap) => {
+                        const existingRow = document.getElementById(`row-${uid}`);
+                        const p = pSnap.exists() ? pSnap.data() : { displayName: 'Inconnu', email: 'N/A' };
+                        
+                        const rowHtml = `
+                            <td class="p-4">
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-blue-950">${p.displayName || 'Utilisateur'}</span>
+                                    <span class="text-[10px] text-gray-400 font-mono">${uid}</span>
+                                </div>
                             </td>
-                        </tr>
-                    `;
-                });
+                            <td class="p-4 text-gray-600">${p.email || 'Pas d\'email'}</td>
+                            <td class="p-4 text-gray-500 text-xs">${formatDate(p.createdAt)}</td>
+                            <td class="p-4 text-gray-500 text-xs font-semibold">${formatDate(p.lastLogin)}</td>
+                            <td class="p-4 text-right">
+                                <span class="px-2 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-full border border-emerald-100">MEMBRE</span>
+                            </td>
+                        `;
+
+                        if (existingRow) {
+                            existingRow.innerHTML = rowHtml;
+                        } else {
+                            const tr = document.createElement('tr');
+                            tr.id = `row-${uid}`;
+                            tr.className = "hover:bg-gray-50 transition";
+                            tr.innerHTML = rowHtml;
+                            list.appendChild(tr);
+                        }
+                    });
+                }
+                updateCount('stat-users', count);
             });
 
-            // 2. Activity Aggregator (Downloads & Comments)
-            const downloadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'downloads');
-            const commentsRef = collection(db, 'artifacts', appId, 'public', 'data', 'comments');
-            
-            // Sync Counts
-            onSnapshot(downloadsRef, s => updateCount('stat-downloads', s.size));
-            onSnapshot(commentsRef, s => updateCount('stat-comments', s.size));
-
-            // Combined Feed
-            onSnapshot(query(commentsRef, orderBy("timestamp", "desc")), (cSnap) => {
+            // 2. Activity Logs
+            onSnapshot(query(collection(db, 'activity_logs'), orderBy("timestamp", "desc")), (snap) => {
                 const feed = document.getElementById('activity-feed');
-                // We clear and rebuild to maintain order (simplified version)
-                feed.innerHTML = '<h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Flux des derniers commentaires</h3>';
-                cSnap.forEach(cdoc => {
-                    const data = cdoc.data();
-                    const card = document.createElement('div');
-                    card.className = "bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-600 flex justify-between items-center";
-                    card.innerHTML = `
-                        <div>
-                            <p class="text-xs font-bold text-blue-600 uppercase">Commentaire</p>
-                            <p class="text-sm font-medium text-gray-800">"${data.text}"</p>
-                            <p class="text-[10px] text-gray-400 mt-1">Par <b>${data.userName || 'Utilisateur'}</b> le ${data.timestamp?.toDate().toLocaleString() || 'récemment'}</p>
+                feed.innerHTML = '<h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Dernières actions</h3>';
+                updateCount('stat-logs', snap.size);
+                snap.forEach(d => {
+                    const data = d.data();
+                    feed.innerHTML += `
+                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-emerald-500 flex justify-between items-center">
+                            <div>
+                                <p class="text-xs font-bold text-emerald-600 uppercase">Log</p>
+                                <p class="text-sm font-medium text-gray-800">${data.action || 'Action'}</p>
+                                <p class="text-[10px] text-gray-400 mt-1">${formatDate(data.timestamp)}</p>
+                            </div>
+                            <button onclick="deleteDoc(doc(db, 'activity_logs', '${d.id}'))" class="text-gray-300 hover:text-red-500">×</button>
                         </div>
-                        <button onclick="deleteData('comments', '${cdoc.id}')" class="text-gray-300 hover:text-red-500">Supprimer</button>
                     `;
-                    feed.appendChild(card);
                 });
             });
 
             // 3. Announcements
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'announcements'), orderBy("createdAt", "desc")), (snap) => {
+            const annRef = collection(db, 'artifacts', appId, 'public', 'data', 'announcements');
+            onSnapshot(query(annRef, orderBy("createdAt", "desc")), (snap) => {
                 updateCount('stat-announces', snap.size);
                 const list = document.getElementById('ann-list');
                 list.innerHTML = '';
@@ -183,21 +211,14 @@
                                 <p class="text-sm text-gray-600">${a.message}</p>
                             </div>
                             <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition">
-                                <button onclick="editAnn('${d.id}', '${a.title.replace(/'/g,"")}', '${a.message.replace(/'/g,"")}')" class="p-2 text-blue-600 bg-blue-50 rounded-lg">Modifier</button>
-                                <button onclick="deleteData('announcements', '${d.id}')" class="p-2 text-red-600 bg-red-50 rounded-lg">Effacer</button>
+                                <button onclick="editAnn('${d.id}', '${a.title}', '${a.message}')" class="p-2 text-blue-600 bg-blue-50 rounded-lg">Modifier</button>
+                                <button onclick="deleteDoc(doc(db, 'artifacts', '${appId}', 'public', 'data', 'announcements', '${d.id}'))" class="p-2 text-red-600 bg-red-50 rounded-lg">Effacer</button>
                             </div>
                         </div>
                     `;
                 });
             });
         }
-
-        // Global Actions
-        window.deleteData = async (coll, id) => {
-            if(confirm("Voulez-vous vraiment supprimer cet élément ?")) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', coll, id));
-            }
-        };
 
         window.editAnn = (id, title, msg) => {
             document.getElementById('edit-id').value = id;
@@ -208,41 +229,23 @@
             switchTab('announces');
         };
 
-        document.getElementById('btn-cancel').onclick = () => {
-            document.getElementById('edit-id').value = '';
-            document.getElementById('ann-title').value = '';
-            document.getElementById('ann-text').value = '';
-            document.getElementById('btn-save').innerText = "Publier";
-            document.getElementById('btn-cancel').classList.add('hidden');
-        };
-
         document.getElementById('btn-save').onclick = async () => {
             const id = document.getElementById('edit-id').value;
             const title = document.getElementById('ann-title').value;
             const message = document.getElementById('ann-text').value;
             if(!title || !message) return;
-
-            if(id) {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'announcements', id), { title, message });
-            } else {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'announcements'), {
-                    title, message, createdAt: serverTimestamp()
-                });
-            }
+            const col = collection(db, 'artifacts', appId, 'public', 'data', 'announcements');
+            if(id) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'announcements', id), { title, message });
+            else await addDoc(col, { title, message, createdAt: serverTimestamp() });
             document.getElementById('btn-cancel').click();
         };
 
-        // Auth Gate
         onAuthStateChanged(auth, (user) => {
-            if (user && user.uid === ADMIN_UID) {
-                startSync();
-            } else {
-                window.location.href = 'index.html';
-            }
+            if (user && user.uid === ADMIN_UID) startSync();
+            else window.location.href = 'index.html';
         });
 
         document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = 'index.html');
-
     </script>
 </body>
 </html>
