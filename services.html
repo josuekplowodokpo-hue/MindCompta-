@@ -21,6 +21,7 @@
         #mobile-menu.open { transform: translateX(0); }
         #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
         #mobile-menu-overlay.open { display: block; }
+        .comment-item { background: #f9fafb; border-radius: 12px; padding: 10px; border: 1px solid #f1f5f9; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -36,6 +37,10 @@
                 <a href="services.html" class="nav-link active-link">Services</a>
                 <a href="about.html" class="nav-link">À Propos</a>
                 <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
+                <!-- Bouton Admin Desktop -->
+                <div id="admin-link-desktop" class="hidden">
+                    <a href="admin.html" class="nav-link border-2 border-accent text-accent font-bold">Admin</a>
+                </div>
                 <div id="auth-actions-desktop" class="flex items-center ml-4 border-l border-blue-800 pl-4"></div>
             </nav>
             <button id="menu-button" class="md:hidden p-2 text-white"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
@@ -50,6 +55,8 @@
             <a href="services.html" class="p-3 bg-accent text-brand-dark rounded-lg font-bold">Services</a>
             <a href="about.html" class="p-3">À Propos</a>
             <a href="youtube.html" class="p-3">Vidéos YouTube</a>
+            <!-- Bouton Admin Mobile -->
+            <a id="admin-link-mobile" href="admin.html" class="p-3 text-accent font-bold border border-accent rounded-lg hidden">Tableau de Bord Admin</a>
             <hr class="border-gray-700 my-4">
             <div id="auth-actions-mobile"></div>
         </div>
@@ -114,45 +121,40 @@
 
         setPersistence(auth, browserSessionPersistence);
 
-        // --- TRAÇAGE D'ACTIVITÉ ---
         window.trackActivity = async (actionType, targetName) => {
-            const user = auth.currentUser;
-            if (!user) return;
-            try {
-                await addDoc(collection(db, "activity_logs"), {
-                    userEmail: user.email,
-                    userId: user.uid,
-                    action: actionType,
-                    target: targetName,
-                    timestamp: serverTimestamp()
-                });
-            } catch (e) { console.error("Erreur de log", e); }
+            const user = auth.currentUser; if (!user) return;
+            try { await addDoc(collection(db, "activity_logs"), { userEmail: user.email, userId: user.uid, action: actionType, target: targetName, timestamp: serverTimestamp() }); } catch (e) {}
         };
+
+        const toggleMenu = () => {
+            document.getElementById('mobile-menu').classList.toggle('open');
+            document.getElementById('mobile-menu-overlay').classList.toggle('open');
+        };
+        document.getElementById('menu-button').onclick = toggleMenu;
+        document.getElementById('close-menu-button').onclick = toggleMenu;
+        document.getElementById('mobile-menu-overlay').onclick = toggleMenu;
 
         window.switchTab = (tab) => {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'text-brand-dark'));
+            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active', 'text-brand-dark'); b.classList.add('text-gray-400'); });
             document.getElementById('section-' + tab).classList.remove('hidden');
-            document.getElementById('btn-' + tab).classList.add('active');
+            const activeBtn = document.getElementById('btn-' + tab);
+            activeBtn.classList.add('active', 'text-brand-dark'); activeBtn.classList.remove('text-gray-400');
         };
 
-        window.shareArticle = async (t, c) => { try { if (navigator.share) { await navigator.share({title:t, text:c.substring(0,100), url:window.location.href}); } else { await navigator.clipboard.writeText(window.location.href); alert("Lien copié !"); } } catch (e) {} };
-        
         window.toggleReadMore = (btn) => {
             const card = btn.closest('.post-card');
             const title = card.querySelector('.post-title').innerText;
             const container = btn.parentElement.querySelector('.content-text');
             const isCollapsed = container.classList.contains('content-collapsed');
-            
-            if (isCollapsed) { trackActivity("Lecture Article", title); }
-
+            if (isCollapsed) trackActivity("Lecture Article", title);
             container.classList.toggle('content-collapsed', !isCollapsed);
             container.classList.toggle('content-expanded', isCollapsed);
             btn.innerText = isCollapsed ? "Voir moins" : "Lire la suite";
         };
 
         window.handleLike = async (docId) => {
-            const user = auth.currentUser; if (!user) return alert("Connectez-vous !");
+            const user = auth.currentUser; if (!user) return;
             const likeRef = doc(db, "resources", docId, "likes", user.uid);
             const docRef = doc(db, "resources", docId);
             await runTransaction(db, async (t) => {
@@ -163,22 +165,14 @@
             });
         };
 
-        window.deletePublication = async (id, coll) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, coll, id)); };
-
-        window.editPublication = (id) => {
-            const card = document.querySelector(`[data-id="${id}"]`);
-            const titleEl = card.querySelector('.post-title');
-            const contentEl = card.querySelector('.content-text');
-            titleEl.innerHTML = `<input type="text" class="edit-title w-full p-2 border border-accent rounded mb-2 text-xl font-bold" value="${titleEl.innerText}">`;
-            contentEl.innerHTML = `<textarea class="edit-content w-full p-2 border border-accent rounded h-40">${contentEl.innerText}</textarea>`;
-            card.querySelector('.admin-controls').innerHTML = `<button onclick="saveEdit('${id}')" class="bg-green-600 text-white px-3 py-1 rounded text-[10px] font-bold">Enregistrer</button>`;
+        window.postComment = async (docId) => {
+            const input = document.getElementById(`comment-input-${docId}`);
+            const text = input.value.trim();
+            if (!text || !auth.currentUser) return;
+            try { await addDoc(collection(db, "resources", docId, "comments"), { userId: auth.currentUser.uid, userEmail: auth.currentUser.email, text: text, createdAt: serverTimestamp() }); input.value = ""; trackActivity("Commentaire", `Sur article ${docId}`); } catch (e) {}
         };
 
-        window.saveEdit = async (id) => {
-            const card = document.querySelector(`[data-id="${id}"]`);
-            await updateDoc(doc(db, "resources", id), { title: card.querySelector('.edit-title').value, content: card.querySelector('.edit-content').value });
-            window.location.reload();
-        };
+        window.deletePublication = async (id, coll) => { if(confirm("Supprimer définitivement ?")) await deleteDoc(doc(db, coll, id)); };
 
         onAuthStateChanged(auth, (user) => {
             document.getElementById('loader').classList.add('hidden');
@@ -188,10 +182,16 @@
                 document.getElementById('documents-list').classList.remove('hidden');
                 document.getElementById('library-list').classList.remove('hidden');
                 const isAdmin = user.uid === ADMIN_UID;
-                const logoutHTML = `<button id="logout" class="bg-red-600/20 border border-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase">Déconnexion</button>`;
+                const logoutHTML = `<button onclick="window.handleLogout()" class="bg-red-600/20 border border-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase">Déconnexion</button>`;
                 dAuth.innerHTML = logoutHTML; mAuth.innerHTML = logoutHTML;
-                document.querySelectorAll('#logout').forEach(b => b.onclick = () => signOut(auth).then(() => window.location.reload()));
-                if (isAdmin) { document.getElementById('admin-articles').classList.remove('hidden'); document.getElementById('admin-library').classList.remove('hidden'); }
+                
+                if (isAdmin) {
+                    document.getElementById('admin-articles').classList.remove('hidden');
+                    document.getElementById('admin-library').classList.remove('hidden');
+                    document.getElementById('admin-link-desktop').classList.remove('hidden');
+                    document.getElementById('admin-link-mobile').classList.remove('hidden');
+                }
+                
                 loadArticles(isAdmin, user.uid);
                 loadLibrary(isAdmin);
             } else {
@@ -199,83 +199,77 @@
             }
         });
 
+        window.handleLogout = () => signOut(auth).then(() => window.location.reload());
+
         function loadArticles(isAdmin, currentUid) {
             onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snap) => {
                 const list = document.getElementById('documents-list'); list.innerHTML = '';
                 snap.forEach(async (docSnap) => {
                     const data = docSnap.data(); const docId = docSnap.id;
-                    const userLikeRef = doc(db, "resources", docId, "likes", currentUid);
-                    const userLikeSnap = await getDoc(userLikeRef); const isLiked = userLikeSnap.exists();
                     const art = document.createElement('article');
-                    art.className = "post-card bg-white p-6 md:p-8 rounded-2xl shadow-sm relative";
-                    art.setAttribute('data-id', docId);
+                    art.className = "post-card bg-white p-6 md:p-8 rounded-2xl shadow-sm mb-6";
                     art.innerHTML = `
                         <div class="flex justify-between items-center mb-4">
                             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">MindCompta</span>
-                            <div class="admin-controls">${isAdmin ? `<button onclick="editPublication('${docId}')" class="text-blue-600 text-xs font-bold mr-2 uppercase">Modifier</button><button onclick="deletePublication('${docId}', 'resources')" class="text-red-500 text-xs font-bold uppercase">Supprimer</button>` : ''}</div>
+                            ${isAdmin ? `<button onclick="deletePublication('${docId}', 'resources')" class="text-red-500 text-xs font-bold uppercase">Supprimer</button>` : ''}
                         </div>
-                        ${data.imageUrl ? `<img src="${data.imageUrl}" class="w-full h-64 object-cover rounded-xl mb-4 shadow-sm">` : ''}
+                        ${data.imageUrl ? `<img src="${data.imageUrl}" class="w-full h-64 object-cover rounded-xl mb-4">` : ''}
                         <h3 class="post-title text-2xl font-black text-brand-dark mb-4">${data.title}</h3>
-                        <div class="content-text text-gray-600 whitespace-pre-wrap leading-relaxed content-collapsed">${data.content}</div>
-                        <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2 hover:underline">Lire la suite</button>
-                        <div class="mt-6 pt-6 border-t border-gray-100 flex justify-between items-center">
-                            <div class="flex items-center gap-4">
-                                <button onclick="shareArticle('${data.title.replace(/'/g, "\\'")}', '${data.content.substring(0,50).replace(/'/g, "\\'")}')" class="text-gray-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-                                </button>
-                                <button onclick="handleLike('${docId}')" class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg><span class="text-sm font-bold ${isLiked ? 'text-red-500' : 'text-gray-500'}">${data.likesCount || 0}</span></button>
+                        <div class="content-text text-gray-600 leading-relaxed content-collapsed">${data.content}</div>
+                        <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2">Lire la suite</button>
+                        <div class="mt-6 pt-6 border-t flex gap-6">
+                             <button onclick="handleLike('${docId}')" id="like-btn-${docId}" class="flex items-center gap-1.5 transition">
+                                <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" id="like-icon-${docId}"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                                <span class="text-sm font-bold text-gray-500" id="like-count-${docId}">${data.likesCount || 0}</span>
+                             </button>
+                        </div>
+                        <div class="mt-8 bg-gray-50 p-4 rounded-xl">
+                            <h4 class="text-xs font-bold uppercase text-gray-400 mb-4">Commentaires</h4>
+                            <div id="comments-container-${docId}" class="space-y-3 mb-4 max-h-60 overflow-y-auto pr-2"></div>
+                            <div class="flex gap-2">
+                                <input id="comment-input-${docId}" type="text" class="flex-grow p-2 text-sm border rounded-lg outline-none focus:border-brand-dark" placeholder="Écrire un commentaire...">
+                                <button onclick="postComment('${docId}')" class="bg-brand-dark text-white px-4 py-2 rounded-lg text-xs font-bold uppercase">Poster</button>
                             </div>
                         </div>`;
                     list.appendChild(art);
+                    onSnapshot(doc(db, "resources", docId, "likes", currentUid), (lSnap) => {
+                        const icon = document.getElementById(`like-icon-${docId}`);
+                        const count = document.getElementById(`like-count-${docId}`);
+                        if (lSnap.exists()) { icon.classList.replace('text-gray-400', 'text-red-500'); icon.setAttribute('fill', 'currentColor'); count.classList.replace('text-gray-500', 'text-red-500'); }
+                        else { icon.classList.replace('text-red-500', 'text-gray-400'); icon.setAttribute('fill', 'none'); count.classList.replace('text-red-500', 'text-gray-500'); }
+                    });
+                    loadComments(docId, isAdmin, currentUid);
                 });
             });
         }
+
+        function loadComments(docId, isAdmin, currentUid) {
+            const container = document.getElementById(`comments-container-${docId}`);
+            onSnapshot(query(collection(db, "resources", docId, "comments"), orderBy("createdAt", "asc")), (snap) => {
+                container.innerHTML = '';
+                snap.forEach(cSnap => {
+                    const c = cSnap.data(); const isMyComment = c.userId === currentUid;
+                    const commentDiv = document.createElement('div'); commentDiv.className = "comment-item";
+                    commentDiv.innerHTML = `<div class="flex justify-between items-center mb-1"><span class="font-bold text-brand-dark text-[11px]">${c.userEmail ? c.userEmail.split('@')[0] : 'Anonyme'}</span>${(isAdmin || isMyComment) ? `<button onclick="deleteComment('${docId}', '${cSnap.id}')" class="text-red-400 text-[10px] hover:underline uppercase font-bold">Supprimer</button>` : ''}</div><p class="text-gray-700 text-sm leading-snug">${c.text}</p>`;
+                    container.appendChild(commentDiv);
+                });
+            });
+        }
+
+        window.deleteComment = async (docId, commentId) => { if(confirm("Supprimer ce commentaire ?")) await deleteDoc(doc(db, "resources", docId, "comments", commentId)); };
 
         function loadLibrary(isAdmin) {
             onSnapshot(query(collection(db, "library"), orderBy("createdAt", "desc")), (snap) => {
                 const list = document.getElementById('library-list'); list.innerHTML = '';
                 snap.forEach(ds => {
                     const b = ds.data();
-                    list.innerHTML += `
-                        <div class="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col border border-gray-100">
-                            <img src="${b.imageUrl}" class="w-full h-56 object-cover">
-                            <div class="p-5 flex-grow">
-                                <h4 class="font-black text-brand-dark mb-1 leading-tight">${b.title}</h4>
-                                <p class="text-[10px] font-black text-accent uppercase mb-3 tracking-widest">Auteur: ${b.author}</p>
-                                <p class="text-xs text-gray-500 line-clamp-3 mb-4">${b.description}</p>
-                                <a href="${b.bookUrl}" 
-                                   onclick="trackActivity('Téléchargement Livre', '${b.title.replace(/'/g, "\\'")}')"
-                                   target="_blank" 
-                                   class="block w-full text-center bg-brand-dark text-white text-xs font-bold py-3 rounded-lg hover:bg-blue-900 transition">TÉLÉCHARGER LE LIVRE</a>
-                            </div>
-                            ${isAdmin ? `<button onclick="deletePublication('${ds.id}', 'library')" class="bg-red-50 text-red-500 text-[10px] font-bold py-2 border-t">SUPPRIMER</button>` : ''}
-                        </div>`;
+                    list.innerHTML += `<div class="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col border border-gray-100"><img src="${b.imageUrl}" class="w-full h-56 object-cover"><div class="p-5 flex-grow"><h4 class="font-black text-brand-dark mb-1 leading-tight">${b.title}</h4><p class="text-[10px] font-black text-accent uppercase mb-3 tracking-widest">Auteur: ${b.author}</p><a href="${b.bookUrl}" onclick="trackActivity('Téléchargement Livre', '${b.title.replace(/'/g, "\\'")}')" target="_blank" class="block w-full text-center bg-brand-dark text-white text-xs font-bold py-3 rounded-lg hover:bg-blue-900 transition uppercase">Télécharger</a></div>${isAdmin ? `<button onclick="deletePublication('${ds.id}', 'library')" class="bg-red-50 text-red-500 text-[10px] font-bold py-2 border-t hover:bg-red-100 uppercase">Supprimer</button>` : ''}</div>`;
                 });
             });
         }
 
-        document.getElementById('add-doc-form').onsubmit = async (e) => {
-            e.preventDefault();
-            await addDoc(collection(db, "resources"), { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null, likesCount: 0, createdAt: serverTimestamp() });
-            e.target.reset();
-        };
-
-        document.getElementById('add-book-form').onsubmit = async (e) => {
-            e.preventDefault();
-            await addDoc(collection(db, "library"), { title: document.getElementById('book-title').value, author: document.getElementById('book-author').value, imageUrl: document.getElementById('book-image').value, bookUrl: document.getElementById('book-url').value, description: document.getElementById('book-desc').value, createdAt: serverTimestamp() });
-            e.target.reset(); alert("Livre ajouté !");
-        };
-
-        // --- FIN DU SCRIPT MANQUANT ---
-        const toggle = () => { 
-            document.getElementById('mobile-menu').classList.toggle('open'); 
-            document.getElementById('mobile-menu-overlay').classList.toggle('open'); 
-        };
-        document.getElementById('menu-button').onclick = toggle; 
-        document.getElementById('close-menu-button').onclick = toggle; 
-        document.getElementById('mobile-menu-overlay').onclick = toggle;
-
-        window.signOut = (a) => signOut(a).then(() => window.location.reload());
+        document.getElementById('add-doc-form').onsubmit = async (e) => { e.preventDefault(); await addDoc(collection(db, "resources"), { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null, likesCount: 0, createdAt: serverTimestamp() }); e.target.reset(); };
+        document.getElementById('add-book-form').onsubmit = async (e) => { e.preventDefault(); await addDoc(collection(db, "library"), { title: document.getElementById('book-title').value, author: document.getElementById('book-author').value, imageUrl: document.getElementById('book-image').value, bookUrl: document.getElementById('book-url').value, description: document.getElementById('book-desc').value, createdAt: serverTimestamp() }); e.target.reset(); };
     </script>
 </body>
 </html>
