@@ -114,15 +114,17 @@
         </div>
     </section>
 
-    <section class="w-full max-w-6xl mx-auto py-12 px-4">
-        <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
-            <h2 class="text-2xl font-black text-brand-dark uppercase tracking-tight">Dernières Mises à Jour</h2>
-            <span class="text-[10px] font-bold text-accent uppercase tracking-widest bg-accent/10 px-3 py-1 rounded-full">Actualité</span>
+   <section class="w-full max-w-6xl mx-auto py-12 px-4">
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+        <h2 class="text-2xl font-black text-brand-dark uppercase tracking-tight">Dernières Mises à Jour</h2>
+        <span class="text-[10px] font-bold text-accent uppercase tracking-widest bg-accent/10 px-3 py-1 rounded-full">Actualité</span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="recent-updates-grid">
+        <div class="col-span-full py-10 text-center flex justify-center">
+             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="recent-updates-grid">
-            <div class="col-span-full py-10 text-center text-gray-400 italic">Chargement...</div>
-        </div>
-    </section>
+    </div>
+</section>
 
     <div id="notification-bell" class="bg-brand-dark rounded-full shadow-2xl border-2 border-white/20 select-none">
         <span class="text-2xl">🔔</span>
@@ -261,6 +263,75 @@
         }
         document.getElementById('menu-button').onclick = () => { document.getElementById('mobile-menu').classList.add('open'); document.getElementById('mobile-menu-overlay').classList.remove('hidden'); };
         document.getElementById('close-menu-button').onclick = () => { document.getElementById('mobile-menu').classList.remove('open'); document.getElementById('mobile-menu-overlay').classList.add('hidden'); };
-    </script>
+    // --- FONCTION DE MISE À JOUR DU FLUX D'ACTUALITÉ ---
+async function loadRecentUpdates() {
+    const grid = document.getElementById('recent-updates-grid');
+    if (!grid) return;
+
+    try {
+        const qArticle = query(collection(db, "resources"), orderBy("createdAt", "desc"), limit(1));
+        const qVideo = query(collection(db, "youtube_videos"), orderBy("createdAt", "desc"), limit(1));
+        const qBook = query(collection(db, "library"), orderBy("createdAt", "desc"), limit(1));
+
+        grid.innerHTML = ''; 
+
+        // Article -> redirige vers services.html
+        onSnapshot(qArticle, (snap) => {
+            snap.forEach(ds => renderUpdateCard(ds.data(), 'Article', 'services.html', 'bg-brand-dark'));
+        });
+
+        // Vidéo -> redirige vers youtube.html
+        onSnapshot(qVideo, (snap) => {
+            snap.forEach(ds => renderUpdateCard(ds.data(), 'Vidéo', 'youtube.html', 'bg-red-600'));
+        });
+
+        // Livre -> redirige AUSSI vers services.html
+        onSnapshot(qBook, (snap) => {
+            snap.forEach(ds => renderUpdateCard(ds.data(), 'Livre', 'services.html', 'bg-accent'));
+        });
+
+    } catch (error) {
+        console.error("Erreur flux actualité:", error);
+        grid.innerHTML = `<p class="col-span-full text-center text-gray-400 italic text-xs uppercase tracking-widest py-10">Mises à jour non disponibles</p>`;
+    }
+}
+
+// Fonction pour générer le design des cartes
+function renderUpdateCard(data, type, link, colorClass) {
+    const grid = document.getElementById('recent-updates-grid');
+    const cardId = `update-${type}`;
+    
+    let card = document.getElementById(cardId);
+    if (!card) {
+        card = document.createElement('div');
+        card.id = cardId;
+        grid.appendChild(card);
+    }
+
+    card.className = "group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition duration-300";
+    card.innerHTML = `
+        <div class="p-1">
+            <div class="h-40 bg-gray-200 overflow-hidden rounded-t-xl relative">
+                <img src="${data.imageUrl || (data.youtubeId ? 'https://img.youtube.com/vi/'+data.youtubeId+'/mqdefault.jpg' : 'logo.jpg')}" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                     onerror="this.src='logo.jpg'">
+                <span class="absolute top-3 left-3 ${colorClass} text-white text-[9px] font-black px-2 py-1 rounded uppercase tracking-widest">
+                    Nouveau ${type}
+                </span>
+            </div>
+        </div>
+        <div class="p-5">
+            <h3 class="font-bold text-brand-dark text-lg leading-snug mb-2 line-clamp-2">${data.title}</h3>
+            <p class="text-gray-500 text-xs line-clamp-2 mb-4">${data.content || data.description || 'Découvrez cette nouvelle ressource MindCompta.'}</p>
+            <a href="${link}" class="text-brand-dark text-[10px] font-black uppercase tracking-widest flex items-center group-hover:gap-2 transition-all">
+                Consulter maintenant <span class="ml-1">→</span>
+            </a>
+        </div>
+    `;
+}
+
+loadRecentUpdates();
+
+        </script>
 </body>
 </html>
