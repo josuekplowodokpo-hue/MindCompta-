@@ -14,12 +14,12 @@
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
         .nav-link:hover { background-color: #345b85; }
         .active-link-desktop { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
-        
+
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
         #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
         #mobile-menu-overlay.open { display: block; }
-        
+
         .mobile-link { display: block; padding: 0.75rem 1rem; color: white; font-weight: 500; border-radius: 0.5rem; }
         .active-link-mobile { background-color: var(--accent); color: var(--brand-dark); font-weight: 700; }
     </style>
@@ -29,7 +29,7 @@
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center group">
-                <img src="logo.jpg" alt="Logo" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
+                <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
                 <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
             </a>
             <nav class="hidden sm:flex items-center space-x-4">
@@ -37,6 +37,9 @@
                 <a href="services.html" class="nav-link">Services</a>
                 <a href="about.html" class="nav-link">À Propos</a>
                 <a href="youtube.html" class="nav-link active-link-desktop">Vidéos YouTube</a>
+                <div id="admin-link-desktop" class="hidden">
+                    <a href="admin.html" class="nav-link border-2 border-accent text-accent font-bold">Admin</a>
+                </div>
                 <div id="auth-actions-desktop" class="flex items-center ml-4 pl-4 border-l border-blue-800"></div>
             </nav>
             <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
@@ -52,13 +55,13 @@
                 <a href="services.html" class="mobile-link">Services</a>
                 <a href="about.html" class="mobile-link">À Propos</a>
                 <a href="youtube.html" class="mobile-link active-link-mobile">Vidéos YouTube</a>
+                <a id="admin-link-mobile" href="admin.html" class="mobile-link text-accent font-bold border border-accent hidden">Admin</a>
                 <div id="auth-actions-mobile" class="pt-4 border-t border-blue-800 mt-4 space-y-3"></div>
             </div>
         </div>
     </nav>
 
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-12">
-        
         <div class="text-center mb-6">
             <h1 class="text-4xl font-extrabold text-brand-dark mb-4">Vidéos YouTube</h1>
             <a href="https://youtube.com/@mindcompta-info?si=E45uoy_v5xDGrtfp" target="_blank" class="inline-flex items-center bg-red-600 text-white px-6 py-2 rounded-full font-bold hover:bg-red-700 transition shadow-lg uppercase text-sm">
@@ -71,9 +74,9 @@
             <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase text-center">Publier une vidéo</h2>
             <form id="add-video-form" class="space-y-4 max-w-2xl mx-auto">
                 <input type="text" id="v-title" required class="w-full border p-3 rounded-lg" placeholder="Titre de la vidéo">
-                <input type="url" id="v-url" required class="w-full border p-3 rounded-lg" placeholder="Lien YouTube complet (ex: https://www.youtube.com/watch?v=...)">
+                <input type="url" id="v-url" required class="w-full border p-3 rounded-lg" placeholder="Lien YouTube complet">
                 <textarea id="v-desc" rows="2" class="w-full border p-3 rounded-lg" placeholder="Description de la vidéo..."></textarea>
-                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg uppercase hover:bg-blue-900 transition shadow-md">Publier sur le site</button>
+                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-3 rounded-lg uppercase hover:bg-blue-900 transition">Publier</button>
             </form>
         </div>
 
@@ -82,25 +85,14 @@
         </div>
     </main>
 
-    <footer class="w-full bg-brand-dark border-t border-gray-700 py-8">
-        <div class="max-w-6xl mx-auto px-4 text-center">
-            <p class="text-white font-bold text-lg mb-2">MindCompta Finance</p>
-            <p class="text-gray-400 text-sm mb-6">Expertise en Droit OHADA et Comptabilité.</p>
-            <div class="flex justify-center space-x-6 mb-8">
-                <a href="index.html" class="text-gray-400 hover:text-white transition text-xs">Accueil</a>
-                <a href="services.html" class="text-gray-400 hover:text-white transition text-xs">Services</a>
-                <a href="youtube.html" class="text-gray-400 hover:text-white transition text-xs">YouTube</a>
-            </div>
-            <p class="text-gray-500 text-[10px] tracking-widest uppercase">
-                &copy; 2025 MindCompta. Tous droits réservés.
-            </p>
-        </div>
+    <footer class="w-full bg-brand-dark py-8 text-center">
+        <p class="text-gray-500 text-[10px] tracking-widest uppercase">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const fb = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
         const app = initializeApp(fb); const auth = getAuth(app); const db = getFirestore(app);
@@ -116,33 +108,35 @@
         onAuthStateChanged(auth, (user) => {
             const dActions = document.getElementById('auth-actions-desktop');
             const mActions = document.getElementById('auth-actions-mobile');
-            const isAdmin = user && user.uid === ADMIN_UID;
-
             if (user) {
+                const isAdmin = user.uid === ADMIN_UID;
                 const name = user.email.split('@')[0];
-                const logoutUI = `<div class="flex flex-col items-center"><span class="text-accent text-[10px] font-bold">${name}</span><button id="lo-btn" class="bg-red-600 px-3 py-1 rounded text-white text-[10px] font-bold uppercase">Déconnexion</button></div>`;
-                dActions.innerHTML = logoutUI;
+                const logoutBtn = `<button id="lo-btn" class="bg-red-600 px-3 py-1 rounded text-white text-[10px] font-bold uppercase ml-2">Déconnexion</button>`;
+                dActions.innerHTML = `<span class="text-accent text-[10px] font-bold">${name}</span>` + logoutBtn;
                 mActions.innerHTML = `<span class="text-accent text-sm font-bold block">Connecté: ${name}</span><button id="lo-btn-m" class="bg-red-600 w-full py-2 rounded text-white font-bold text-xs uppercase">Déconnexion</button>`;
                 document.getElementById('lo-btn')?.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
                 document.getElementById('lo-btn-m')?.addEventListener('click', () => signOut(auth).then(() => window.location.reload()));
-                if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
+                if (isAdmin) {
+                    document.getElementById('admin-section').classList.remove('hidden');
+                    document.getElementById('admin-link-desktop').classList.remove('hidden');
+                    document.getElementById('admin-link-mobile').classList.remove('hidden');
+                }
+                loadVideos(isAdmin, user.uid);
             } else {
-                const loginUI = `<a href="login.html" class="bg-accent py-2 px-5 text-sm font-bold rounded-full text-white">Connexion</a>`;
-                dActions.innerHTML = loginUI;
+                const loginBtn = `<a href="login.html" class="bg-accent py-2 px-5 text-sm font-bold rounded-full text-white">Connexion</a>`;
+                dActions.innerHTML = loginBtn;
                 mActions.innerHTML = `<a href="login.html" class="mobile-link bg-accent text-brand-dark text-center font-bold">Connexion</a>`;
+                loadVideos(false, null);
             }
-            loadVideos(isAdmin);
         });
 
-        function loadVideos(isAdmin) {
+        function loadVideos(isAdmin, currentUid) {
             onSnapshot(query(collection(db, "youtube_videos"), orderBy("createdAt", "desc")), (snap) => {
                 const list = document.getElementById('videos-list'); list.innerHTML = '';
                 document.getElementById('loader')?.remove();
-                const isLoggedIn = auth.currentUser !== null;
-
+                
                 snap.forEach((ds, index) => {
-                    if (!isLoggedIn && index > 0) return;
-
+                    if (!currentUid && index > 0) return;
                     const v = ds.data(); const id = ds.id;
                     const card = document.createElement('div');
                     card.className = "bg-white rounded-xl shadow-lg overflow-hidden border flex flex-col";
@@ -151,33 +145,67 @@
                         <div class="p-5 flex-grow">
                             <div class="flex justify-between items-start mb-2">
                                 <h3 class="font-bold text-brand-dark leading-tight">${v.title}</h3>
-                                <button onclick="window.handleLike('${id}')" class="flex items-center space-x-1 text-gray-400 hover:text-red-500 transition">
-                                    <span class="text-lg">❤️</span>
-                                    <span class="text-xs font-bold">${v.likesCount || 0}</span>
+                                <button onclick="window.handleLike('${id}')" id="like-btn-${id}" class="flex items-center space-x-1 transition group">
+                                    <svg id="like-icon-${id}" class="h-6 w-6 text-gray-400 group-hover:scale-110 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                                    <span id="like-count-${id}" class="text-xs font-bold text-gray-500">${v.likesCount || 0}</span>
                                 </button>
                             </div>
                             <div class="mt-3">
-                                ${isAdmin ? 
-                                    `<textarea onblur="window.updateDesc('${id}', this.value)" class="w-full text-sm border p-2 rounded bg-blue-50 focus:ring-1 focus:ring-accent" rows="2">${v.description || ''}</textarea>` 
-                                    : `<p class="text-sm text-gray-600 line-clamp-3">${v.description || 'Pas de description.'}</p>`
-                                }
+                                ${isAdmin ? `<textarea onblur="window.updateDesc('${id}', this.value)" class="w-full text-sm border p-2 rounded bg-blue-50" rows="2">${v.description || ''}</textarea>` : `<p class="text-sm text-gray-600 line-clamp-3">${v.description || 'Pas de description.'}</p>`}
                             </div>
                             ${isAdmin ? `<button onclick="window.delVideo('${id}')" class="text-red-500 text-[10px] font-bold mt-4 uppercase">Supprimer</button>` : ''}
                         </div>`;
                     list.appendChild(card);
+
+                    // Real-time Like State
+                    if (currentUid) {
+                        onSnapshot(doc(db, "youtube_videos", id, "likes", currentUid), (lSnap) => {
+                            const icon = document.getElementById(`like-icon-${id}`);
+                            const count = document.getElementById(`like-count-${id}`);
+                            if (lSnap.exists()) {
+                                icon.classList.replace('text-gray-400', 'text-red-500');
+                                icon.setAttribute('fill', 'currentColor');
+                                count.classList.replace('text-gray-500', 'text-red-500');
+                            } else {
+                                icon.classList.replace('text-red-500', 'text-gray-400');
+                                icon.setAttribute('fill', 'none');
+                                count.classList.replace('text-red-500', 'text-gray-500');
+                            }
+                        });
+                    }
                 });
 
-                if (!isLoggedIn && snap.size > 1) {
+                if (!currentUid && snap.size > 1) {
                     const invite = document.createElement('div');
                     invite.className = "col-span-full text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 mt-4";
-                    invite.innerHTML = `
-                        <p class="text-gray-500 font-bold mb-4 italic">Plus de vidéos disponibles. Connectez-vous pour voir l'intégralité du contenu !</p>
-                        <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold uppercase text-xs shadow-md">Se connecter</a>
-                    `;
+                    invite.innerHTML = `<p class="text-gray-500 font-bold mb-4 italic">Connectez-vous pour voir l'intégralité du contenu !</p><a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold uppercase text-xs">Se connecter</a>`;
                     list.appendChild(invite);
                 }
             });
         }
+
+        window.handleLike = async (videoId) => {
+            const user = auth.currentUser; if (!user) return alert("Veuillez vous connecter pour liker.");
+            const likeRef = doc(db, "youtube_videos", videoId, "likes", user.uid);
+            const videoRef = doc(db, "youtube_videos", videoId);
+            
+            await runTransaction(db, async (t) => {
+                const vSnap = await t.get(videoRef);
+                const lSnap = await t.get(likeRef);
+                let currentLikes = vSnap.data().likesCount || 0;
+                
+                if (lSnap.exists()) {
+                    t.delete(likeRef);
+                    t.update(videoRef, { likesCount: Math.max(0, currentLikes - 1) });
+                } else {
+                    t.set(likeRef, { uid: user.uid });
+                    t.update(videoRef, { likesCount: currentLikes + 1 });
+                }
+            });
+        };
+
+        window.updateDesc = async (id, val) => { await updateDoc(doc(db, "youtube_videos", id), { description: val }); };
+        window.delVideo = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "youtube_videos", id)); };
 
         document.getElementById('add-video-form').onsubmit = async (e) => {
             e.preventDefault();
@@ -187,17 +215,6 @@
             e.target.reset();
         };
 
-        window.handleLike = async (id) => {
-            if(!auth.currentUser) return alert("Veuillez vous connecter pour liker.");
-            await updateDoc(doc(db, "youtube_videos", id), { likesCount: increment(1) });
-        };
-
-        window.updateDesc = async (id, val) => {
-            await updateDoc(doc(db, "youtube_videos", id), { description: val });
-        };
-
-        window.delVideo = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "youtube_videos", id)); };
-
         const menu = document.getElementById('mobile-menu');
         const overlay = document.getElementById('mobile-menu-overlay');
         document.getElementById('menu-button').onclick = () => { menu.classList.add('open'); overlay.classList.add('open'); };
@@ -206,3 +223,4 @@
     </script>
 </body>
 </html>
+
