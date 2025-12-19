@@ -43,13 +43,13 @@
     </header>
 
     <div id="mobile-menu-overlay"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-brand-dark text-white shadow-2xl z-50 p-6 flex flex-col">
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-brand-dark text-white shadow-2xl z-50 p-6 flex flex-col text-sm">
         <button id="close-menu-button" class="absolute top-4 right-4 text-4xl">&times;</button>
         <div class="pt-12 flex flex-col h-full space-y-3">
-            <a href="index.html" class="p-3 hover:bg-blue-800 rounded-lg">Accueil</a>
+            <a href="index.html" class="p-3">Accueil</a>
             <a href="services.html" class="p-3 bg-accent text-brand-dark rounded-lg font-bold">Services</a>
-            <a href="about.html" class="p-3 hover:bg-blue-800 rounded-lg">À Propos</a>
-            <a href="youtube.html" class="p-3 hover:bg-blue-800 rounded-lg">Vidéos YouTube</a>
+            <a href="about.html" class="p-3">À Propos</a>
+            <a href="youtube.html" class="p-3">Vidéos YouTube</a>
             <hr class="border-gray-700 my-4">
             <div id="auth-actions-mobile"></div>
         </div>
@@ -57,8 +57,8 @@
 
     <main class="w-full max-w-5xl mx-auto p-4 flex-grow">
         <div class="flex justify-center space-x-12 border-b mb-10 mt-6">
-            <button onclick="switchTab('articles')" id="btn-articles" class="tab-btn active pb-3 uppercase text-sm tracking-widest font-bold transition-all">Flux Ressources</button>
-            <button onclick="switchTab('library')" id="btn-library" class="tab-btn pb-3 uppercase text-sm tracking-widest font-bold text-gray-400 transition-all">Bibliothèque</button>
+            <button onclick="switchTab('articles')" id="btn-articles" class="tab-btn active pb-3 uppercase text-sm tracking-widest font-bold">Flux Ressources</button>
+            <button onclick="switchTab('library')" id="btn-library" class="tab-btn pb-3 uppercase text-sm tracking-widest font-bold text-gray-400">Bibliothèque</button>
         </div>
 
         <div id="section-articles" class="tab-content">
@@ -68,7 +68,7 @@
                     <input type="text" id="doc-title" required class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark font-semibold" placeholder="Titre de l'article...">
                     <input type="url" id="doc-image" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Lien de l'image (URL)">
                     <textarea id="doc-content" required rows="6" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Contenu de l'article..."></textarea>
-                    <button type="submit" class="w-full bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-900 transition uppercase">Diffuser sur le flux</button>
+                    <button type="submit" class="w-full bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg uppercase">Diffuser sur le flux</button>
                 </form>
             </div>
             <div id="documents-list" class="grid grid-cols-1 gap-8 hidden"></div>
@@ -81,9 +81,9 @@
                     <input type="text" id="book-title" required class="w-full p-4 border-2 border-gray-100 rounded-xl" placeholder="Titre du livre">
                     <input type="text" id="book-author" required class="w-full p-4 border-2 border-gray-100 rounded-xl" placeholder="Nom de l'auteur">
                     <input type="url" id="book-image" required class="w-full p-4 border-2 border-gray-100 rounded-xl" placeholder="URL de la couverture">
-                    <input type="url" id="book-url" required class="w-full p-4 border-2 border-gray-100 rounded-xl" placeholder="Lien de téléchargement (PDF/Drive)">
+                    <input type="url" id="book-url" required class="w-full p-4 border-2 border-gray-100 rounded-xl" placeholder="Lien de téléchargement">
                     <textarea id="book-desc" required rows="3" class="w-full p-4 border-2 border-gray-100 rounded-xl" placeholder="Description du livre..."></textarea>
-                    <button type="submit" class="w-full bg-accent text-brand-dark font-bold py-4 rounded-xl shadow-lg uppercase">Ajouter à la Bibliothèque</button>
+                    <button type="submit" class="w-full bg-accent text-brand-dark font-bold py-4 rounded-xl uppercase">Ajouter à la Bibliothèque</button>
                 </form>
             </div>
             <div id="library-list" class="grid grid-cols-1 md:grid-cols-3 gap-8 hidden"></div>
@@ -114,7 +114,21 @@
 
         setPersistence(auth, browserSessionPersistence);
 
-        // --- NAVIGATION TABS ---
+        // --- TRAÇAGE D'ACTIVITÉ ---
+        window.trackActivity = async (actionType, targetName) => {
+            const user = auth.currentUser;
+            if (!user) return;
+            try {
+                await addDoc(collection(db, "activity_logs"), {
+                    userEmail: user.email,
+                    userId: user.uid,
+                    action: actionType,
+                    target: targetName,
+                    timestamp: serverTimestamp()
+                });
+            } catch (e) { console.error("Erreur de log", e); }
+        };
+
         window.switchTab = (tab) => {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'text-brand-dark'));
@@ -122,12 +136,16 @@
             document.getElementById('btn-' + tab).classList.add('active');
         };
 
-        // --- FONCTIONS ARTICLES (RESTORES) ---
         window.shareArticle = async (t, c) => { try { if (navigator.share) { await navigator.share({title:t, text:c.substring(0,100), url:window.location.href}); } else { await navigator.clipboard.writeText(window.location.href); alert("Lien copié !"); } } catch (e) {} };
         
         window.toggleReadMore = (btn) => {
+            const card = btn.closest('.post-card');
+            const title = card.querySelector('.post-title').innerText;
             const container = btn.parentElement.querySelector('.content-text');
             const isCollapsed = container.classList.contains('content-collapsed');
+            
+            if (isCollapsed) { trackActivity("Lecture Article", title); }
+
             container.classList.toggle('content-collapsed', !isCollapsed);
             container.classList.toggle('content-expanded', isCollapsed);
             btn.innerText = isCollapsed ? "Voir moins" : "Lire la suite";
@@ -162,7 +180,6 @@
             window.location.reload();
         };
 
-        // --- AUTH & LOAD ---
         onAuthStateChanged(auth, (user) => {
             document.getElementById('loader').classList.add('hidden');
             const dAuth = document.getElementById('auth-actions-desktop');
@@ -203,7 +220,9 @@
                         <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2 hover:underline">Lire la suite</button>
                         <div class="mt-6 pt-6 border-t border-gray-100 flex justify-between items-center">
                             <div class="flex items-center gap-4">
-                                <button onclick="shareArticle('${data.title.replace(/'/g, "\\'")}', '${data.content.substring(0,50).replace(/'/g, "\\'")}')" class="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg></button>
+                                <button onclick="shareArticle('${data.title.replace(/'/g, "\\'")}', '${data.content.substring(0,50).replace(/'/g, "\\'")}')" class="text-gray-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                                </button>
                                 <button onclick="handleLike('${docId}')" class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg><span class="text-sm font-bold ${isLiked ? 'text-red-500' : 'text-gray-500'}">${data.likesCount || 0}</span></button>
                             </div>
                         </div>`;
@@ -224,7 +243,10 @@
                                 <h4 class="font-black text-brand-dark mb-1 leading-tight">${b.title}</h4>
                                 <p class="text-[10px] font-black text-accent uppercase mb-3 tracking-widest">Auteur: ${b.author}</p>
                                 <p class="text-xs text-gray-500 line-clamp-3 mb-4">${b.description}</p>
-                                <a href="${b.bookUrl}" target="_blank" class="block w-full text-center bg-brand-dark text-white text-xs font-bold py-3 rounded-lg hover:bg-blue-900 transition">TÉLÉCHARGER LE LIVRE</a>
+                                <a href="${b.bookUrl}" 
+                                   onclick="trackActivity('Téléchargement Livre', '${b.title.replace(/'/g, "\\'")}')"
+                                   target="_blank" 
+                                   class="block w-full text-center bg-brand-dark text-white text-xs font-bold py-3 rounded-lg hover:bg-blue-900 transition">TÉLÉCHARGER LE LIVRE</a>
                             </div>
                             ${isAdmin ? `<button onclick="deletePublication('${ds.id}', 'library')" class="bg-red-50 text-red-500 text-[10px] font-bold py-2 border-t">SUPPRIMER</button>` : ''}
                         </div>`;
@@ -232,7 +254,6 @@
             });
         }
 
-        // --- FORMS SUBMIT ---
         document.getElementById('add-doc-form').onsubmit = async (e) => {
             e.preventDefault();
             await addDoc(collection(db, "resources"), { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null, likesCount: 0, createdAt: serverTimestamp() });
@@ -245,9 +266,16 @@
             e.target.reset(); alert("Livre ajouté !");
         };
 
-        // Menu Logic
-        const toggle = () => { document.getElementById('mobile-menu').classList.toggle('open'); document.getElementById('mobile-menu-overlay').classList.toggle('open'); };
-        document.getElementById('menu-button').onclick = toggle; document.getElementById('close-menu-button').onclick = toggle; document.getElementById('mobile-menu-overlay').onclick = toggle;
+        const toggle = () => { document.getElementById('mobile-menu').
+        const toggle = () => { 
+            document.getElementById('mobile-menu').classList.toggle('open'); 
+            document.getElementById('mobile-menu-overlay').classList.toggle('open'); 
+        };
+        document.getElementById('menu-button').onclick = toggle; 
+        document.getElementById('close-menu-button').onclick = toggle; 
+        document.getElementById('mobile-menu-overlay').onclick = toggle;
+
+        window.signOut = (a) => signOut(a).then(() => window.location.reload());
     </script>
 </body>
 </html>
