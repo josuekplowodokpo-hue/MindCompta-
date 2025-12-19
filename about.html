@@ -7,155 +7,304 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        :root { --brand-dark: #1E3A8A; --accent: #F59E0B; font-family: 'Inter', sans-serif; }
+        :root {
+            --brand-dark: #1E3A8A;
+            --accent: #F59E0B;
+            font-family: 'Inter', sans-serif;
+        }
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
+
+        /* --- FIXED MOBILE MENU --- */
+        #mobile-menu {
+            position: fixed; top: 0; right: -100%; width: 280px; height: 100%;
+            background-color: var(--brand-dark); z-index: 1000;
+            transition: right 0.3s ease-in-out; display: flex; flex-direction: column; padding: 2rem;
+        }
+        #mobile-menu.open { right: 0; }
+        #mobile-menu-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(2px); z-index: 900; display: none;
+        }
+        #mobile-menu-overlay.active { display: block; }
+
+        /* --- NOTIFICATION SYSTEM --- */
+        #notification-bell {
+            position: fixed; bottom: 100px; right: 20px; z-index: 100;
+            cursor: grab; touch-action: none; width: 56px; height: 56px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .bell-dot {
+            position: absolute; top: 2px; right: 2px; height: 14px; width: 14px;
+            background-color: #EF4444; border: 2px solid white; border-radius: 50%;
+            display: none; animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        #notif-panel {
+            position: fixed; width: 300px; max-height: 400px; background: white;
+            border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            display: none; flex-direction: column; overflow: hidden; z-index: 101;
+            border: 1px solid #e5e7eb;
+        }
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: all 0.2s; }
-        .active-link-desktop { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 700; }
-        #mobile-menu { position: fixed; top: 0; right: -100%; width: 85%; max-width: 320px; height: 100%; background-color: var(--brand-dark); z-index: 1000; transition: right 0.3s ease; box-shadow: -5px 0 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; padding: 1.5rem; }
-        #mobile-menu.active { right: 0; }
-        #menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 900; backdrop-filter: blur(2px); }
-        #menu-overlay.active { display: block; }
-        #floating-bell-container { position: fixed; bottom: 100px; right: 10px; z-index: 2000; cursor: move; touch-action: none; transition: transform 0.1s, left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .bell-bounce { animation: ring 2.5s infinite ease-in-out; }
-        @keyframes ring { 0%, 100% { transform: rotate(0); } 10%, 30% { transform: rotate(12deg); } 20%, 40% { transform: rotate(-12deg); } 50% { transform: rotate(0); } }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
 
-    <div id="floating-bell-container" class="select-none">
-        <div id="bell-icon" class="relative bg-accent p-4 rounded-full shadow-2xl border-4 border-white cursor-pointer hover:scale-110 active:scale-95 transition">
-            <svg class="w-6 h-6 text-brand-dark bell-bounce" fill="currentColor" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-            <div id="bell-badge" class="hidden absolute top-0 right-0 h-4 w-4 bg-red-600 rounded-full border-2 border-white animate-pulse"></div>
-        </div>
-        <div id="notification-modal" class="hidden absolute bottom-16 right-0 w-64 bg-white rounded-2xl shadow-2xl border-2 border-accent overflow-hidden">
-            <div class="bg-accent p-3 flex justify-between items-center"><span class="font-black text-brand-dark uppercase text-[10px] tracking-widest">Annonces</span><button id="close-notif" class="text-brand-dark font-bold text-xl">&times;</button></div>
-            <div id="notification-content" class="p-4 text-xs text-gray-700 italic">Aucune mise à jour.</div>
-        </div>
-    </div>
-
-    <header class="w-full bg-brand-dark py-4 shadow-lg text-white sticky top-0 z-50">
+   <body class="bg-gray-50 min-h-screen flex flex-col font-inter">
+    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
-            <a href="index.html" class="flex items-center"><div class="h-10 w-10 bg-white rounded-full flex items-center justify-center mr-3"><span class="text-brand-dark font-black text-xl">MC</span></div><span class="text-lg font-bold">MindCompta Finance</span></a>
-            <nav class="hidden md:flex items-center space-x-2"><a href="index.html" class="nav-link">Accueil</a><a href="services.html" class="nav-link">Services</a><a href="about.html" class="nav-link active-link-desktop">À Propos</a><a href="youtube.html" class="nav-link">Vidéos</a><div id="auth-actions-desktop" class="ml-4"></div></nav>
-            <button id="open-btn" class="md:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
-        </div>
+            <a href="index.html" class="flex items-center group">
+                <img src="logo.jpg" alt="MC" class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
+                <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
+            </a>
+            <nav class="hidden sm:flex items-center space-x-4">
+                <a href="index.html" class="nav-link ">Accueil</a>
+                <a href="services.html" class="nav-link">Services</a>
+                <a href="about.html" class="nav-link bg-accent text-brand-dark font-bold">À Propos</a>
+                <a href="youtube.html" class="nav-link">YouTube</a>
+                <div id="admin-link-desktop" class="hidden">
+                    <a href="admin.html" class="nav-link border border-accent text-accent font-bold">Tableau de Bord</a>
+                </div>
+                <div id="auth-actions-desktop"></div>
+            </nav>
+            <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+        
     </header>
 
-    <div id="menu-overlay"></div>
-    <nav id="mobile-menu">
-        <div class="flex justify-between items-center mb-6 border-b border-white/20 pb-4"><span class="text-white font-black">NAVIGATION</span><button id="close-btn" class="text-white text-4xl">&times;</button></div>
-        <div id="user-info-mobile" class="mb-6 p-4 bg-white/10 rounded-2xl hidden"><p id="user-display-name" class="text-white font-bold"></p></div>
-        <div class="flex flex-col space-y-2">
-            <a href="index.html" class="text-white p-3">Accueil</a><a href="services.html" class="text-white p-3">Services</a><a href="about.html" class="bg-accent text-brand-dark p-3 rounded-xl font-bold">À Propos</a><a href="youtube.html" class="text-white p-3">Vidéos</a>
-            <a href="admin.html" id="admin-link-mobile" class="hidden text-accent p-3 border border-accent rounded-xl">Admin</a>
-            <div id="auth-actions-mobile" class="pt-6 border-t border-white/10"></div>
+   
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark text-white p-8 shadow-2xl">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-xs font-black uppercase tracking-[0.2em] text-white">NAVIGATION</h2>
+            <button id="close-menu-button" class="text-3xl text-white/50 hover:text-white transition">&times;</button>
+        </div>
+        <div class="flex flex-col space-y-3">
+            <a href="index.html" class="p-4 ">Accueil</a>
+            <a href="services.html" class="p-4 hover:bg-white/5 rounded-2xl font-medium transition text-gray-200">Services</a>
+            <a id="admin-link-mobile" href="admin.html" class="p-4 border border-accent text-accent rounded-2xl font-bold hidden text-center uppercase text-sm">Tableau de Bord</a>
+            <a href="about.html" class="p-4 bg-accent text-brand-dark rounded-2xl font-black uppercase text-sm shadow-lg">À Propos</a>
+            <a href="youtube.html" class="p-4 hover:bg-white/5 rounded-2xl font-medium transition text-gray-200">YouTube</a>
+            <div id="auth-actions-mobile" class="pt-8 mt-4 border-t border-white/10 flex flex-col space-y-4"></div>
         </div>
     </nav>
+    
+    <main class="w-full max-w-6xl mx-auto p-4 py-12 flex-grow">
+    <div class="text-center mb-16">
+        <h1 class="text-4xl md:text-5xl font-black text-brand-dark italic tracking-tighter uppercase mb-4">
+            À PROPOS DE NOUS
+        </h1>
+        <div class="w-24 h-2 bg-accent mx-auto rounded-full"></div>
+    </div>
 
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-12">
-        <div class="text-center mb-16"><h1 class="text-4xl font-black text-brand-dark uppercase">À Propos</h1></div>
-        <div class="grid md:grid-cols-2 gap-12 mb-20">
-            <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
-                <h2 class="text-2xl font-bold text-brand-dark mb-8 flex items-center"><span class="w-2 h-8 bg-accent mr-3 rounded-full"></span> Contact</h2>
-                <div class="space-y-6">
-                    <div><p class="text-[10px] font-black text-gray-400 uppercase">Adresse</p><p id="display-address" class="text-gray-700">Chargement...</p></div>
-                    <div><p class="text-[10px] font-black text-gray-400 uppercase">Téléphone</p><p id="display-phone" class="text-gray-700 font-bold">Chargement...</p></div>
-                    <div><p class="text-[10px] font-black text-gray-400 uppercase">Email</p><p id="display-email" class="text-gray-700">Chargement...</p></div>
+    <div class="grid md:grid-cols-2 gap-12 items-start">
+        
+        <div class="space-y-8">
+            <section class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+                <h2 class="text-2xl font-black text-brand-dark mb-4 flex items-center">
+                    <span class="bg-accent/20 p-2 rounded-lg mr-3">🚀</span> NOTRE MISSION
+                </h2>
+                <p class="text-gray-600 leading-relaxed font-medium">
+                    Chez <span class="text-brand-dark font-bold">MindCompta Finance</span>, nous croyons que la gestion financière ne doit pas être un casse-tête. Notre objectif est de simplifier l'expertise comptable pour les entrepreneurs et les entreprises, en alliant rigueur traditionnelle et outils numériques modernes.
+                </p>
+            </section>
+
+            <section class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+                <h2 class="text-2xl font-black text-brand-dark mb-4 flex items-center">
+                    <span class="bg-accent/20 p-2 rounded-lg mr-3">📊</span> NOTRE DESCRIPTION
+                </h2>
+                <p class="text-gray-600 leading-relaxed font-medium">
+                    Nous sommes un cabinet de conseil et d'assistance comptable dédié à la croissance de nos clients. Nous offrons un accompagnement personnalisé pour la tenue de comptabilité, l'audit et la stratégie financière, permettant aux dirigeants de se concentrer sur ce qu'ils font de mieux : leur métier.
+                </p>
+            </section>
+        </div>
+
+        <div class="bg-brand-dark text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full"></div>
+            
+            <h2 class="text-2xl font-black mb-8 border-b border-white/20 pb-4">COORDONNÉES</h2>
+            
+            <div class="space-y-6">
+                <div class="flex items-start">
+                    <div class="bg-accent text-brand-dark p-3 rounded-xl mr-4">📍</div>
+                    <div>
+                        <h4 class="font-bold text-accent text-sm uppercase">Localisation</h4>
+                        <p class="text-gray-200">Lomé, Togo (Quartier Administratif)</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="bg-accent text-brand-dark p-3 rounded-xl mr-4">📞</div>
+                    <div>
+                        <h4 class="font-bold text-accent text-sm uppercase">Téléphone</h4>
+                        <p class="text-gray-200">+228 79 59 27 17</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="bg-accent text-brand-dark p-3 rounded-xl mr-4">📧</div>
+                    <div>
+                        <h4 class="font-bold text-accent text-sm uppercase">Email</h4>
+                        <p class="text-gray-200">mindcompta@gmail.com</p>
+                    </div>
                 </div>
             </div>
-            <div class="bg-brand-dark rounded-3xl p-10 text-white shadow-2xl">
-                <h3 class="text-2xl font-black mb-4 italic text-accent">Engagement</h3>
-                <p class="text-blue-100 leading-relaxed">Expertise OHADA au service des leaders.</p>
+
+            <div class="mt-10">
+                <a href="mailto:mindcompta@gmail.com" class="block w-full text-center bg-accent text-brand-dark font-black py-4 rounded-xl hover:scale-105 transition shadow-lg">
+                    NOUS CONTACTER PAR EMAIL
+                </a>
             </div>
         </div>
 
-        <div id="admin-info-panel" class="hidden bg-white border-4 border-accent p-8 rounded-3xl shadow-2xl max-w-4xl mx-auto mb-20">
-            <h3 class="text-xl font-black mb-6 uppercase">Édition des Infos</h3>
-            <div class="grid md:grid-cols-3 gap-4 mb-6">
-                <input type="text" id="input-address" class="p-3 bg-gray-50 border rounded-xl" placeholder="Adresse">
-                <input type="text" id="input-phone" class="p-3 bg-gray-50 border rounded-xl" placeholder="Tél">
-                <input type="email" id="input-email" class="p-3 bg-gray-50 border rounded-xl" placeholder="Email">
-            </div>
-            <button id="update-info-btn" class="w-full bg-brand-dark text-white py-4 rounded-xl font-black uppercase">Enregistrer</button>
-            <p id="update-status" class="mt-4 text-center hidden"></p>
+    </div>
+</main>
+
+
+    <div id="notification-bell" class="bg-brand-dark rounded-full shadow-2xl border-2 border-white/20 select-none">
+        <span class="text-2xl">🔔</span>
+        <div id="bell-dot" class="bell-dot"></div>
+    </div>
+
+    <div id="notif-panel">
+        <div class="bg-brand-dark p-4 text-white flex justify-between items-center">
+            <h3 class="font-black text-[10px] uppercase">Notifications</h3>
+            <button id="close-notif" class="text-white/50 text-xl">&times;</button>
         </div>
-    </main>
+        <div id="notif-content" class="p-4 space-y-4 overflow-y-auto bg-gray-50 flex-grow max-h-[300px]"></div>
+    </div>
+    <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-12 space-y-8 md:text-left text-center">
+                <div class="max-w-xs">
+                    <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic">MindCompta Finance</h2>
+                    <p class="text-sm text-gray-400 font-medium">L'expertise comptable simplifiée.</p>
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-8 text-center text-[10px] text-gray-500 font-black uppercase tracking-widest">
+                &copy; 2025 MindCompta Finance.
+            </div>
+        </div>
+    </footer>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+<script type="module">
+    // 1. IMPORTS (Firebase App, Auth et Firestore)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
-        const APP_ID = "mindcompta-finance";
+    // 2. CONFIGURATION ET INITIALISATION
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", 
+        authDomain: "mindcompta-a61ef.firebaseapp.com", 
+        projectId: "mindcompta-a61ef", 
+        storageBucket: "mindcompta-a61ef.firebasestorage.app", 
+        messagingSenderId: "578389020450", 
+        appId: "1:578389020450:web:edf9dd48e394cff7601f7b" 
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        // Notifs Logic
-        const notifQ = query(collection(db, "artifacts", APP_ID, "public", "data", "site_notifications"), orderBy("timestamp", "desc"), limit(1));
-        onSnapshot(notifQ, (snap) => {
-            const content = document.getElementById('notification-content');
-            const badge = document.getElementById('bell-badge');
-            if (!snap.empty) {
-                const latest = snap.docs[0].data();
-                content.innerHTML = `<p class="font-bold text-brand-dark">Dernière annonce :</p><p>${latest.text || latest.message}</p>`;
-                badge.classList.remove('hidden');
+    // 3. GESTION DE L'AUTHENTIFICATION (CONNEXION / ADMIN)
+    const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) signInAnonymously(auth);
+
+        const adminDesktop = document.getElementById('admin-link-desktop');
+        const adminMobile = document.getElementById('admin-link-mobile');
+        const authDesktop = document.getElementById('auth-actions-desktop');
+        const authMobile = document.getElementById('auth-actions-mobile');
+
+        if (user && !user.isAnonymous) {
+            // Si c'est l'Admin (David), on montre le Tableau de Bord
+            if (user.uid === ADMIN_UID) {
+                if (adminDesktop) adminDesktop.classList.remove('hidden');
+                if (adminMobile) adminMobile.classList.remove('hidden');
             }
-        });
 
-        // Contact Info Logic
-        const contactDoc = doc(db, "artifacts", APP_ID, "public", "data", "contactInfo");
-        onSnapshot(contactDoc, (snap) => {
-            if (snap.exists()) {
-                const d = snap.data();
-                document.getElementById('display-address').innerText = d.address || "N/A";
-                document.getElementById('display-phone').innerText = d.phone || "N/A";
-                document.getElementById('display-email').innerText = d.email || "N/A";
-                if(document.getElementById('input-address')) {
-                    document.getElementById('input-address').value = d.address || "";
-                    document.getElementById('input-phone').value = d.phone || "";
-                    document.getElementById('input-email').value = d.email || "";
-                }
-            }
-        });
+            // Boutons de déconnexion
+            if (authDesktop) authDesktop.innerHTML = `<button id="logout-btn" class="text-xs font-bold text-red-400">Quitter</button>`;
+            if (authMobile) authMobile.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl w-full">Déconnexion</button>`;
+            
+            const handleLogout = () => signOut(auth).then(() => window.location.reload());
+            document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
+            document.getElementById('logout-btn-m')?.addEventListener('click', handleLogout);
+        } else {
+            // Boutons de connexion
+            if (authDesktop) authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold">Connexion</a>`;
+            if (authMobile) authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center w-full">Se Connecter</a>`;
+        }
+        
+        // Charger les notifications une fois l'utilisateur prêt
+        listenToAnnouncements();
+    });
 
-        onAuthStateChanged(auth, (user) => {
-            const adminPanel = document.getElementById('admin-info-panel');
-            const actionsDesktop = document.getElementById('auth-actions-desktop');
-            const actionsMobile = document.getElementById('auth-actions-mobile');
-            if (user) {
-                const isAdmin = user.uid === ADMIN_UID;
-                if (isAdmin) adminPanel?.classList.remove('hidden');
-                const btn = `<button onclick="location.reload()" id="logout-trigger" class="bg-red-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase">Quitter</button>`;
-                actionsDesktop.innerHTML = btn;
-                actionsMobile.innerHTML = btn.replace('px-4 py-2', 'p-4 w-full rounded-xl');
-                document.querySelectorAll('#logout-trigger').forEach(b => b.onclick = () => signOut(auth));
-            } else {
-                actionsDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-6 py-2 rounded-full font-black text-xs">CONNEXION</a>`;
-            }
-        });
+    // 4. LOGIQUE DU MENU MOBILE
+    const menuBtn = document.getElementById('menu-button');
+    const closeBtn = document.getElementById('close-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const overlay = document.getElementById('mobile-menu-overlay');
 
-        document.getElementById('update-info-btn').onclick = async () => {
-            try {
-                await setDoc(contactDoc, {
-                    address: document.getElementById('input-address').value,
-                    phone: document.getElementById('input-phone').value,
-                    email: document.getElementById('input-email').value,
-                    updatedAt: new Date().toISOString()
-                }, { merge: true });
-                alert("Mis à jour !");
-            } catch (e) { alert("Erreur."); }
+    const toggleMenu = () => {
+        mobileMenu.classList.toggle('open');
+        overlay.classList.toggle('active');
+    };
+    if (menuBtn) menuBtn.onclick = toggleMenu;
+    if (closeBtn) closeBtn.onclick = toggleMenu;
+    if (overlay) overlay.onclick = toggleMenu;
+
+    // 5. LOGIQUE DE LA CLOCHE DE NOTIFICATION (DRAG & CLICK)
+    const bell = document.getElementById('notification-bell');
+    const panel = document.getElementById('notif-panel');
+    const bellDot = document.getElementById('bell-dot');
+    let isDragging = false, hasMoved = false, startX, startY;
+
+    if (bell) {
+        bell.onmousedown = (e) => { isDragging = true; hasMoved = false; startX = e.clientX - bell.offsetLeft; startY = e.clientY - bell.offsetTop; };
+        window.onmousemove = (e) => { 
+            if (!isDragging) return; hasMoved = true;
+            bell.style.left = `${e.clientX - startX}px`; bell.style.top = `${e.clientY - startY}px`;
+            bell.style.right = 'auto'; bell.style.bottom = 'auto';
         };
+        window.onmouseup = () => { isDragging = false; };
 
-        // UI Controls
-        document.getElementById('bell-icon').onclick = () => document.getElementById('notification-modal').classList.toggle('hidden');
-        document.getElementById('open-btn').onclick = () => { document.getElementById('mobile-menu').classList.add('active'); document.getElementById('menu-overlay').classList.add('active'); };
-        document.getElementById('close-btn').onclick = () => { document.getElementById('mobile-menu').classList.remove('active'); document.getElementById('menu-overlay').classList.remove('active'); };
-    </script>
+        bell.onclick = () => {
+            if (hasMoved) return;
+            panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+            if(panel.style.display === 'flex') {
+                const r = bell.getBoundingClientRect();
+                panel.style.top = r.top > window.innerHeight/2 ? 'auto' : `${r.bottom+10}px`;
+                panel.style.bottom = r.top > window.innerHeight/2 ? `${window.innerHeight-r.top+10}px` : 'auto';
+                panel.style.right = '20px';
+                bellDot.style.display = 'none';
+            }
+        };
+    }
+    document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
+
+    // 6. RÉCUPÉRATION DES NOTIFICATIONS FIREBASE
+    function listenToAnnouncements() {
+        const q = query(collection(db, 'artifacts', 'mindcompta-finance', 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
+        onSnapshot(q, (snap) => {
+            const c = document.getElementById('notif-content');
+            if (!c) return;
+            if (snap.empty) { c.innerHTML = '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>'; return; }
+            c.innerHTML = '';
+            snap.forEach(doc => {
+                const d = doc.data();
+                c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`;
+            });
+            if (bellDot) bellDot.style.display = 'block';
+        });
+    }
+</script>
 </body>
 </html>
