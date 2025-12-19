@@ -7,34 +7,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        :root {
-            --brand-dark: #1E3A8A;
-            --accent: #F59E0B;
-            font-family: 'Inter', sans-serif;
-        }
+        :root { --brand-dark: #1E3A8A; --accent: #F59E0B; font-family: 'Inter', sans-serif; }
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
         .nav-link:hover { background-color: #345b85; }
         .active-link { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
-
         .post-card { transition: all 0.3s ease; border-left: 6px solid var(--brand-dark); }
-
-        .content-collapsed {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
+        .content-collapsed { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .content-expanded { display: block; }
-
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
         #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
         #mobile-menu-overlay.open { display: block; }
-        
         .mobile-link { display: block; padding: 0.75rem 1rem; color: white; font-weight: 500; border-radius: 0.5rem; }
     </style>
 </head>
@@ -46,7 +32,6 @@
                 <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
                 <span class="text-xl font-bold tracking-wider group-hover:text-accent">MindCompta</span>
             </a>
-
             <nav class="hidden md:flex items-center space-x-2">
                 <a href="index.html" class="nav-link">Accueil</a>
                 <a href="services.html" class="nav-link active-link">Services</a>
@@ -54,7 +39,6 @@
                 <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
                 <div id="auth-actions-desktop" class="flex items-center ml-4 border-l border-blue-800 pl-4"></div>
             </nav>
-
             <button id="menu-button" class="md:hidden p-2 text-white">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
@@ -124,10 +108,7 @@
 
         window.shareArticle = async (title, content) => {
             const shareData = { title: title, text: content.substring(0, 100) + "...", url: window.location.href };
-            try {
-                if (navigator.share) { await navigator.share(shareData); } 
-                else { await navigator.clipboard.writeText(window.location.href); alert("Lien copié !"); }
-            } catch (err) { }
+            try { if (navigator.share) { await navigator.share(shareData); } else { await navigator.clipboard.writeText(window.location.href); alert("Lien copié !"); } } catch (err) { }
         };
 
         window.toggleReadMore = (btn) => {
@@ -148,37 +129,46 @@
                 await runTransaction(db, async (transaction) => {
                     const resDoc = await transaction.get(docRef);
                     let currentLikes = resDoc.data().likesCount || 0;
-                    if (likeSnap.exists()) {
-                        transaction.delete(likeRef);
-                        transaction.update(docRef, { likesCount: Math.max(0, currentLikes - 1) });
-                    } else {
-                        transaction.set(likeRef, { uid: user.uid });
-                        transaction.update(docRef, { likesCount: currentLikes + 1 });
-                    }
+                    if (likeSnap.exists()) { transaction.delete(likeRef); transaction.update(docRef, { likesCount: Math.max(0, currentLikes - 1) }); }
+                    else { transaction.set(likeRef, { uid: user.uid }); transaction.update(docRef, { likesCount: currentLikes + 1 }); }
                 });
             } catch (e) { }
         };
 
         window.deletePublication = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "resources", id)); };
 
+        window.editPublication = (id) => {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            const titleEl = card.querySelector('.post-title');
+            const contentEl = card.querySelector('.content-text');
+            const currentTitle = titleEl.innerText;
+            const currentContent = contentEl.innerText;
+            titleEl.innerHTML = `<input type="text" class="edit-title w-full p-2 border border-accent rounded mb-2 font-bold text-xl" value="${currentTitle}">`;
+            contentEl.innerHTML = `<textarea class="edit-content w-full p-2 border border-accent rounded h-40">${currentContent}</textarea>`;
+            card.querySelector('.admin-controls').innerHTML = `<button onclick="saveEdit('${id}')" class="bg-green-600 text-white px-3 py-1 rounded text-[10px] font-bold uppercase mr-2">Enregistrer</button><button onclick="window.location.reload()" class="bg-gray-400 text-white px-3 py-1 rounded text-[10px] font-bold uppercase">Annuler</button>`;
+        };
+
+        window.saveEdit = async (id) => {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            const newTitle = card.querySelector('.edit-title').value;
+            const newContent = card.querySelector('.edit-content').value;
+            try { await updateDoc(doc(db, "resources", id), { title: newTitle, content: newContent }); alert("Mis à jour !"); window.location.reload(); } catch (e) { alert("Erreur"); }
+        };
+
         onAuthStateChanged(auth, (user) => {
             document.getElementById('loader').classList.add('hidden');
             const dAuth = document.getElementById('auth-actions-desktop');
             const mAuth = document.getElementById('auth-actions-mobile');
-
             if (user) {
                 document.getElementById('documents-list').classList.remove('hidden');
                 const userName = user.email.split('@')[0];
                 const isAdmin = user.uid === ADMIN_UID;
                 const logoutHTML = `<button id="logout" class="bg-red-600/20 border border-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase">Déconnexion</button>`;
-                
                 dAuth.innerHTML = `<span class="text-xs mr-4 text-gray-300 font-bold uppercase">${userName}</span>` + logoutHTML;
                 mAuth.innerHTML = `<div class="p-3 bg-blue-900/30 rounded mb-2 text-xs font-bold text-accent uppercase">Connecté: ${userName}</div>` + logoutHTML;
-
                 const logoff = () => signOut(auth).then(() => window.location.reload());
                 document.getElementById('logout').onclick = logoff;
                 if(document.querySelector('#auth-actions-mobile #logout')) document.querySelector('#auth-actions-mobile #logout').onclick = logoff;
-
                 if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
                 loadDocs(isAdmin, user.uid);
             } else {
@@ -195,41 +185,29 @@
                 snap.forEach(async (docSnap) => {
                     const data = docSnap.data(); const docId = docSnap.id;
                     const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString('fr-FR') : '...';
-                    
-                    // Vérification du Like (pour la couleur de l'icône)
                     const userLikeRef = doc(db, "resources", docId, "likes", currentUid);
                     const userLikeSnap = await getDoc(userLikeRef);
                     const isLiked = userLikeSnap.exists();
-
                     const article = document.createElement('article');
                     article.className = "post-card bg-white p-6 rounded-2xl shadow-sm relative mb-4";
                     article.setAttribute('data-id', docId);
                     article.innerHTML = `
                         <div class="flex justify-between items-center mb-4">
                             <span class="bg-blue-50 text-brand-dark text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-blue-100">${date}</span>
-                            <div>${isAdmin ? `<button onclick="deletePublication('${docId}')" class="text-red-500 text-xs font-bold uppercase">Supprimer</button>` : ''}</div>
+                            <div class="admin-controls">${isAdmin ? `<button onclick="editPublication('${docId}')" class="text-blue-600 text-[10px] font-bold uppercase mr-2">Modifier</button><button onclick="deletePublication('${docId}')" class="text-red-500 text-[10px] font-bold uppercase">Supprimer</button>` : ''}</div>
                         </div>
+                        ${data.imageUrl ? `<img src="${data.imageUrl}" class="w-full h-64 object-cover rounded-xl mb-4 shadow-sm" onerror="this.style.display='none'">` : ''}
                         <h3 class="post-title text-2xl font-black text-brand-dark mb-4">${data.title}</h3>
                         <div class="content-text text-gray-600 whitespace-pre-wrap leading-relaxed content-collapsed">${data.content}</div>
                         <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2 hover:underline">Lire la suite</button>
-                        
                         <div class="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center text-[10px] font-bold text-white uppercase">MC</div>
-                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">MindCompta</span>
-                            </div>
-                            
+                            <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center text-[10px] font-bold text-white uppercase">MC</div><span class="text-xs font-bold text-gray-400 uppercase tracking-widest">MindCompta</span></div>
                             <div class="flex items-center gap-4">
                                 <button onclick="shareArticle('${data.title.replace(/'/g, "\\'")}', '${data.content.substring(0,50).replace(/'/g, "\\'")}')" class="text-gray-400 hover:text-brand-dark transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
                                 </button>
-                                
                                 <button onclick="handleLike('${docId}')" class="flex items-center gap-1.5 group">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-colors ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-colors ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                                     <span class="text-sm font-bold ${isLiked ? 'text-red-500' : 'text-gray-500'}">${data.likesCount || 0}</span>
                                 </button>
                             </div>
@@ -241,7 +219,7 @@
 
         document.getElementById('add-doc-form').onsubmit = async (e) => {
             e.preventDefault();
-            await addDoc(collection(db, "resources"), { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, likesCount: 0, createdAt: serverTimestamp() });
+            await addDoc(collection(db, "resources"), { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null, likesCount: 0, createdAt: serverTimestamp() });
             e.target.reset();
         };
 
