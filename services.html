@@ -13,7 +13,9 @@
         .bg-accent { background-color: var(--accent); }
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
         .active-link { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
-        .post-card { border-left: 6px solid var(--brand-dark); }
+        .post-card { border-left: 6px solid var(--brand-dark); transition: all 0.3s ease; }
+        .content-collapsed { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .content-expanded { display: block; }
         .tab-btn.active { border-bottom: 4px solid var(--accent); color: var(--brand-dark); font-weight: 900; }
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
@@ -36,76 +38,83 @@
                 <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
                 <div id="auth-actions-desktop" class="flex items-center ml-4 border-l border-blue-800 pl-4"></div>
             </nav>
-            <button id="menu-button" class="md:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+            <button id="menu-button" class="md:hidden p-2 text-white"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
         </div>
     </header>
 
     <div id="mobile-menu-overlay"></div>
     <nav id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-brand-dark text-white shadow-2xl z-50 p-6 flex flex-col">
         <button id="close-menu-button" class="absolute top-4 right-4 text-4xl">&times;</button>
-        <div class="pt-12 flex flex-col h-full space-y-4">
-            <a href="index.html" class="block p-3">Accueil</a>
-            <a href="services.html" class="block p-3 bg-accent text-brand-dark font-bold rounded">Services</a>
-            <a href="about.html" class="block p-3">À Propos</a>
-            <a href="youtube.html" class="block p-3">Vidéos YouTube</a>
-            <hr class="border-gray-700">
+        <div class="pt-12 flex flex-col h-full space-y-3">
+            <a href="index.html" class="p-3 hover:bg-blue-800 rounded-lg">Accueil</a>
+            <a href="services.html" class="p-3 bg-accent text-brand-dark rounded-lg font-bold">Services</a>
+            <a href="about.html" class="p-3 hover:bg-blue-800 rounded-lg">À Propos</a>
+            <a href="youtube.html" class="p-3 hover:bg-blue-800 rounded-lg">Vidéos YouTube</a>
+            <hr class="border-gray-700 my-4">
             <div id="auth-actions-mobile"></div>
         </div>
     </nav>
 
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
-        <div class="flex justify-center space-x-8 border-b mb-8 mt-6">
-            <button onclick="switchTab('articles')" id="btn-articles" class="tab-btn active pb-2 uppercase text-sm tracking-widest font-bold">Flux Articles</button>
-            <button onclick="switchTab('library')" id="btn-library" class="tab-btn pb-2 uppercase text-sm tracking-widest font-bold text-gray-400">Bibliothèque</button>
+    <main class="w-full max-w-5xl mx-auto p-4 flex-grow">
+        <div class="flex justify-center space-x-12 border-b mb-10 mt-6">
+            <button onclick="switchTab('articles')" id="btn-articles" class="tab-btn active pb-3 uppercase text-sm tracking-widest font-bold transition-all">Flux Ressources</button>
+            <button onclick="switchTab('library')" id="btn-library" class="tab-btn pb-3 uppercase text-sm tracking-widest font-bold text-gray-400 transition-all">Bibliothèque</button>
         </div>
 
         <div id="section-articles" class="tab-content">
-            <div id="admin-articles" class="bg-white p-6 rounded-2xl shadow-lg mb-8 border-2 border-accent hidden">
-                <h2 class="text-xl font-bold mb-4 text-brand-dark uppercase">Publier un Article</h2>
-                <form id="form-article" class="space-y-3">
-                    <input type="text" id="art-title" required class="w-full p-3 border rounded-lg" placeholder="Titre...">
-                    <input type="url" id="art-img" class="w-full p-3 border rounded-lg" placeholder="Lien image...">
-                    <textarea id="art-content" required class="w-full p-3 border rounded-lg" rows="4" placeholder="Contenu..."></textarea>
-                    <button class="w-full bg-brand-dark text-white py-3 rounded-lg font-bold">PUBLIER</button>
+            <div id="admin-articles" class="bg-white p-8 rounded-2xl shadow-xl mb-12 border-2 border-accent hidden">
+                <h2 class="text-2xl font-bold text-brand-dark mb-6 text-center underline uppercase">Publier un Article</h2>
+                <form id="add-doc-form" class="space-y-4">
+                    <input type="text" id="doc-title" required class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark font-semibold" placeholder="Titre de l'article...">
+                    <input type="url" id="doc-image" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Lien de l'image (URL)">
+                    <textarea id="doc-content" required rows="6" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Contenu de l'article..."></textarea>
+                    <button type="submit" class="w-full bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-900 transition uppercase">Diffuser sur le flux</button>
                 </form>
             </div>
-            <div id="articles-list" class="grid gap-6"></div>
+            <div id="documents-list" class="grid grid-cols-1 gap-8 hidden"></div>
         </div>
 
         <div id="section-library" class="tab-content hidden">
-            <div id="admin-library" class="bg-white p-6 rounded-2xl shadow-lg mb-8 border-2 border-accent hidden">
-                <h2 class="text-xl font-bold mb-4 text-brand-dark uppercase">Ajouter un Livre</h2>
-                <form id="form-book" class="space-y-3">
-                    <input type="text" id="book-title" required class="w-full p-3 border rounded-lg" placeholder="Titre du livre">
-                    <input type="text" id="book-author" required class="w-full p-3 border rounded-lg" placeholder="Nom de l'auteur">
-                    <input type="url" id="book-img" required class="w-full p-3 border rounded-lg" placeholder="Lien de la couverture (URL)">
-                    <textarea id="book-desc" required class="w-full p-3 border rounded-lg" rows="3" placeholder="Petite description / résumé"></textarea>
-                    <button class="w-full bg-accent text-brand-dark py-3 rounded-lg font-bold">AJOUTER À LA BIBLIOTHÈQUE</button>
+            <div id="admin-library" class="bg-white p-8 rounded-2xl shadow-xl mb-12 border-2 border-accent hidden">
+                <h2 class="text-2xl font-bold text-brand-dark mb-6 text-center underline uppercase">Ajouter un Livre</h2>
+                <form id="add-book-form" class="space-y-4">
+                    <input type="text" id="book-title" required class="w-full p-4 border-2 border-gray-100 rounded-xl" placeholder="Titre du livre">
+                    <input type="text" id="book-author" required class="w-full p-4 border-2 border-gray-100 rounded-xl" placeholder="Nom de l'auteur">
+                    <input type="url" id="book-image" required class="w-full p-4 border-2 border-gray-100 rounded-xl" placeholder="URL de la couverture">
+                    <input type="url" id="book-url" required class="w-full p-4 border-2 border-gray-100 rounded-xl" placeholder="Lien de téléchargement (PDF/Drive)">
+                    <textarea id="book-desc" required rows="3" class="w-full p-4 border-2 border-gray-100 rounded-xl" placeholder="Description du livre..."></textarea>
+                    <button type="submit" class="w-full bg-accent text-brand-dark font-bold py-4 rounded-xl shadow-lg uppercase">Ajouter à la Bibliothèque</button>
                 </form>
             </div>
-            <div id="library-list" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
+            <div id="library-list" class="grid grid-cols-1 md:grid-cols-3 gap-8 hidden"></div>
         </div>
 
-        <div id="login-msg" class="hidden text-center py-20 bg-white rounded-3xl shadow">
-            <p class="text-gray-500 font-bold mb-4">Veuillez vous connecter pour voir le contenu.</p>
-            <a href="login.html" class="bg-brand-dark text-white px-8 py-2 rounded-full font-bold">CONNEXION</a>
+        <div id="login-required" class="hidden text-center py-20 bg-white rounded-3xl shadow">
+            <h3 class="text-xl font-bold mb-4 text-brand-dark uppercase">Accès Réservé</h3>
+            <a href="login.html" class="bg-brand-dark text-white px-10 py-3 rounded-full font-bold uppercase">Se connecter</a>
+        </div>
+
+        <div id="loader" class="flex justify-center py-20">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div>
         </div>
     </main>
 
-    <footer class="w-full bg-brand-dark py-6 mt-auto text-center text-gray-400 text-xs">
-        © 2025 MindCompta Finance - Tous droits réservés.
+    <footer class="w-full bg-brand-dark border-t border-gray-700 py-8 mt-auto text-center text-gray-400">
+        © 2025 MindCompta - Tous droits réservés.
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const fbConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
-        const app = initializeApp(fbConfig); const auth = getAuth(app); const db = getFirestore(app);
+        const fb = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
+        const app = initializeApp(fb); const auth = getAuth(app); const db = getFirestore(app);
         const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
 
-        // Navigation Tabs
+        setPersistence(auth, browserSessionPersistence);
+
+        // --- NAVIGATION TABS ---
         window.switchTab = (tab) => {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'text-brand-dark'));
@@ -113,91 +122,132 @@
             document.getElementById('btn-' + tab).classList.add('active');
         };
 
+        // --- FONCTIONS ARTICLES (RESTORES) ---
+        window.shareArticle = async (t, c) => { try { if (navigator.share) { await navigator.share({title:t, text:c.substring(0,100), url:window.location.href}); } else { await navigator.clipboard.writeText(window.location.href); alert("Lien copié !"); } } catch (e) {} };
+        
+        window.toggleReadMore = (btn) => {
+            const container = btn.parentElement.querySelector('.content-text');
+            const isCollapsed = container.classList.contains('content-collapsed');
+            container.classList.toggle('content-collapsed', !isCollapsed);
+            container.classList.toggle('content-expanded', isCollapsed);
+            btn.innerText = isCollapsed ? "Voir moins" : "Lire la suite";
+        };
+
+        window.handleLike = async (docId) => {
+            const user = auth.currentUser; if (!user) return alert("Connectez-vous !");
+            const likeRef = doc(db, "resources", docId, "likes", user.uid);
+            const docRef = doc(db, "resources", docId);
+            await runTransaction(db, async (t) => {
+                const snap = await t.get(docRef); const likeSnap = await t.get(likeRef);
+                let count = snap.data().likesCount || 0;
+                if (likeSnap.exists()) { t.delete(likeRef); t.update(docRef, { likesCount: Math.max(0, count - 1) }); }
+                else { t.set(likeRef, { uid: user.uid }); t.update(docRef, { likesCount: count + 1 }); }
+            });
+        };
+
+        window.deletePublication = async (id, coll) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, coll, id)); };
+
+        window.editPublication = (id) => {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            const titleEl = card.querySelector('.post-title');
+            const contentEl = card.querySelector('.content-text');
+            titleEl.innerHTML = `<input type="text" class="edit-title w-full p-2 border border-accent rounded mb-2 text-xl font-bold" value="${titleEl.innerText}">`;
+            contentEl.innerHTML = `<textarea class="edit-content w-full p-2 border border-accent rounded h-40">${contentEl.innerText}</textarea>`;
+            card.querySelector('.admin-controls').innerHTML = `<button onclick="saveEdit('${id}')" class="bg-green-600 text-white px-3 py-1 rounded text-[10px] font-bold">Enregistrer</button>`;
+        };
+
+        window.saveEdit = async (id) => {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            await updateDoc(doc(db, "resources", id), { title: card.querySelector('.edit-title').value, content: card.querySelector('.edit-content').value });
+            window.location.reload();
+        };
+
+        // --- AUTH & LOAD ---
         onAuthStateChanged(auth, (user) => {
+            document.getElementById('loader').classList.add('hidden');
+            const dAuth = document.getElementById('auth-actions-desktop');
+            const mAuth = document.getElementById('auth-actions-mobile');
             if (user) {
+                document.getElementById('documents-list').classList.remove('hidden');
+                document.getElementById('library-list').classList.remove('hidden');
                 const isAdmin = user.uid === ADMIN_UID;
-                if(isAdmin) { document.getElementById('admin-articles').classList.remove('hidden'); document.getElementById('admin-library').classList.remove('hidden'); }
-                loadArticles(isAdmin);
+                const logoutHTML = `<button id="logout" class="bg-red-600/20 border border-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase">Déconnexion</button>`;
+                dAuth.innerHTML = logoutHTML; mAuth.innerHTML = logoutHTML;
+                document.querySelectorAll('#logout').forEach(b => b.onclick = () => signOut(auth).then(() => window.location.reload()));
+                if (isAdmin) { document.getElementById('admin-articles').classList.remove('hidden'); document.getElementById('admin-library').classList.remove('hidden'); }
+                loadArticles(isAdmin, user.uid);
                 loadLibrary(isAdmin);
-                
-                const logout = `<button onclick="signOut(auth)" class="bg-red-600 px-3 py-1 rounded text-white text-[10px] font-bold">DÉCONNEXION</button>`;
-                document.getElementById('auth-actions-desktop').innerHTML = logout;
-                document.getElementById('auth-actions-mobile').innerHTML = logout;
             } else {
-                document.getElementById('login-msg').classList.remove('hidden');
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                document.getElementById('login-required').classList.remove('hidden');
             }
         });
 
-        // Load Articles
-        function loadArticles(isAdmin) {
+        function loadArticles(isAdmin, currentUid) {
             onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snap) => {
-                const list = document.getElementById('articles-list'); list.innerHTML = '';
-                snap.forEach(ds => {
-                    const data = ds.data();
-                    list.innerHTML += `
-                        <div class="bg-white p-6 rounded-xl shadow-sm post-card">
-                            <h3 class="font-black text-xl text-brand-dark mb-2">${data.title}</h3>
-                            <p class="text-gray-600 text-sm whitespace-pre-wrap">${data.content}</p>
-                            ${isAdmin ? `<button onclick="deleteDoc(doc(db, 'resources', '${ds.id}'))" class="text-red-500 text-[10px] mt-4 uppercase font-bold">Supprimer</button>` : ''}
+                const list = document.getElementById('documents-list'); list.innerHTML = '';
+                snap.forEach(async (docSnap) => {
+                    const data = docSnap.data(); const docId = docSnap.id;
+                    const userLikeRef = doc(db, "resources", docId, "likes", currentUid);
+                    const userLikeSnap = await getDoc(userLikeRef); const isLiked = userLikeSnap.exists();
+                    const art = document.createElement('article');
+                    art.className = "post-card bg-white p-6 md:p-8 rounded-2xl shadow-sm relative";
+                    art.setAttribute('data-id', docId);
+                    art.innerHTML = `
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">MindCompta</span>
+                            <div class="admin-controls">${isAdmin ? `<button onclick="editPublication('${docId}')" class="text-blue-600 text-xs font-bold mr-2 uppercase">Modifier</button><button onclick="deletePublication('${docId}', 'resources')" class="text-red-500 text-xs font-bold uppercase">Supprimer</button>` : ''}</div>
+                        </div>
+                        ${data.imageUrl ? `<img src="${data.imageUrl}" class="w-full h-64 object-cover rounded-xl mb-4 shadow-sm">` : ''}
+                        <h3 class="post-title text-2xl font-black text-brand-dark mb-4">${data.title}</h3>
+                        <div class="content-text text-gray-600 whitespace-pre-wrap leading-relaxed content-collapsed">${data.content}</div>
+                        <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2 hover:underline">Lire la suite</button>
+                        <div class="mt-6 pt-6 border-t border-gray-100 flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <button onclick="shareArticle('${data.title.replace(/'/g, "\\'")}', '${data.content.substring(0,50).replace(/'/g, "\\'")}')" class="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg></button>
+                                <button onclick="handleLike('${docId}')" class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg><span class="text-sm font-bold ${isLiked ? 'text-red-500' : 'text-gray-500'}">${data.likesCount || 0}</span></button>
+                            </div>
                         </div>`;
+                    list.appendChild(art);
                 });
             });
         }
 
-        // Load Library (NEW)
-        
         function loadLibrary(isAdmin) {
             onSnapshot(query(collection(db, "library"), orderBy("createdAt", "desc")), (snap) => {
                 const list = document.getElementById('library-list'); list.innerHTML = '';
                 snap.forEach(ds => {
-                    const book = ds.data();
+                    const b = ds.data();
                     list.innerHTML += `
-                        <div class="bg-white rounded-lg shadow hover:shadow-md transition overflow-hidden flex flex-col">
-                            <img src="${book.imageUrl}" class="w-full h-48 object-cover" alt="book">
-                            <div class="p-3 flex-grow">
-                                <h4 class="font-bold text-brand-dark leading-tight mb-1">${book.title}</h4>
-                                <p class="text-[10px] font-bold text-accent uppercase mb-2">Auteur: ${book.author}</p>
-                                <p class="text-xs text-gray-500 line-clamp-3">${book.description}</p>
+                        <div class="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col border border-gray-100">
+                            <img src="${b.imageUrl}" class="w-full h-56 object-cover">
+                            <div class="p-5 flex-grow">
+                                <h4 class="font-black text-brand-dark mb-1 leading-tight">${b.title}</h4>
+                                <p class="text-[10px] font-black text-accent uppercase mb-3 tracking-widest">Auteur: ${b.author}</p>
+                                <p class="text-xs text-gray-500 line-clamp-3 mb-4">${b.description}</p>
+                                <a href="${b.bookUrl}" target="_blank" class="block w-full text-center bg-brand-dark text-white text-xs font-bold py-3 rounded-lg hover:bg-blue-900 transition">TÉLÉCHARGER LE LIVRE</a>
                             </div>
-                            ${isAdmin ? `<button onclick="deleteDoc(doc(db, 'library', '${ds.id}'))" class="bg-red-50 text-red-500 text-[10px] py-1 font-bold">Supprimer</button>` : ''}
+                            ${isAdmin ? `<button onclick="deletePublication('${ds.id}', 'library')" class="bg-red-50 text-red-500 text-[10px] font-bold py-2 border-t">SUPPRIMER</button>` : ''}
                         </div>`;
                 });
             });
         }
 
-        // Add Book
-        document.getElementById('form-book').onsubmit = async (e) => {
+        // --- FORMS SUBMIT ---
+        document.getElementById('add-doc-form').onsubmit = async (e) => {
             e.preventDefault();
-            await addDoc(collection(db, "library"), {
-                title: document.getElementById('book-title').value,
-                author: document.getElementById('book-author').value,
-                imageUrl: document.getElementById('book-img').value,
-                description: document.getElementById('book-desc').value,
-                createdAt: serverTimestamp()
-            });
+            await addDoc(collection(db, "resources"), { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null, likesCount: 0, createdAt: serverTimestamp() });
             e.target.reset();
-            alert("Livre ajouté !");
         };
 
-        // Add Article
-        document.getElementById('form-article').onsubmit = async (e) => {
+        document.getElementById('add-book-form').onsubmit = async (e) => {
             e.preventDefault();
-            await addDoc(collection(db, "resources"), {
-                title: document.getElementById('art-title').value,
-                content: document.getElementById('art-content').value,
-                imageUrl: document.getElementById('art-img').value || null,
-                createdAt: serverTimestamp()
-            });
-            e.target.reset();
+            await addDoc(collection(db, "library"), { title: document.getElementById('book-title').value, author: document.getElementById('book-author').value, imageUrl: document.getElementById('book-image').value, bookUrl: document.getElementById('book-url').value, description: document.getElementById('book-desc').value, createdAt: serverTimestamp() });
+            e.target.reset(); alert("Livre ajouté !");
         };
 
         // Menu Logic
         const toggle = () => { document.getElementById('mobile-menu').classList.toggle('open'); document.getElementById('mobile-menu-overlay').classList.toggle('open'); };
-        document.getElementById('menu-button').onclick = toggle;
-        document.getElementById('close-menu-button').onclick = toggle;
-        document.getElementById('mobile-menu-overlay').onclick = toggle;
-        window.signOut = (a) => signOut(a).then(() => window.location.reload());
+        document.getElementById('menu-button').onclick = toggle; document.getElementById('close-menu-button').onclick = toggle; document.getElementById('mobile-menu-overlay').onclick = toggle;
     </script>
 </body>
 </html>
