@@ -289,7 +289,7 @@
         document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
 
         function listenToAnnouncements() {
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'announcements'), orderBy('createdAt', 'desc'), limit(5));
+            const q = query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'contactInfo'), orderBy('createdAt', 'desc'), limit(5));
             onSnapshot(q, (snap) => {
                 const c = document.getElementById('notif-content');
                 if (snap.empty) { c.innerHTML = '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>'; return; }
