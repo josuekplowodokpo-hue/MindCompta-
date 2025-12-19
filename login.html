@@ -26,7 +26,7 @@
     </header>
 
     <main class="flex-grow flex items-center justify-center p-4">
-        <div class="w-full max-w-sm bg-white rounded-xl shadow-2xl p-8"> 
+        <div class="w-full max-w-sm bg-white rounded-xl shadow-2xl p-8 border border-gray-100"> 
             <h2 id="form-title" class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
 
             <button id="google-btn" type="button" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3 rounded-lg mb-6 hover:bg-gray-50 transition shadow-sm">
@@ -48,11 +48,11 @@
             <form id="auth-form" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Adresse Email</label>
-                    <input type="email" id="auth-email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none">
+                    <input type="email" id="auth-email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none" placeholder="votre@email.com">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Mot de Passe</label>
-                    <input type="password" id="auth-password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none">
+                    <input type="password" id="auth-password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none" placeholder="••••••••">
                 </div>
 
                 <div class="text-right">
@@ -75,12 +75,22 @@
         </div>
     </main>
 
+    <!-- Modal d'information (Vérification Mail) -->
+    <div id="verify-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl">
+            <div class="text-4xl mb-4 text-brand-dark">✉️</div>
+            <h2 id="modal-title" class="text-xl font-bold text-brand-dark mb-2 uppercase">Vérifiez votre boîte mail</h2>
+            <p id="modal-text" class="text-gray-600 text-sm mb-6">Un lien a été envoyé à votre adresse pour valider votre compte.</p>
+            <button onclick="location.reload()" class="w-full bg-brand-dark text-white font-bold py-3 rounded-xl uppercase">J'ai compris</button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
             GoogleAuthProvider, signInWithPopup, setPersistence, browserSessionPersistence,
-            sendPasswordResetEmail 
+            sendPasswordResetEmail, sendEmailVerification, signOut
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -111,7 +121,6 @@
             authMessage.classList.remove('hidden');
         }
 
-        // SWITCH BETWEEN LOGIN AND SIGNUP
         switchButton.onclick = (e) => {
             e.preventDefault();
             isSignInMode = !isSignInMode;
@@ -122,22 +131,19 @@
             authMessage.classList.add('hidden');
         };
 
-        // FORGOT PASSWORD FUNCTION
+        // MOT DE PASSE OUBLIÉ
         document.getElementById('forgot-password').onclick = async () => {
             const email = document.getElementById('auth-email').value.trim();
-            if (!email) {
-                showMsg("Veuillez saisir votre email d'abord.", false);
-                return;
-            }
+            if (!email) return showMsg("Veuillez saisir votre email d'abord.", false);
             try {
                 await sendPasswordResetEmail(auth, email);
-                showMsg("Email de réinitialisation envoyé !", true);
-            } catch (err) {
-                showMsg("Erreur : " + err.message, false);
-            }
+                document.getElementById('modal-title').innerText = "Réinitialisation envoyée";
+                document.getElementById('modal-text').innerText = "Un lien pour changer votre mot de passe vous a été envoyé par email.";
+                document.getElementById('verify-modal').classList.remove('hidden');
+            } catch (err) { showMsg("Erreur : " + err.message, false); }
         };
 
-        // GOOGLE LOGIN
+        // GOOGLE
         document.getElementById('google-btn').onclick = async () => {
             const provider = new GoogleAuthProvider();
             try {
@@ -154,7 +160,7 @@
             } catch (err) { showMsg(err.message, false); }
         };
 
-        // FORM SUBMISSION
+        // VALIDATION DU FORMULAIRE
         document.getElementById('auth-form').onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('auth-email').value.trim();
@@ -165,24 +171,42 @@
 
             try {
                 await setPersistence(auth, browserSessionPersistence);
+                
                 if (isSignInMode) {
                     const res = await signInWithEmailAndPassword(auth, email, password);
+                    
+                    // Bloquer si l'email n'est pas vérifié
+                    if (!res.user.emailVerified) {
+                        await signOut(auth);
+                        showMsg("Email non vérifié. Veuillez consulter votre boîte de réception.", false);
+                        authButton.disabled = false;
+                        authButton.innerText = "Se Connecter";
+                        return;
+                    }
+
                     await setDoc(doc(db, "artifacts", res.user.uid), { 
                         status: "EN LIGNE", 
                         lastLogin: serverTimestamp() 
                     }, { merge: true });
+                    window.location.href = 'index.html';
+
                 } else {
                     const res = await createUserWithEmailAndPassword(auth, email, password);
+                    
+                    // ENVOI AUTOMATIQUE DE L'EMAIL DE VÉRIFICATION APRÈS INSCRIPTION
+                    await sendEmailVerification(res.user);
+                    
                     await setDoc(doc(db, "artifacts", res.user.uid), {
                         uid: res.user.uid,
                         email: email,
                         role: "Client",
                         createdAt: serverTimestamp(),
-                        status: "EN LIGNE"
+                        status: "HORS LIGNE"
                     });
-                    showMsg("Compte créé !", true);
+
+                    await signOut(auth); // Déconnecte pour forcer la validation
+                    document.getElementById('verify-modal').classList.remove('hidden');
                 }
-                setTimeout(() => window.location.href = 'index.html', 1000);
             } catch (err) { 
                 showMsg("Erreur : " + err.message, false);
                 authButton.disabled = false;
@@ -192,3 +216,4 @@
     </script>
 </body>
 </html>
+
