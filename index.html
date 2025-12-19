@@ -15,7 +15,7 @@
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-        
+
         #notification-bell {
             position: fixed; bottom: 100px; right: 20px; z-index: 100;
             cursor: grab; touch-action: none;
@@ -49,11 +49,10 @@
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col font-inter">
 
-    <!-- Header -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center group">
-                <img src="logo.jpg" alt="[Logo MindCompta]" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
+                <img src="logo.jpg" alt="MC" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
                 <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
             </a>
             <nav class="hidden sm:flex items-center space-x-4">
@@ -70,7 +69,6 @@
         </div>
     </header>
 
-    <!-- Mobile Menu -->
     <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
     <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark text-white p-8 shadow-2xl">
         <div class="flex justify-between items-center mb-10">
@@ -87,10 +85,9 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="w-full max-w-6xl mx-auto mt-6 px-4">
         <div class="relative bg-brand-dark rounded-3xl h-80 flex items-center justify-center p-10 shadow-2xl overflow-hidden">
-            <img src="compta.jpg" alt="[Image de Bureau comptable]" class="w-full h-full object-cover absolute inset-0 opacity-40" onerror="this.style.display='none'">
+            <img src="compta.jpg" alt="Bureau" class="w-full h-full object-cover absolute inset-0 opacity-40" onerror="this.style.display='none'">
             <div class="relative z-10 text-center text-white max-w-3xl">
                 <h1 class="text-3xl sm:text-5xl font-black mb-4 uppercase italic tracking-tighter">Votre Partenaire Finance</h1>
                 <p class="text-md font-light mb-6 text-blue-100 italic">L'expertise OHADA au service de votre réussite.</p>
@@ -99,25 +96,21 @@
         </div>
     </section>
 
-    <!-- Nouveautés Section -->
     <section class="w-full max-w-6xl mx-auto py-12 px-4">
         <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
             <h2 class="text-2xl font-black text-brand-dark uppercase tracking-tight">Dernières Mises à Jour</h2>
             <span class="text-[10px] font-bold text-accent uppercase tracking-widest bg-accent/10 px-3 py-1 rounded-full">Actualité</span>
         </div>
-
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="recent-updates-grid">
-            <div class="col-span-full py-10 text-center text-gray-400 italic">Chargement des nouveautés...</div>
+            <div class="col-span-full py-10 text-center text-gray-400 italic">Chargement...</div>
         </div>
     </section>
 
-    <!-- Floating Bell -->
     <div id="notification-bell" class="bg-brand-dark rounded-full shadow-2xl border-2 border-white/20 select-none">
         <span class="text-2xl">🔔</span>
         <div id="bell-dot" class="bell-dot"></div>
     </div>
 
-    <!-- Notifications Panel -->
     <div id="notif-panel">
         <div class="bg-brand-dark p-4 text-white flex justify-between items-center">
             <h3 class="font-black text-[10px] uppercase tracking-widest">Notifications</h3>
@@ -126,45 +119,20 @@
         <div id="notif-content" class="p-4 space-y-4 overflow-y-auto bg-gray-50 flex-grow max-h-[300px]"></div>
     </div>
 
-    <!-- Updated Footer -->
     <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
-        <div class="max-w-6xl mx-auto">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-12 space-y-8 md:space-y-0 text-center md:text-left">
-                <!-- Brand Info -->
+        <div class="max-w-6xl mx-auto text-center md:text-left">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-12 space-y-8 md:space-y-0">
                 <div class="max-w-xs">
                     <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic">MindCompta Finance</h2>
-                    <p class="text-sm text-gray-400 font-medium">L'expertise comptable et financière simplifiée pour tous. Votre réussite, notre priorité.</p>
+                    <p class="text-sm text-gray-400 font-medium">L'expertise comptable simplifiée.</p>
                 </div>
-                
-                <!-- Quick Links -->
-                <div class="flex flex-col space-y-3">
-                    <h3 class="text-accent font-black text-[10px] uppercase tracking-[0.2em] mb-2">Navigation</h3>
+                <div class="flex space-x-6">
                     <a href="index.html" class="text-sm hover:text-accent transition">Accueil</a>
                     <a href="services.html" class="text-sm hover:text-accent transition">Services</a>
-                    <a href="youtube.html" class="text-sm hover:text-accent transition">Vidéos</a>
-                </div>
-
-                <!-- Contact & Social -->
-                <div class="flex flex-col space-y-4 items-center md:items-start">
-                    <h3 class="text-accent font-black text-[10px] uppercase tracking-[0.2em] mb-2">Communauté</h3>
-                    <div class="flex space-x-6">
-                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent hover:text-brand-dark transition">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-accent hover:text-brand-dark transition">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                        </a>
-                    </div>
                 </div>
             </div>
-
-            <!-- Copyright -->
-            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-500">
-                <p>&copy; 2025 MindCompta Finance. Tous droits réservés.</p>
-                <div class="flex space-x-6 mt-4 md:mt-0">
-                    <a href="#" class="hover:text-white transition">Confidentialité</a>
-                    <a href="#" class="hover:text-white transition">CGU</a>
-                </div>
+            <div class="border-t border-white/10 pt-8 text-[10px] text-gray-500 uppercase font-black text-center">
+                &copy; 2025 MindCompta Finance.
             </div>
         </div>
     </footer>
@@ -178,9 +146,9 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
+
         const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
-        const appId = "mindcompta-a61ef";
+        const APP_ID = "mindcompta-finance";
 
         onAuthStateChanged(auth, (user) => {
             if (!user) signInAnonymously(auth);
@@ -191,13 +159,13 @@
 
             if (user && !user.isAnonymous) {
                 if (user.uid === ADMIN_UID) {
-                    adminDesktop.classList.remove('hidden');
-                    adminMobile.classList.remove('hidden');
+                    adminDesktop?.classList.remove('hidden');
+                    adminMobile?.classList.remove('hidden');
                 }
                 const btn = `<button id="logout-btn" class="text-xs font-bold text-red-400 hover:text-red-300">Quitter</button>`;
                 authDesktop.innerHTML = btn;
-                authMobile.innerHTML = `<button id="logout-btn" class="p-4 bg-red-500/10 text-red-400 rounded-2xl text-sm font-bold">Déconnexion</button>`;
-                document.querySelectorAll('#logout-btn').forEach(b => b.onclick = () => signOut(auth));
+                authMobile.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl text-sm font-bold w-full">Déconnexion</button>`;
+                document.querySelectorAll('[id^=logout-btn]').forEach(b => b.onclick = () => signOut(auth).then(()=>window.location.reload()));
             } else {
                 authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold uppercase">Connexion</a>`;
                 authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center font-bold">Se Connecter</a>`;
@@ -208,46 +176,36 @@
 
         async function loadRecentContent() {
             const grid = document.getElementById('recent-updates-grid');
-            const qVids = query(collection(db, 'artifacts', appId, 'public', 'data', 'videos'), orderBy('createdAt', 'desc'), limit(1));
-            const qBooks = query(collection(db, 'artifacts', appId, 'public', 'data', 'books'), orderBy('createdAt', 'desc'), limit(2));
+            // Utilise l'ancien APP_ID interne pour les données si nécessaire, ou APP_ID si migré
+            const DATA_ID = "mindcompta-a61ef"; 
+            const qVids = query(collection(db, 'artifacts', DATA_ID, 'public', 'data', 'videos'), orderBy('createdAt', 'desc'), limit(1));
+            const qBooks = query(collection(db, 'artifacts', DATA_ID, 'public', 'data', 'books'), orderBy('createdAt', 'desc'), limit(2));
 
-            let videos = [];
-            let books = [];
-
+            let videos = [], books = [];
             const render = () => {
                 const all = [...videos, ...books].sort((a,b) => b.createdAt - a.createdAt).slice(0, 3);
-                if (all.length === 0) {
-                    grid.innerHTML = '<div class="col-span-full py-10 text-center text-gray-400 italic">Aucune publication récente.</div>';
-                    return;
-                }
+                if (all.length === 0) { grid.innerHTML = '<div class="col-span-full py-10 text-center text-gray-400 italic">Aucune publication.</div>'; return; }
                 grid.innerHTML = '';
                 all.forEach(item => {
                     const isVid = item.type === 'video';
                     grid.innerHTML += `
                         <div class="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition group">
                             <div class="h-48 bg-gray-200 relative overflow-hidden">
-                                <img src="${item.thumbnail || (isVid ? 'https://placehold.co/600x400/1E3A8A/ffffff?text=Video' : 'https://placehold.co/600x400/F59E0B/ffffff?text=Livre')}" 
-                                     class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                                <div class="absolute top-4 left-4">
-                                    <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm ${isVid ? 'bg-red-500 text-white' : 'bg-accent text-brand-dark'}">
-                                        ${isVid ? 'Vidéo' : 'Livre'}
-                                    </span>
-                                </div>
+                                <img src="${item.thumbnail || 'https://placehold.co/600x400/1E3A8A/ffffff?text=MindCompta'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                                <div class="absolute top-4 left-4"><span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${isVid ? 'bg-red-500 text-white' : 'bg-accent text-brand-dark'}">${isVid ? 'Vidéo' : 'Livre'}</span></div>
                             </div>
                             <div class="p-6">
                                 <h3 class="font-bold text-brand-dark mb-2 line-clamp-2">${item.title}</h3>
-                                <p class="text-xs text-gray-500 mb-4 line-clamp-2">${item.description || ''}</p>
                                 <a href="${isVid ? 'youtube.html' : 'services.html'}" class="text-brand-dark font-black text-[10px] uppercase tracking-tighter border-b-2 border-accent pb-1">En savoir plus &rarr;</a>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
             };
-
             onSnapshot(qVids, (s) => { videos = s.docs.map(d => ({...d.data(), type: 'video'})); render(); });
             onSnapshot(qBooks, (s) => { books = s.docs.map(d => ({...d.data(), type: 'book'})); render(); });
         }
 
+        // Bell Drag & Logic
         const bell = document.getElementById('notification-bell');
         const panel = document.getElementById('notif-panel');
         const bellDot = document.getElementById('bell-dot');
@@ -289,7 +247,7 @@
         document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
 
         function listenToAnnouncements() {
-            const q = query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'contactInfo'), orderBy('createdAt', 'desc'), limit(5));
+            const q = query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
             onSnapshot(q, (snap) => {
                 const c = document.getElementById('notif-content');
                 if (snap.empty) { c.innerHTML = '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>'; return; }
@@ -297,19 +255,16 @@
                 snap.forEach(doc => {
                     const d = doc.data();
                     c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent">
-                        <h4 class="font-bold text-brand-dark text-[10px] uppercase">${d.title || 'Annonce'}</h4>
-                        <p class="text-xs text-gray-600 mt-1">${d.message || d.content}</p>
+                        <h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4>
+                        <p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p>
                     </div>`;
                 });
                 bellDot.style.display = 'block';
             });
         }
 
-        const menu = document.getElementById('mobile-menu');
-        const ov = document.getElementById('mobile-menu-overlay');
-        document.getElementById('menu-button').onclick = () => { menu.classList.add('open'); ov.classList.remove('hidden'); };
-        document.getElementById('close-menu-button').onclick = () => { menu.classList.remove('open'); ov.classList.add('hidden'); };
-        ov.onclick = () => { menu.classList.remove('open'); ov.classList.add('hidden'); };
+        document.getElementById('menu-button').onclick = () => { document.getElementById('mobile-menu').classList.add('open'); document.getElementById('mobile-menu-overlay').classList.remove('hidden'); };
+        document.getElementById('close-menu-button').onclick = () => { document.getElementById('mobile-menu').classList.remove('open'); document.getElementById('mobile-menu-overlay').classList.add('hidden'); };
     </script>
 </body>
 </html>
