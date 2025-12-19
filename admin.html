@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCompta - Tableau de Bord Admin</title>
+    <title>MindCompta - Administration</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -13,184 +13,189 @@
             font-family: 'Inter', sans-serif;
         }
         .bg-brand-dark { background-color: var(--brand-dark); }
-        .text-brand-dark { color: var(--brand-dark); }
-        .bg-accent { background-color: var(--accent); }
-        .tab-active { border-bottom: 4px solid var(--accent); color: var(--accent); }
+        .tab-active { border-bottom: 4px solid var(--accent); color: var(--accent); font-weight: 800; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
+    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
             <div class="flex items-center">
-                <div class="h-10 w-10 bg-white text-brand-dark rounded-full flex items-center justify-center font-black mr-3">MC</div>
-                <span class="text-xl font-bold tracking-wider">MindCompta Admin</span>
+                <div class="h-10 w-10 bg-white text-brand-dark rounded-xl flex items-center justify-center font-black mr-3 shadow-inner">MC</div>
+                <span class="text-xl font-bold tracking-tighter">MindCompta <span class="text-yellow-400">Admin</span></span>
             </div>
             <nav class="flex items-center space-x-6">
-                <button onclick="switchTab('users')" id="btn-users" class="font-bold text-sm tab-active pb-1">UTILISATEURS</button>
-                <button onclick="switchTab('logs')" id="btn-logs" class="font-bold text-sm text-gray-300 pb-1">ACTIVITÉS</button>
-                <button id="logout-btn" class="bg-red-500 hover:bg-red-600 px-4 py-1 rounded-full text-xs font-bold transition">Déconnexion</button>
+                <button onclick="switchTab('users')" id="btn-users" class="text-xs tab-active pb-1 uppercase tracking-widest">Utilisateurs</button>
+                <button onclick="switchTab('logs')" id="btn-logs" class="text-xs text-blue-200 pb-1 uppercase tracking-widest">Activités</button>
+                <button id="logout-btn" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg text-[10px] font-bold transition-all">Quitter</button>
             </nav>
         </div>
     </header>
 
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
         
-        <!-- Tab 1: Users -->
-        <div id="tab-users-content" class="mt-6">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-black text-brand-dark uppercase">Gestion des Utilisateurs</h1>
-                <div class="flex items-center bg-white px-3 py-2 rounded-lg shadow-sm border border-gray-200">
-                    <span class="text-[10px] font-bold text-gray-400 mr-2 uppercase">Trier par :</span>
-                    <select id="sort-users" class="text-xs font-bold text-brand-dark outline-none bg-transparent">
-                        <option value="recent">Plus récent</option>
-                        <option value="alpha">Ordre A-Z</option>
-                    </select>
+        <div id="loading-overlay" class="py-20 text-center">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-dark mb-4"></div>
+            <p class="text-gray-500 font-medium">Synchronisation des données...</p>
+        </div>
+
+        <!-- Section: Utilisateurs -->
+        <div id="tab-users-content" class="mt-6 hidden">
+            <div class="flex justify-between items-end mb-6">
+                <div>
+                    <h1 class="text-3xl font-black text-brand-dark">Membres</h1>
+                    <p class="text-sm text-gray-500">Gestion des profils et accès</p>
                 </div>
+                <select id="sort-users" class="text-xs font-bold bg-white border border-gray-200 p-2 rounded-lg outline-none shadow-sm">
+                    <option value="recent">Dernière connexion</option>
+                    <option value="alpha">Ordre Alphabétique</option>
+                </select>
             </div>
 
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50 border-b border-gray-100">
                         <tr>
-                            <th class="px-6 py-3 text-left text-[10px] font-black text-gray-500 uppercase">Nom</th>
-                            <th class="px-6 py-3 text-left text-[10px] font-black text-gray-500 uppercase">Email</th>
-                            <th class="px-6 py-3 text-left text-[10px] font-black text-gray-500 uppercase">Rôle</th>
-                            <th class="px-6 py-3 text-center text-[10px] font-black text-gray-500 uppercase">Statut</th>
-                            <th class="px-6 py-3 text-right text-[10px] font-black text-gray-500 uppercase">Dernière Connexion</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase">Utilisateur</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase">Email</th>
+                            <th class="px-6 py-4 text-center text-[10px] font-bold text-gray-400 uppercase">Statut</th>
+                            <th class="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase">Dernière Connexion</th>
                         </tr>
                     </thead>
-                    <tbody id="user-list-body" class="divide-y divide-gray-100">
-                        <!-- Users will be injected here -->
-                    </tbody>
+                    <tbody id="user-list-body" class="divide-y divide-gray-50"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Tab 2: Activity Logs -->
+        <!-- Section: Logs -->
         <div id="tab-logs-content" class="mt-6 hidden">
-            <h1 class="text-2xl font-black text-brand-dark uppercase mb-6">Tracé des Activités</h1>
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-200">
+            <h1 class="text-3xl font-black text-brand-dark mb-2">Activités</h1>
+            <p class="text-sm text-gray-500 mb-6">Suivi des lectures et téléchargements</p>
+            
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                <table class="min-w-full">
                     <thead class="bg-brand-dark text-white">
                         <tr>
-                            <th class="px-6 py-3 text-left text-[10px] font-bold uppercase">Utilisateur</th>
-                            <th class="px-6 py-3 text-left text-[10px] font-bold uppercase">Action effectuée</th>
-                            <th class="px-6 py-3 text-left text-[10px] font-bold uppercase">Cible (Livre/Article)</th>
-                            <th class="px-6 py-3 text-right text-[10px] font-bold uppercase">Date & Heure</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-bold uppercase">Utilisateur</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-bold uppercase">Action</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-bold uppercase">Élément</th>
+                            <th class="px-6 py-4 text-right text-[10px] font-bold uppercase">Date</th>
                         </tr>
                     </thead>
-                    <tbody id="activity-list-body" class="divide-y divide-gray-100">
-                        <!-- Logs will be injected here -->
-                    </tbody>
+                    <tbody id="activity-list-body" class="divide-y divide-gray-50"></tbody>
                 </table>
             </div>
         </div>
-
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
-            authDomain: "mindcompta-a61ef.firebaseapp.com",
-            projectId: "mindcompta-a61ef",
-            storageBucket: "mindcompta-a61ef.firebasestorage.app",
-            messagingSenderId: "578389020450",
-            appId: "1:578389020450:web:edf9dd48e394cff7601f7b"
-        };
-
+        const firebaseConfig = JSON.parse(__firebase_config);
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = "default-app-id"; // As seen in your document ID path
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-        let users = [];
-        let userSort = 'recent';
+        let usersData = [];
+        let currentTab = 'users';
 
         window.switchTab = (tab) => {
+            currentTab = tab;
             document.getElementById('tab-users-content').classList.toggle('hidden', tab !== 'users');
             document.getElementById('tab-logs-content').classList.toggle('hidden', tab !== 'logs');
-            document.getElementById('btn-users').className = tab === 'users' ? 'font-bold text-sm tab-active pb-1' : 'font-bold text-sm text-gray-300 pb-1';
-            document.getElementById('btn-logs').className = tab === 'logs' ? 'font-bold text-sm tab-active pb-1' : 'font-bold text-sm text-gray-300 pb-1';
+            document.getElementById('btn-users').className = tab === 'users' ? 'text-xs tab-active pb-1 uppercase tracking-widest' : 'text-xs text-blue-200 pb-1 uppercase tracking-widest';
+            document.getElementById('btn-logs').className = tab === 'logs' ? 'text-xs tab-active pb-1 uppercase tracking-widest' : 'text-xs text-blue-200 pb-1 uppercase tracking-widest';
         };
 
-        function formatFSDate(ts) {
-            if (!ts) return 'Inconnu';
+        function formatTime(ts) {
+            if (!ts) return "Jamais";
             const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
-            return date.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            return date.toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
         }
 
-        // --- FETCH USERS FROM user_profiles ---
-        function initUserSync() {
-            const usersRef = collection(db, "artifacts", appId, "public", "data", "user_profiles");
+        // SYNC UTILISATEURS
+        function initUsers() {
+            // Utilisation du chemin dynamique appId
+            const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'user_profiles');
             onSnapshot(usersRef, (snap) => {
-                users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                usersData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderUsers();
+                document.getElementById('loading-overlay').classList.add('hidden');
+                if(currentTab === 'users') document.getElementById('tab-users-content').classList.remove('hidden');
             });
         }
 
         function renderUsers() {
             const list = document.getElementById('user-list-body');
-            const sorted = [...users].sort((a, b) => {
-                if (userSort === 'alpha') return (a.username || '').localeCompare(b.username || '');
+            const sortVal = document.getElementById('sort-users').value;
+            
+            const sorted = [...usersData].sort((a, b) => {
+                if (sortVal === 'alpha') return (a.username || '').localeCompare(b.username || '');
                 return (b.lastLogin?.seconds || 0) - (a.lastLogin?.seconds || 0);
             });
 
             list.innerHTML = sorted.map(u => {
-                const isOnline = u.status === 'EN LIGNE' || u.status === 'online';
+                const online = u.status === 'online' || u.status === 'EN LIGNE';
                 return `
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-6 py-4 text-sm font-bold text-brand-dark">${u.username || u.displayName || 'Anonyme'}</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">${u.email || 'N/A'}</td>
-                    <td class="px-6 py-4 text-xs font-semibold uppercase text-gray-400">${u.role || 'Client'}</td>
+                <tr class="hover:bg-blue-50/20 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs uppercase">
+                                ${(u.username || 'U').charAt(0)}
+                            </div>
+                            <span class="font-semibold text-slate-800">${u.username || 'Anonyme'}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">${u.email || 'Non fourni'}</td>
                     <td class="px-6 py-4 text-center">
-                        <span class="px-3 py-1 text-[9px] font-black rounded-full border ${isOnline ? 'bg-green-50 text-green-600 border-green-200' : 'bg-gray-50 text-gray-400 border-gray-200'}">
-                            ${isOnline ? 'EN LIGNE' : 'HORS LIGNE'}
+                        <span class="px-2 py-0.5 text-[9px] font-black rounded-md border ${online ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-100 text-gray-400 border-gray-200'}">
+                            ${online ? 'EN LIGNE' : 'HORS LIGNE'}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-right text-xs font-mono text-gray-400">${formatFSDate(u.lastLogin)}</td>
+                    <td class="px-6 py-4 text-right text-xs font-medium text-gray-400">${formatTime(u.lastLogin)}</td>
                 </tr>`;
             }).join('');
         }
 
-        // --- FETCH ACTIVITY LOGS ---
-        function initActivitySync() {
-            const logsRef = collection(db, "artifacts", appId, "public", "data", "activity_logs");
-            const q = query(logsRef, orderBy("timestamp", "desc"));
-            
+        // SYNC ACTIVITÉS (LOGS)
+        function initLogs() {
+            const logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'activity_logs');
+            const q = query(logsRef, orderBy('timestamp', 'desc'), limit(100));
             onSnapshot(q, (snap) => {
                 const list = document.getElementById('activity-list-body');
                 list.innerHTML = snap.docs.map(doc => {
-                    const log = doc.data();
-                    const isDownload = log.action?.includes('Télécharge');
+                    const l = doc.data();
+                    const isDl = l.action?.toLowerCase().includes('télécharg');
                     return `
-                    <tr class="hover:bg-blue-50/50 transition">
-                        <td class="px-6 py-4 text-sm font-bold text-gray-700">${log.userEmail || log.username || 'Utilisateur'}</td>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 text-sm font-bold text-slate-700">${l.userEmail || l.username || 'Visiteur'}</td>
                         <td class="px-6 py-4">
-                            <span class="text-xs font-bold uppercase ${isDownload ? 'text-orange-500' : 'text-blue-600'}">${log.action}</span>
+                            <span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${isDl ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}">
+                                ${l.action || 'Action'}
+                            </span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-500 italic">"${log.target || 'N/A'}"</td>
-                        <td class="px-6 py-4 text-right text-xs text-gray-400 font-mono">${formatFSDate(log.timestamp)}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 italic">"${l.target || 'N/A'}"</td>
+                        <td class="px-6 py-4 text-right text-xs text-gray-400">${formatTime(l.timestamp)}</td>
                     </tr>`;
                 }).join('');
             });
         }
 
-        document.getElementById('sort-users').onchange = (e) => {
-            userSort = e.target.value;
-            renderUsers();
-        };
+        document.getElementById('sort-users').onchange = renderUsers;
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                initUserSync();
-                initActivitySync();
+                initUsers();
+                initLogs();
             } else {
-                await signInAnonymously(auth);
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
             }
         });
 
