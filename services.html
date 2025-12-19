@@ -3,25 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Services - MindCompta Finance</title>
+    <title>MindCompta - Services & Flux</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        :root { --brand-dark: #1E3A8A; --accent: #F59E0B; font-family: 'Inter', sans-serif; }
+        :root {
+            --brand-dark: #1E3A8A;
+            --accent: #F59E0B;
+            font-family: 'Inter', sans-serif;
+        }
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
+
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
         .nav-link:hover { background-color: #345b85; }
-        .active-link-desktop { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
-        
+        .active-link { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
+
+        .post-card { transition: all 0.3s ease; border-left: 6px solid var(--brand-dark); }
+
+        .content-collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .content-expanded { display: block; }
+
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
         #mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
         #mobile-menu-overlay.open { display: block; }
         
         .mobile-link { display: block; padding: 0.75rem 1rem; color: white; font-weight: 500; border-radius: 0.5rem; }
-        .active-link-mobile { background-color: var(--accent); color: var(--brand-dark); font-weight: 700; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -29,136 +43,224 @@
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center group">
-                <img src="logo.jpg" alt="Logo" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
-                <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
+                <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
+                <span class="text-xl font-bold tracking-wider group-hover:text-accent">MindCompta</span>
             </a>
-            <nav class="hidden sm:flex items-center space-x-4">
+
+            <nav class="hidden md:flex items-center space-x-2">
                 <a href="index.html" class="nav-link">Accueil</a>
-                <a href="services.html" class="nav-link active-link-desktop">Services</a>
+                <a href="services.html" class="nav-link active-link">Services</a>
                 <a href="about.html" class="nav-link">À Propos</a>
                 <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
-                <div id="auth-actions-desktop" class="flex items-center ml-4 pl-4 border-l border-blue-800"></div>
+                <div id="auth-actions-desktop" class="flex items-center ml-4 border-l border-blue-800 pl-4"></div>
             </nav>
-            <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+
+            <button id="menu-button" class="md:hidden p-2 text-white">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
         </div>
     </header>
 
     <div id="mobile-menu-overlay"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-brand-dark text-white shadow-2xl z-50 p-6 text-center">
-        <button id="close-menu-button" class="text-4xl absolute top-4 right-4">&times;</button>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
+        <button id="close-menu-button" class="text-4xl absolute top-4 right-4 focus:outline-none">&times;</button>
         <div class="pt-12 flex flex-col h-full">
-            <div class="space-y-2">
-                <a href="index.html" class="mobile-link">Accueil</a>
-                <a href="services.html" class="mobile-link active-link-mobile">Services</a>
-                <a href="about.html" class="mobile-link">À Propos</a>
-                <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
-                <div id="auth-actions-mobile" class="pt-4 border-t border-blue-800 mt-4 space-y-3"></div>
+            <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent uppercase text-sm tracking-widest">Navigation</h3>
+            <div class="space-y-2 flex-grow">
+                <a href="index.html" class="mobile-link hover:bg-blue-800">Accueil</a>
+                <a href="services.html" class="mobile-link bg-accent text-brand-dark font-bold">Services</a>
+                <a href="about.html" class="mobile-link hover:bg-blue-800">À Propos</a>
+                <a href="youtube.html" class="mobile-link hover:bg-blue-800">Vidéos YouTube</a>
+                <hr class="border-gray-700 my-4">
+                <div id="auth-actions-mobile"></div>
             </div>
         </div>
     </nav>
 
-    <section class="py-16 bg-white border-b">
-        <div class="max-w-4xl mx-auto px-4 text-center">
-            <h1 class="text-4xl font-extrabold text-brand-dark mb-4 uppercase tracking-tight">Nos Prestations & Ressources</h1>
-            <p class="text-lg text-gray-600">Accompagnement sur mesure en comptabilité, fiscalité et droit des affaires OHADA.</p>
+    <main class="w-full max-w-5xl mx-auto p-4 flex-grow">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 mt-6">
+            <h1 class="text-4xl font-black text-brand-dark italic uppercase tracking-tight">Espace <span class="text-accent">Ressources</span></h1>
+            <p id="user-welcome" class="text-gray-500 font-medium"></p>
         </div>
-    </section>
 
-    <section class="py-12 bg-gray-50">
+        <div id="admin-section" class="bg-white p-8 rounded-2xl shadow-xl mb-12 border-2 border-accent hidden">
+            <h2 class="text-2xl font-bold text-brand-dark mb-6 text-center underline uppercase">Publier un Article</h2>
+            <form id="add-doc-form" class="space-y-4">
+                <input type="text" id="doc-title" required class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark font-semibold" placeholder="Titre de l'article...">
+                <input type="url" id="doc-image" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Lien de l'image (Optionnel)">
+                <textarea id="doc-content" required rows="6" class="w-full bg-gray-50 border-2 border-gray-200 p-4 rounded-xl outline-none focus:border-brand-dark" placeholder="Contenu de l'article..."></textarea>
+                <button type="submit" class="w-full bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-900 transition uppercase">Diffuser sur le flux</button>
+            </form>
+        </div>
+
+        <div id="login-required" class="hidden text-center py-20 bg-white rounded-3xl shadow">
+            <h3 class="text-xl font-bold mb-4 text-brand-dark">Accès réservé aux membres</h3>
+            <p class="text-gray-500 mb-6">Connectez-vous pour accéder aux ressources exclusives.</p>
+            <a href="login.html" class="bg-brand-dark text-white px-8 py-3 rounded-full font-bold uppercase">Se connecter / S'inscrire</a>
+        </div>
+
+        <div id="documents-list" class="grid grid-cols-1 gap-8 hidden"></div>
+
+        <div id="loader" class="flex justify-center py-20">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div>
+        </div>
+    </main>
+
+    <footer class="w-full bg-brand-dark border-t border-gray-700 py-8 mt-auto text-center text-gray-400">
         <div class="max-w-6xl mx-auto px-4">
-            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-gray-100">
-                <div class="md:w-1/3 bg-brand-dark flex items-center justify-center p-12">
-                    <div class="w-48 h-64 bg-white rounded shadow-lg flex items-center justify-center text-brand-dark font-bold text-center p-4">
-                        Couverture du Livre (OHADA)
-                    </div>
-                </div>
-                <div class="md:w-2/3 p-8 md:p-12">
-                    <span class="bg-accent text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Nouveauté</span>
-                    <h2 class="text-3xl font-bold text-brand-dark mt-4 mb-4">Le Guide Essentiel du Droit OHADA</h2>
-                    <p class="text-gray-600 mb-6 leading-relaxed">
-                        Maîtrisez les rouages de la comptabilité et du droit des affaires dans l'espace OHADA. Un ouvrage complet conçu pour les étudiants et les professionnels du chiffre.
-                    </p>
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-center text-sm text-gray-700 font-medium"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 15 études de cas pratiques</li>
-                        <li class="flex items-center text-sm text-gray-700 font-medium"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Lexique des termes fiscaux</li>
-                        <li class="flex items-center text-sm text-gray-700 font-medium"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Mises à jour 2024 incluses</li>
-                    </ul>
-                    <a href="https://wa.me/22896367319" class="inline-block bg-accent hover:bg-yellow-600 text-white font-bold py-4 px-8 rounded-xl transition shadow-lg transform hover:-translate-y-1">
-                        Commander le livre via WhatsApp
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-16">
-        <div class="max-w-6xl mx-auto px-4">
-            <h2 class="text-2xl font-bold text-brand-dark mb-10 text-center uppercase tracking-wider">Services de Conseil</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition border-t-4 border-brand-dark">
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                    </div>
-                    <h3 class="font-bold text-xl mb-3">Audit Comptable</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Analyse rigoureuse de vos états financiers pour garantir la conformité aux normes SYSCOHADA.</p>
-                </div>
-
-                <div class="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition border-t-4 border-accent">
-                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    </div>
-                    <h3 class="font-bold text-xl mb-3">Conseil Fiscal</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Optimisation de votre fiscalité et assistance lors de vos déclarations périodiques.</p>
-                </div>
-
-                <div class="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition border-t-4 border-brand-dark">
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    </div>
-                    <h3 class="font-bold text-xl mb-3">Formation OHADA</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Sessions de formation en entreprise pour maîtriser le nouveau référentiel comptable.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="w-full bg-brand-dark py-10 mt-auto">
-        <div class="max-w-6xl mx-auto px-4 text-center">
-            <p class="text-white font-bold text-lg">MindCompta Finance</p>
-            <p class="text-gray-400 text-sm mb-6">Expertise et Rigueur au service de votre croissance.</p>
-            <p class="text-gray-500 text-[10px] tracking-widest uppercase">
-                &copy; 2025 MindCompta. Tous droits réservés.
-            </p>
+            <p class="font-bold text-white mb-2 uppercase tracking-widest">MindCompta Finance</p>
+            <p class="text-sm mb-4">Expertise OHADA & Comptabilité</p>
+            <p class="text-[10px] uppercase">© 2025 MindCompta - Tous droits réservés.</p>
         </div>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const fb = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
-        const app = initializeApp(fb); const auth = getAuth(app);
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
+            authDomain: "mindcompta-a61ef.firebaseapp.com",
+            projectId: "mindcompta-a61ef",
+            storageBucket: "mindcompta-a61ef.firebasestorage.app",
+            messagingSenderId: "578389020450",
+            appId: "1:578389020450:web:edf9dd48e394cff7601f7b"
+        };
 
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
+
+        setPersistence(auth, browserSessionPersistence);
+
+        // Partager
+        window.shareArticle = async (title, content) => {
+            const shareData = { title: title, text: content.substring(0, 100) + "...", url: window.location.href };
+            try {
+                if (navigator.share) { await navigator.share(shareData); } 
+                else { await navigator.clipboard.writeText(window.location.href); alert("Lien copié !"); }
+            } catch (err) { }
+        };
+
+        // Lire la suite
+        window.toggleReadMore = (btn) => {
+            const container = btn.parentElement.querySelector('.content-text');
+            const isCollapsed = container.classList.contains('content-collapsed');
+            container.classList.toggle('content-collapsed', !isCollapsed);
+            container.classList.toggle('content-expanded', isCollapsed);
+            btn.innerText = isCollapsed ? "Voir moins" : "Lire la suite";
+        };
+
+        // Like logic
+        window.handleLike = async (docId) => {
+            const user = auth.currentUser;
+            if (!user) return alert("Veuillez vous connecter !");
+            const likeRef = doc(db, "resources", docId, "likes", user.uid);
+            const docRef = doc(db, "resources", docId);
+            try {
+                const likeSnap = await getDoc(likeRef);
+                await runTransaction(db, async (transaction) => {
+                    const resDoc = await transaction.get(docRef);
+                    let currentLikes = resDoc.data().likesCount || 0;
+                    if (likeSnap.exists()) {
+                        transaction.delete(likeRef);
+                        transaction.update(docRef, { likesCount: Math.max(0, currentLikes - 1) });
+                    } else {
+                        transaction.set(likeRef, { uid: user.uid });
+                        transaction.update(docRef, { likesCount: currentLikes + 1 });
+                    }
+                });
+            } catch (e) { }
+        };
+
+        // Admin Edit/Delete
+        window.deletePublication = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "resources", id)); };
+        window.editPublication = (id) => {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            const titleEl = card.querySelector('.post-title');
+            const contentEl = card.querySelector('.content-text');
+            titleEl.innerHTML = `<input type="text" class="edit-title w-full p-2 border border-accent rounded mb-2" value="${titleEl.innerText}">`;
+            contentEl.innerHTML = `<textarea class="edit-content w-full p-2 border border-accent rounded h-40">${contentEl.innerText}</textarea>`;
+            card.querySelector('.admin-controls').innerHTML = `<button onclick="saveEdit('${id}')" class="bg-green-600 text-white px-3 py-1 rounded text-xs">OK</button>`;
+        };
+        window.saveEdit = async (id) => {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            await updateDoc(doc(db, "resources", id), { title: card.querySelector('.edit-title').value, content: card.querySelector('.edit-content').value });
+            window.location.reload();
+        };
+
+        // Auth Listener
         onAuthStateChanged(auth, (user) => {
-            const d = document.getElementById('auth-actions-desktop');
-            const m = document.getElementById('auth-actions-mobile');
+            document.getElementById('loader').classList.add('hidden');
+            const dAuth = document.getElementById('auth-actions-desktop');
+            const mAuth = document.getElementById('auth-actions-mobile');
+
             if (user) {
-                const name = user.email.split('@')[0];
-                const ui = `<button id="logout-btn" class="bg-red-600 px-3 py-1 rounded text-white text-[10px] font-bold uppercase">Déconnexion (${name})</button>`;
-                d.innerHTML = ui; m.innerHTML = ui;
-                document.querySelectorAll('#logout-btn').forEach(b => b.onclick = () => signOut(auth).then(() => window.location.reload()));
+                document.getElementById('documents-list').classList.remove('hidden');
+                const userName = user.email.split('@')[0];
+                const isAdmin = user.uid === ADMIN_UID;
+                const logoutBtn = `<button id="logout" class="bg-red-600/20 border border-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase">Déconnexion</button>`;
+                dAuth.innerHTML = `<span class="text-xs mr-4 text-gray-300 font-bold uppercase">${userName}</span>` + logoutBtn;
+                mAuth.innerHTML = `<div class="p-3 bg-blue-900/30 rounded mb-2 text-xs font-bold uppercase text-accent">Connecté: ${userName}</div>` + logoutBtn;
+                
+                const handleOut = () => signOut(auth).then(() => window.location.reload());
+                document.getElementById('logout').onclick = handleOut;
+                if(document.querySelector('#auth-actions-mobile #logout')) document.querySelector('#auth-actions-mobile #logout').onclick = handleOut;
+
+                if (isAdmin) document.getElementById('admin-section').classList.remove('hidden');
+                loadDocs(isAdmin, user.uid);
             } else {
-                const ui = `<a href="login.html" class="bg-accent py-2 px-5 text-sm font-bold rounded-full text-white">Connexion</a>`;
-                d.innerHTML = ui; m.innerHTML = ui;
+                document.getElementById('login-required').classList.remove('hidden');
+                const logBtn = `<a href="login.html" class="bg-accent px-6 py-2 rounded-full text-brand-dark font-bold text-xs">CONNEXION</a>`;
+                dAuth.innerHTML = logBtn; mAuth.innerHTML = logBtn;
             }
         });
 
-        // Menu Toggle
-        const menu = document.getElementById('mobile-menu');
+        function loadDocs(isAdmin, currentUid) {
+            onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snap) => {
+                const list = document.getElementById('documents-list');
+                list.innerHTML = '';
+                snap.forEach(async (docSnap) => {
+                    const data = docSnap.data(); const docId = docSnap.id;
+                    const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString('fr-FR') : '...';
+                    const article = document.createElement('article');
+                    article.className = "post-card bg-white p-6 rounded-2xl shadow-sm relative mb-4";
+                    article.setAttribute('data-id', docId);
+                    article.innerHTML = `
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="bg-blue-50 text-brand-dark text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-blue-100">${date}</span>
+                            <div class="admin-controls">${isAdmin ? `<button onclick="editPublication('${docId}')" class="text-blue-600 text-xs mr-2">Modifier</button><button onclick="deletePublication('${docId}')" class="text-red-500 text-xs">Supprimer</button>` : ''}</div>
+                        </div>
+                        <h3 class="post-title text-2xl font-black text-brand-dark mb-4">${data.title}</h3>
+                        <div class="content-text text-gray-600 whitespace-pre-wrap leading-relaxed content-collapsed">${data.content}</div>
+                        <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2">Lire la suite</button>
+                        <div class="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">MindCompta</span>
+                            <div class="flex items-center gap-4">
+                                <button onclick="shareArticle('${data.title}', '${data.content}')" class="text-gray-400">🔗</button>
+                                <button onclick="handleLike('${docId}')" class="flex items-center gap-1.5 font-bold text-gray-500">❤️ ${data.likesCount || 0}</button>
+                            </div>
+                        </div>`;
+                    list.appendChild(article);
+                });
+            });
+        }
+
+        document.getElementById('add-doc-form').onsubmit = async (e) => {
+            e.preventDefault();
+            await addDoc(collection(db, "resources"), { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null, likesCount: 0, createdAt: serverTimestamp() });
+            e.target.reset();
+        };
+
+        // Menu Logic
+        const menuBtn = document.getElementById('menu-button');
+        const closeBtn = document.getElementById('close-menu-button');
         const overlay = document.getElementById('mobile-menu-overlay');
-        document.getElementById('menu-button').onclick = () => { menu.classList.add('open'); overlay.classList.add('open'); };
-        document.getElementById('close-menu-button').onclick = () => { menu.classList.remove('open'); overlay.classList.remove('open'); };
-        overlay.onclick = () => { menu.classList.remove('open'); overlay.classList.remove('open'); };
+        const menu = document.getElementById('mobile-menu');
+        const toggle = () => { menu.classList.toggle('open'); overlay.classList.toggle('open'); };
+        menuBtn.onclick = toggle; closeBtn.onclick = toggle; overlay.onclick = toggle;
     </script>
 </body>
 </html>
