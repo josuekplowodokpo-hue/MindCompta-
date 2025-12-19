@@ -7,417 +7,313 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        /* Import the Inter font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
-        /* Brand Colors (Standardized) */
         :root {
-            --brand-dark: #1E3A8A; /* Deep Blue (Indigo-900) */
-            --accent: #F59E0B; /* Vivid Orange / Gold (Amber-500) */
-            --vibrant-green: #10B981; /* Bright Green (Emerald-500) */
+            --brand-dark: #1E3A8A;
+            --accent: #F59E0B;
+            --vibrant-green: #10B981;
             font-family: 'Inter', sans-serif;
         }
 
-        /* Custom Tailwind classes for colors */
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
         .hover-accent:hover { background-color: #D97706; } 
-        .bg-vibrant-green { background-color: var(--vibrant-green); }
-        .hover-vibrant-green:hover { background-color: #047857; } /* Darker Emerald (Emerald-700) */
 
-        /* Navigation Link Styles */
-        .nav-link {
-            color: white;
-            font-weight: 500;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
+        /* --- MAGNETIC NOTIFICATION BELL STYLES --- */
+        #notification-bell {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            z-index: 100;
+            cursor: grab;
+            touch-action: none;
+            transition: transform 0.2s, left 0.3s ease-out, right 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
         }
-        .nav-link:hover {
-            background-color: #345b85;
-        }
-        .active-link-desktop {
-            background-color: var(--accent);
-            font-weight: 600;
-            color: var(--brand-dark) !important;
+        #notification-bell:active { cursor: grabbing; }
+        
+        .bell-dot {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            height: 14px;
+            width: 14px;
+            background-color: #EF4444;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: none;
+            animation: pulse 2s infinite;
         }
 
-        /* Mobile Menu Styles (Off-Canvas) */
-        #mobile-menu {
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 50; 
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
-        #mobile-menu.open {
-            transform: translateX(0);
+
+        #notif-panel {
+            position: fixed;
+            width: 300px;
+            max-height: 400px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 101;
+            border: 1px solid #e5e7eb;
         }
-        /* Overlay */
-        #mobile-menu-overlay {
-            display: none; 
-            z-index: 40;
-        }
-        #mobile-menu-overlay.open {
-            display: block;
-        }
-        .mobile-link {
-            display: block;
-            padding: 0.75rem 1rem;
-            color: white;
-            font-weight: 500;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
-        }
-        .mobile-link.active-link-mobile {
-            background-color: var(--accent);
-            color: var(--brand-dark);
-            font-weight: 700;
-        }
-        .mobile-link-btn {
-             display: block;
-             width: 100%;
-             text-align: center;
-        }
+
+        /* Nav & Mobile Menu */
+        .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: all 0.2s; }
+        .nav-link:hover { background-color: #345b85; }
+        .active-link-desktop { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
+        
+        #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
+        #mobile-menu.open { transform: translateX(0); }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- HEADER AND NAVIGATION -->
+    <!-- Header -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between items-center">
-
-                <!-- LOGO/BRAND (CLICKABLE) -->
-                <a href="index.html" class="flex items-center group">
-                    <img src="logo.jpg" 
-                         alt="[Image du Logo MindCompta]" 
-                         onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
-                         class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
-                    <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
-                </a>
-
-                <!-- DESKTOP NAVIGATION -->
-                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
-                    <a href="index.html" class="nav-link active-link-desktop text-brand-dark">Accueil</a>
-                    <a href="services.html" class="nav-link">Services (Livre)</a>
-                    <a href="about.html" class="nav-link">À Propos</a>
-                    <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
-
-                    <!-- Action Buttons and User Info -->
-                    <div id="auth-actions-desktop" class="flex items-center space-x-3">
-                        <!-- Placeholder par défaut (avant que Firebase n'initialise) -->
-                        <a href="login.html" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                            Chargement...
-                        </a>
-                    </div>
-                </nav>
-
-                <!-- MOBILE MENU BUTTON -->
-                <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-            </div>
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center group">
+                <img src="logo.jpg" alt="[Logo MindCompta]" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
+                <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Finance</span>
+            </a>
+            <nav class="hidden sm:flex items-center space-x-4">
+                <a href="index.html" class="nav-link active-link-desktop text-brand-dark">Accueil</a>
+                <a href="services.html" class="nav-link">Services</a>
+                <a href="about.html" class="nav-link">À Propos</a>
+                <a href="youtube.html" class="nav-link">YouTube</a>
+                <div id="auth-actions-desktop"></div>
+            </nav>
+            <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
         </div>
     </header>
 
-    <!-- MOBILE MENU OFF-CANVAS -->
-    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
-        <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none">
-            &times;
-        </button>
-        <div class="pt-12 space-y-3">
-            <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
-
-            <a href="index.html" class="mobile-link active-link-mobile text-brand-dark">Accueil</a>
-            <a href="services.html" class="mobile-link">Services (Livre)</a>
-            <a href="about.html" class="mobile-link">À Propos</a>
-            <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
-
-            <!-- Auth Actions Mobile -->
-            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
-                <a href="login.html" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Chargement...</a>
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
+    <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark text-white p-8 shadow-2xl">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-xs font-black uppercase tracking-[0.2em] text-white">Navigation</h2>
+            <button id="close-menu-button" class="text-3xl text-white/50 hover:text-white transition">&times;</button>
+        </div>
+        
+        <div class="flex flex-col space-y-3">
+            <a href="index.html" class="p-4 bg-accent text-brand-dark rounded-2xl font-black uppercase text-sm shadow-lg">Accueil</a>
+            <a href="services.html" class="p-4 hover:bg-white/5 rounded-2xl font-medium transition text-gray-200">Services</a>
+            <a href="about.html" class="p-4 hover:bg-white/5 rounded-2xl font-medium transition text-gray-200">À Propos</a>
+            <a href="youtube.html" class="p-4 hover:bg-white/5 rounded-2xl font-medium transition text-gray-200">YouTube</a>
+            
+            <div id="auth-actions-mobile" class="pt-8 mt-4 border-t border-white/10 flex flex-col space-y-4">
+                <!-- Chargé via JS -->
             </div>
         </div>
     </nav>
-    <!-- END MOBILE MENU -->
 
-    <!-- HERO SECTION -->
+    <!-- Hero Section -->
     <section class="w-full max-w-6xl mx-auto mt-6 px-4">
-        <div class="relative bg-brand-dark rounded-2xl h-96 flex items-center justify-center p-6 sm:p-10 shadow-2xl overflow-hidden">
-            <!-- Background Visuals -->
-            <img src="compta.jpg" 
-                 alt="[Image d'un bureau de conseil financier]" 
-                 class="w-full h-full object-cover absolute inset-0 opacity-50 rounded-2xl"
-                 onerror="this.style.display='none'; this.closest('div').classList.add('bg-brand-dark');">
-            <div class="absolute inset-0 bg-black bg-opacity-40 rounded-2xl"></div>
-
-            <!-- Content Block -->
-            <div class="relative z-10 text-center text-white p-4 sm:p-8 rounded-xl max-w-3xl">
-                <h1 class="text-4xl sm:text-6xl font-extrabold mb-4 tracking-tight leading-tight">
-                    Votre Conformité OHADA & Croissance Fiscale
-                </h1>
-                <p class="text-lg sm:text-xl font-light max-w-2xl mx-auto mb-8">
-                    Maîtrisez les lois d'affaires de l'espace UEMOA et sécurisez vos transactions avec l'expertise MindCompta.
-                </p>
-                <a href="login.html" id="hero-cta" class="inline-block bg-accent text-brand-dark font-bold py-3 px-8 rounded-full shadow-xl transition duration-300 transform hover:scale-105 hover:shadow-2xl">
-                    Découvrir Nos Services
-                </a>
+        <div class="relative bg-brand-dark rounded-3xl h-96 flex items-center justify-center p-10 shadow-2xl overflow-hidden">
+            <img src="compta.jpg" alt="[Image de bureau comptable]" class="w-full h-full object-cover absolute inset-0 opacity-40" onerror="this.style.display='none'">
+            <div class="relative z-10 text-center text-white max-w-3xl">
+                <h1 class="text-4xl sm:text-6xl font-black mb-4 uppercase italic tracking-tighter">Expertise OHADA</h1>
+                <p class="text-lg font-light mb-8 text-blue-100">Optimisez votre gestion fiscale et comptable avec MindCompta.</p>
+                <a href="services.html" class="bg-accent text-brand-dark font-black py-4 px-10 rounded-full shadow-lg hover:scale-105 transition inline-block">NOS SERVICES</a>
             </div>
         </div>
     </section>
 
-    <!-- ADVANTAGES SECTION -->
-    <section class="py-16">
-        <div class="max-w-6xl mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center text-brand-dark mb-12">Pourquoi choisir MindCompta ?</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-
-                <!-- Advantage 1: Compliance -->
-                <div class="bg-white p-6 rounded-xl shadow-lg border-b-4 border-accent hover:shadow-xl transition duration-300">
-                    <div class="text-5xl text-accent mb-4">📜</div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Conformité OHADA Assurée</h3>
-                    <p class="text-gray-600">Restez serein. Nos experts garantissent que vos pratiques sont à jour avec la législation régionale.</p>
-                </div>
-
-                <!-- Advantage 2: Strategy -->
-                <div class="bg-white p-6 rounded-xl shadow-lg border-b-4 border-accent hover:shadow-xl transition duration-300">
-                    <div class="text-5xl text-accent mb-4">📈</div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Croissance Stratégique</h3>
-                    <p class="text-gray-600">Nous élaborons des plans financiers personnalisés pour maximiser votre potentiel de croissance et d'investissement.</p>
-                </div>
-
-                <!-- Advantage 3: Local Expertise -->
-                <div class="bg-white p-6 rounded-xl shadow-lg border-b-4 border-accent hover:shadow-xl transition duration-300">
-                    <div class="text-5xl text-accent mb-4">🌍</div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Expertise Régionale Profonde</h3>
-                    <p class="text-gray-600">Des connaissances précises des marchés locaux pour des conseils pertinents et efficaces.</p>
-                </div>
-
-            </div>
+    <!-- Advantages Section -->
+    <section class="py-16 max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border-b-4 border-accent hover:shadow-md transition">
+            <div class="text-4xl mb-4">📜</div>
+            <h3 class="font-bold text-brand-dark mb-2 text-xl">Conformité</h3>
+            <p class="text-gray-500 text-sm">Garantissez que vos pratiques respectent la législation régionale UEMOA.</p>
+        </div>
+        <div class="bg-white p-8 rounded-2xl shadow-sm border-b-4 border-accent hover:shadow-md transition">
+            <div class="text-4xl mb-4">📈</div>
+            <h3 class="font-bold text-brand-dark mb-2 text-xl">Croissance</h3>
+            <p class="text-gray-500 text-sm">Maximisez votre potentiel avec des plans financiers personnalisés.</p>
+        </div>
+        <div class="bg-white p-8 rounded-2xl shadow-sm border-b-4 border-accent hover:shadow-md transition">
+            <div class="text-4xl mb-4">🌍</div>
+            <h3 class="font-bold text-brand-dark mb-2 text-xl">Proximité</h3>
+            <p class="text-gray-500 text-sm">Une expertise locale profonde pour des conseils d'affaires efficaces.</p>
         </div>
     </section>
 
-    <!-- CALL TO ACTION SECTION FOR PREMIUM BOOK (Dynamically updated by JS) -->
-    <section class="bg-brand-dark text-white py-16">
-        <div class="max-w-4xl mx-auto px-4 text-center">
-            <h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-accent">
-                Débloquez l'Expertise
-            </h2>
-            <p class="text-xl mb-8 opacity-90">
-                Accédez à notre "Livre Blanc" exclusif, une mine d'informations sur la fiscalité et la comptabilité en zone OHADA.
-            </p>
-            <a href="login.html" id="book-cta" class="bg-red-500 text-white font-bold py-3 px-8 rounded-full shadow-xl hover:bg-red-600 transition duration-300 transform hover:scale-105 inline-block">
-                Se Connecter et Accéder
-            </a>
-        </div>
-    </section>
+    <!-- MAGNETIC NOTIFICATION BELL -->
+    <div id="notification-bell" class="bg-brand-dark rounded-full shadow-2xl border-2 border-white/20 select-none">
+        <span class="text-2xl">🔔</span>
+        <div id="bell-dot" class="bell-dot"></div>
+    </div>
 
-    <!-- FOOTER -->
-    <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
-        <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
+    <!-- NOTIFICATION PANEL -->
+    <div id="notif-panel">
+        <div class="bg-brand-dark p-4 text-white flex justify-between items-center">
+            <h3 class="font-black text-[10px] uppercase tracking-widest">Notifications</h3>
+            <button id="close-notif" class="text-white/50 text-xl hover:text-white transition">&times;</button>
+        </div>
+        <div id="notif-content" class="p-4 space-y-4 overflow-y-auto bg-gray-50 flex-grow max-h-[300px]">
+            <div class="text-center py-8 text-gray-400 text-xs italic">Chargement des nouvelles...</div>
+        </div>
+    </div>
+
+    <footer class="mt-auto bg-brand-dark py-8 text-center text-gray-500 text-[10px] uppercase font-bold tracking-widest">
+        &copy; 2025 MindCompta Finance - Tous droits réservés.
     </footer>
 
-    <!-- JAVASCRIPT LOGIC AND FIREBASE AUTHENTICATION -->
     <script type="module">
-        // --- IMPORTS FIREBASE AUTH ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
-        // Configuration Firebase fournie par l'utilisateur
-        const firebaseConfig = {
-            apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
-            authDomain: "mindcompta-a61ef.firebaseapp.com",
-            projectId: "mindcompta-a61ef",
-            storageBucket: "mindcompta-a61ef.firebasestorage.app",
-            messagingSenderId: "578389020450",
-            appId: "1:578389020450:web:edf9dd48e394cff7601f7b",
-            measurementId: "G-CDS9XYT35Y"
+        import { getAuth, onAuthStateChanged, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- MAGNETIC BELL LOGIC ---
+        const bell = document.getElementById('notification-bell');
+        const panel = document.getElementById('notif-panel');
+        const bellDot = document.getElementById('bell-dot');
+        let isDragging = false, hasMoved = false;
+        let startX, startY, currentX, currentY;
+
+        const handleStart = (e) => {
+            isDragging = true;
+            hasMoved = false;
+            bell.style.transition = 'none';
+            const touch = e.type.includes('touch') ? e.touches[0] : e;
+            startX = touch.clientX - bell.offsetLeft;
+            startY = touch.clientY - bell.offsetTop;
         };
-        
-        const ADMIN_EMAIL = 'admin@mindcompta.com';
-        const LOGIN_PAGE = 'login.html';
-        const SERVICES_PAGE = 'services.html';
-        const ADMIN_PAGE = 'admin.html';
-        let auth;
-        
-        // --- Initialisation Firebase ---
-        function initializeFirebase() {
-            try {
-                // Variables globales fournies par l'environnement
-                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-
-                // Tentative d'authentification
-                authenticateUser(auth, initialAuthToken);
-
-            } catch (error) {
-                console.error("Échec de l'initialisation Firebase:", error);
-                renderDisconnectedUI();
-            }
-        }
-        
-        async function authenticateUser(auth, initialAuthToken) {
-            try {
-                if (initialAuthToken) {
-                    // Utiliser le jeton personnalisé fourni par l'environnement
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    // Si aucun jeton n'est fourni, se connecter anonymement
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.warn("Échec de l'authentification automatique (jeton expiré ou autre). Poursuite en mode déconnecté.", error);
-            }
-             // L'écouteur onAuthStateChanged prendra le relais pour la mise à jour de l'UI
-             setupAuthStateListener(auth);
-        }
-
-        // --- Écouteur d'État d'Authentification et rendu UI ---
-        function setupAuthStateListener(auth) {
-            onAuthStateChanged(auth, (user) => {
-                if (user && user.email) {
-                    renderConnectedUI(user);
-                } else {
-                    renderDisconnectedUI();
-                }
-            });
-        }
-        
-        // --- Déconnexion ---
-        async function handleLogout() {
-            try {
-                await signOut(auth);
-                console.log("Déconnexion réussie.");
-                // onAuthStateChanged mettra à jour l'UI automatiquement
-            } catch (error) {
-                console.error("Erreur lors de la déconnexion:", error);
-            }
-        }
-
-
-        // --- Fonctions de Rendu UI ---
-
-        /** * Rend l'interface utilisateur pour un utilisateur connecté.
-         * @param {Object} user - L'objet utilisateur Firebase.
-         */
-        function renderConnectedUI(user) {
-            // Utilise l'email (avant le @) pour le nom d'affichage
-            const userName = user.email ? user.email.split('@')[0] : 'Utilisateur';
-            const isUserAdmin = user.email === ADMIN_EMAIL;
+        const handleMove = (e) => {
+            if (!isDragging) return;
+            hasMoved = true;
+            const touch = e.type.includes('touch') ? e.touches[0] : e;
+            currentX = touch.clientX - startX;
+            currentY = touch.clientY - startY;
             
-            const desktopActions = document.getElementById('auth-actions-desktop');
-            const mobileActions = document.getElementById('auth-actions-mobile');
-            const heroCta = document.getElementById('hero-cta');
-            const bookCta = document.getElementById('book-cta');
-
-            // 1. Desktop Actions (Cache "Se Connecter" et affiche le profil/déconnexion)
-            const adminButtonHtml = isUserAdmin 
-                ? `<a href="${ADMIN_PAGE}" class="nav-link bg-red-500 py-2 px-4 rounded-full text-white hover:bg-red-600">Admin</a>` 
-                : '';
-
-            desktopActions.innerHTML = `
-                ${adminButtonHtml}
-                <span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">
-                    <span class="hidden sm:inline">Bienvenue,</span> ${userName}
-                </span>
-                <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover:bg-red-600 transition duration-300 text-white">
-                    Déconnexion
-                </button>
-            `;
-
-            // 2. Mobile Actions
-            mobileActions.innerHTML = `
-                ${isUserAdmin ? 
-                    `<a href="${ADMIN_PAGE}" class="mobile-link bg-red-500 text-center font-semibold text-white py-3 mb-2">Admin</a>`
-                    : ''}
-                <p class="text-accent text-lg font-bold mb-2">Connecté en tant que</p>
-                <p class="text-white text-md font-semibold mb-3">${userName}</p>
-                <button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>
-            `;
-
-            // 3. Attacher les écouteurs de déconnexion
-            document.getElementById('logout-desktop-btn')?.addEventListener('click', handleLogout);
-            document.getElementById('logout-mobile-btn')?.addEventListener('click', handleLogout);
-
-            // 4. Mettre à jour les CTAs
-            if (heroCta) {
-                heroCta.textContent = "Commencer Votre Conseil";
-                heroCta.href = SERVICES_PAGE;
-            }
-            if (bookCta) {
-                bookCta.textContent = "Accéder au Livre Blanc (Services)";
-                bookCta.href = SERVICES_PAGE;
-                // Change le style du bouton pour indiquer un accès réussi
-                bookCta.classList.remove('bg-red-500', 'hover:bg-red-600');
-                bookCta.classList.add('bg-vibrant-green', 'hover-vibrant-green'); 
-            }
-        }
-
-        /** Rend l'interface utilisateur pour un utilisateur déconnecté. */
-        function renderDisconnectedUI() {
-            const desktopActions = document.getElementById('auth-actions-desktop');
-            const mobileActions = document.getElementById('auth-actions-mobile');
-            const heroCta = document.getElementById('hero-cta');
-            const bookCta = document.getElementById('book-cta');
-
-            // 1. Desktop Actions (Affiche uniquement "Se Connecter")
-            desktopActions.innerHTML = `
-                <a href="${LOGIN_PAGE}" id="nav-login-btn" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                    Se Connecter
-                </a>
-            `;
-
-            // 2. Mobile Actions
-            mobileActions.innerHTML = `
-                <a href="${LOGIN_PAGE}" id="mobile-login-btn" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Se Connecter</a>
-            `;
-
-            // 3. Mettre à jour les CTAs
-            if (heroCta) {
-                heroCta.textContent = "Découvrir Nos Services";
-                heroCta.href = SERVICES_PAGE; // Le service est accessible, mais le Livre est bloqué
-            }
-            if (bookCta) {
-                bookCta.textContent = "Se Connecter et Accéder";
-                bookCta.href = LOGIN_PAGE;
-                bookCta.classList.add('bg-red-500', 'hover:bg-red-600');
-                bookCta.classList.remove('bg-vibrant-green', 'hover-vibrant-green'); 
-            }
-        }
-
-        // --- GESTIONNAIRE DU MENU MOBILE (Off-Canvas) ---
-        const elements = {
-            mobileMenu: document.getElementById('mobile-menu'),
-            overlay: document.getElementById('mobile-menu-overlay'),
-            menuButton: document.getElementById('menu-button'),
-            closeMenuButton: document.getElementById('close-menu-button'),
+            currentX = Math.max(10, Math.min(window.innerWidth - 66, currentX));
+            currentY = Math.max(80, Math.min(window.innerHeight - 66, currentY));
+            
+            bell.style.left = `${currentX}px`;
+            bell.style.top = `${currentY}px`;
+            bell.style.right = 'auto';
+            bell.style.bottom = 'auto';
+            panel.style.display = 'none'; 
         };
 
-        function toggleMobileMenu(isOpen) {
-            const isOpening = isOpen === undefined ? !elements.mobileMenu.classList.contains('open') : isOpen;
-            if (isOpening) {
-                elements.mobileMenu.classList.add('open');
-                elements.overlay.classList.add('open');
-                document.body.style.overflow = 'hidden'; 
+        const handleEnd = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            bell.style.transition = 'left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.3s';
+            if (currentX + 28 < window.innerWidth / 2) {
+                bell.style.left = '10px';
             } else {
-                elements.mobileMenu.classList.remove('open');
-                elements.overlay.classList.remove('open');
-                document.body.style.overflow = '';
+                bell.style.left = `${window.innerWidth - 66}px`;
             }
-        }
-        elements.menuButton?.addEventListener('click', () => toggleMobileMenu(true));
-        elements.closeMenuButton?.addEventListener('click', () => toggleMobileMenu(false));
-        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
-        elements.overlay?.addEventListener('click', () => toggleMobileMenu(false));
+        };
 
-        // --- Exécution principale ---
-        document.addEventListener('DOMContentLoaded', initializeFirebase);
+        bell.addEventListener('mousedown', handleStart);
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', handleEnd);
+        bell.addEventListener('touchstart', handleStart, {passive: false});
+        window.addEventListener('touchmove', handleMove, {passive: false});
+        window.addEventListener('touchend', handleEnd);
+
+        bell.onclick = () => {
+            if (hasMoved) return;
+            const rect = bell.getBoundingClientRect();
+            const isOpen = panel.style.display === 'flex';
+            
+            if (!isOpen) {
+                if (rect.top > window.innerHeight / 2) {
+                    panel.style.bottom = `${window.innerHeight - rect.top + 10}px`;
+                    panel.style.top = 'auto';
+                } else {
+                    panel.style.top = `${rect.bottom + 10}px`;
+                    panel.style.bottom = 'auto';
+                }
+
+                if (rect.left < window.innerWidth / 2) {
+                    panel.style.left = '20px';
+                    panel.style.right = 'auto';
+                } else {
+                    panel.style.right = '20px';
+                    panel.style.left = 'auto';
+                }
+                panel.style.display = 'flex';
+                bellDot.style.display = 'none'; 
+            } else {
+                panel.style.display = 'none';
+            }
+        };
+
+        document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
+
+        // --- FIREBASE ---
+        function listenToAnnouncements() {
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'mindcompta-a61ef';
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'announcements'), orderBy('createdAt', 'desc'), limit(5));
+            
+            onSnapshot(q, (snap) => {
+                const content = document.getElementById('notif-content');
+                if (snap.empty) {
+                    content.innerHTML = '<div class="text-center py-8 text-gray-400 text-xs italic">Aucune annonce.</div>';
+                    return;
+                }
+                
+                content.innerHTML = '';
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString('fr-FR') : 'Récemment';
+                    content.innerHTML += `
+                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent">
+                            <p class="text-[10px] text-gray-400 font-bold mb-1">${date}</p>
+                            <h4 class="font-bold text-brand-dark text-sm mb-1">${data.title || 'Note'}</h4>
+                            <p class="text-xs text-gray-600 leading-relaxed">${data.message || data.content}</p>
+                        </div>
+                    `;
+                });
+                bellDot.style.display = 'block'; 
+            }, (err) => console.error("Firestore Error:", err));
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) signInAnonymously(auth);
+            const d = document.getElementById('auth-actions-desktop');
+            const m = document.getElementById('auth-actions-mobile');
+            if (user && user.email) {
+                const btn = `<button id="logout-btn" class="bg-red-500/10 text-red-400 px-6 py-3 rounded-2xl text-[10px] font-bold uppercase border border-red-500/20 tracking-widest">Se Déconnecter</button>`;
+                d.innerHTML = `<button id="logout-btn" class="bg-white/10 px-4 py-2 rounded-full text-[10px] font-bold uppercase border border-white/20">Quitter</button>`; 
+                m.innerHTML = btn;
+                document.querySelectorAll('#logout-btn').forEach(b => b.onclick = () => signOut(auth));
+            } else {
+                const dBtn = `<a href="login.html" class="bg-accent px-6 py-2 rounded-full text-brand-dark font-black text-[11px] uppercase shadow-lg">Connexion</a>`;
+                const mBtn = `<a href="login.html" class="bg-accent px-6 py-4 rounded-2xl text-brand-dark font-black text-sm text-center uppercase shadow-xl">Se Connecter</a>`;
+                d.innerHTML = dBtn; m.innerHTML = mBtn;
+            }
+            listenToAnnouncements();
+        });
+
+        const menu = document.getElementById('mobile-menu');
+        const ov = document.getElementById('mobile-menu-overlay');
+        document.getElementById('menu-button').onclick = () => { menu.classList.add('open'); ov.classList.remove('hidden'); };
+        document.getElementById('close-menu-button').onclick = () => { menu.classList.remove('open'); ov.classList.add('hidden'); };
+        ov.onclick = () => { menu.classList.remove('open'); ov.classList.add('hidden'); };
     </script>
 </body>
 </html>
+
