@@ -1,206 +1,322 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCompta - Administration</title>
+    <title>MindCompta - Tableau de Bord Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         :root {
             --brand-dark: #1E3A8A;
             --accent: #F59E0B;
+            --vibrant-green: #10B981;
             font-family: 'Inter', sans-serif;
         }
         .bg-brand-dark { background-color: var(--brand-dark); }
-        .tab-active { border-bottom: 4px solid var(--accent); color: var(--accent); font-weight: 800; }
+        .text-brand-dark { color: var(--brand-dark); }
+        .bg-accent { background-color: var(--accent); }
+        .hover-accent:hover { background-color: #D97706; }
+
+        .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
+
+        /* Sidebar Menu Styles */
+        .admin-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .admin-menu-item:hover {
+            background-color: rgba(30, 58, 138, 0.05);
+            border-color: var(--brand-dark);
+        }
+        .admin-menu-item.active {
+            background-color: var(--brand-dark);
+            color: white !important;
+        }
+
+        .section-fade { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans">
 
+    <!-- HEADER -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
-            <div class="flex items-center">
-                <div class="h-10 w-10 bg-white text-brand-dark rounded-xl flex items-center justify-center font-black mr-3 shadow-inner">MC</div>
-                <span class="text-xl font-bold tracking-tighter">MindCompta <span class="text-yellow-400">Admin</span></span>
-            </div>
-            <nav class="flex items-center space-x-6">
-                <button onclick="switchTab('users')" id="btn-users" class="text-xs tab-active pb-1 uppercase tracking-widest">Utilisateurs</button>
-                <button onclick="switchTab('logs')" id="btn-logs" class="text-xs text-blue-200 pb-1 uppercase tracking-widest">Activités</button>
-                <button id="logout-btn" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg text-[10px] font-bold transition-all">Quitter</button>
-            </nav>
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center group">
+                <div class="h-10 w-10 bg-white rounded-full flex items-center justify-center mr-3 border-2 border-white/20">
+                    <span class="text-brand-dark font-black text-xl">MC</span>
+                </div>
+                <span class="text-xl font-bold tracking-wider">MindCompta Admin</span>
+            </a>
+            <div id="auth-actions-desktop" class="flex items-center"></div>
         </div>
     </header>
 
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
-        
-        <div id="loading-overlay" class="py-20 text-center">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-dark mb-4"></div>
-            <p class="text-gray-500 font-medium">Synchronisation des données...</p>
-        </div>
+    <main class="w-full max-w-7xl mx-auto p-4 flex-grow flex flex-col md:flex-row gap-8">
 
-        <!-- Section: Utilisateurs -->
-        <div id="tab-users-content" class="mt-6 hidden">
-            <div class="flex justify-between items-end mb-6">
-                <div>
-                    <h1 class="text-3xl font-black text-brand-dark">Membres</h1>
-                    <p class="text-sm text-gray-500">Gestion des profils et accès</p>
+        <!-- SIDEBAR MENU -->
+        <aside class="w-full md:w-72 flex flex-col gap-2 mt-4">
+
+            <h2 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 px-2">Navigation Publique</h2>
+            <a href="index.html" class="admin-menu-item group text-gray-600 bg-white shadow-sm border-gray-100">
+                <span class="mr-3 text-xl">🏠</span>
+                <span class="font-bold">Aller à l'Accueil</span>
+            </a>
+            <a href="services.html" class="admin-menu-item group text-gray-600 bg-white shadow-sm border-gray-100">
+                <span class="mr-3 text-xl">📄</span>
+                <span class="font-bold">Voir les Articles</span>
+            </a>
+
+            <div class="my-6"></div>
+
+            <h2 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 px-2">Centre de Contrôle</h2>
+            <div onclick="switchAdminTab('users')" id="menu-users" class="admin-menu-item active group">
+                <span class="mr-3 text-xl group-[.active]:text-white">👥</span>
+                <span class="font-bold">Utilisateurs</span>
+            </div>
+            <div onclick="switchAdminTab('activity')" id="menu-activity" class="admin-menu-item group text-gray-600">
+                <span class="mr-3 text-xl">📜</span>
+                <span class="font-bold">Activités</span>
+            </div>
+            <div onclick="switchAdminTab('notifications')" id="menu-notifications" class="admin-menu-item group text-gray-600">
+                <span class="mr-3 text-xl">🔔</span>
+                <span class="font-bold">Notifications</span>
+            </div>
+            <div onclick="switchAdminTab('stats')" id="menu-stats" class="admin-menu-item group text-gray-600">
+                <span class="mr-3 text-xl">📊</span>
+                <span class="font-bold">Statistiques</span>
+            </div>
+
+            <hr class="my-6 border-gray-200">
+            <a href="services.html" class="p-4 bg-accent/10 border-2 border-accent border-dashed rounded-2xl flex items-center justify-center text-accent hover:bg-accent hover:text-white transition group">
+                <span class="mr-2 text-xl">✍️</span>
+                <span class="font-black text-xs uppercase tracking-widest">Publier un article</span>
+            </a>
+        </aside>
+
+        <!-- CONTENT AREA -->
+        <div class="flex-grow mt-4">
+            <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-2xl shadow-sm mb-6 flex items-center">
+                <span class="animate-pulse mr-2">⏳</span> Vérification des accès...
+            </div>
+
+            <!-- TAB: USERS -->
+            <section id="tab-users" class="admin-tab section-fade">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-black text-brand-dark uppercase tracking-tighter">Gestion Utilisateurs</h1>
+                    <span id="user-count" class="bg-brand-dark text-white px-4 py-1 rounded-full text-xs font-bold">0 Membres</span>
                 </div>
-                <select id="sort-users" class="text-xs font-bold bg-white border border-gray-200 p-2 rounded-lg outline-none shadow-sm">
-                    <option value="recent">Dernière connexion</option>
-                    <option value="alpha">Ordre Alphabétique</option>
-                </select>
-            </div>
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-100">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Utilisateur</th>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Email</th>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Statut</th>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Dernière Connexion</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-list" class="bg-white divide-y divide-gray-50">
+                                <tr><td colspan="4" class="py-20 text-center text-gray-400 animate-pulse italic">Chargement...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-                <table class="min-w-full">
-                    <thead class="bg-gray-50 border-b border-gray-100">
-                        <tr>
-                            <th class="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase">Utilisateur</th>
-                            <th class="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase">Email</th>
-                            <th class="px-6 py-4 text-center text-[10px] font-bold text-gray-400 uppercase">Statut</th>
-                            <th class="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase">Dernière Connexion</th>
-                        </tr>
-                    </thead>
-                    <tbody id="user-list-body" class="divide-y divide-gray-50"></tbody>
-                </table>
-            </div>
-        </div>
+            <!-- TAB: ACTIVITY -->
+            <section id="tab-activity" class="admin-tab hidden section-fade">
+                <h1 class="text-3xl font-black text-brand-dark uppercase tracking-tighter mb-6">Logs d'Activités</h1>
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-100">
+                            <thead class="bg-brand-dark text-white">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest">Utilisateur</th>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest">Action</th>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest">Cible</th>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest">Heure</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activity-list" class="bg-white divide-y divide-gray-50 text-sm">
+                                <tr><td colspan="4" class="py-20 text-center text-gray-400 italic">Aucune donnée récente.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
-        <!-- Section: Logs -->
-        <div id="tab-logs-content" class="mt-6 hidden">
-            <h1 class="text-3xl font-black text-brand-dark mb-2">Activités</h1>
-            <p class="text-sm text-gray-500 mb-6">Suivi des lectures et téléchargements</p>
-            
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-                <table class="min-w-full">
-                    <thead class="bg-brand-dark text-white">
-                        <tr>
-                            <th class="px-6 py-4 text-left text-[10px] font-bold uppercase">Utilisateur</th>
-                            <th class="px-6 py-4 text-left text-[10px] font-bold uppercase">Action</th>
-                            <th class="px-6 py-4 text-left text-[10px] font-bold uppercase">Élément</th>
-                            <th class="px-6 py-4 text-right text-[10px] font-bold uppercase">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody id="activity-list-body" class="divide-y divide-gray-50"></tbody>
-                </table>
-            </div>
+            <!-- TAB: NOTIFICATIONS -->
+            <section id="tab-notifications" class="admin-tab hidden section-fade">
+                <h1 class="text-3xl font-black text-brand-dark uppercase tracking-tighter mb-6">Diffusion Cloche</h1>
+                <div class="bg-white rounded-3xl shadow-2xl p-8 border-t-8 border-vibrant-green">
+                    <div class="mb-6">
+                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Message à diffuser</label>
+                        <textarea id="notif-text" rows="4" class="w-full p-5 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-vibrant-green outline-none transition text-lg" placeholder="Ex: Une nouvelle formation est disponible !"></textarea>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs text-gray-400 max-w-sm">Ce message sera visible par tous les utilisateurs via la cloche flottante.</p>
+                        <button id="send-notif-btn" class="bg-vibrant-green text-white px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:shadow-lg hover:shadow-green-200 transition active:scale-95">
+                            Envoyer maintenant
+                        </button>
+                    </div>
+                    <div id="notif-status" class="mt-4 text-center hidden font-bold"></div>
+                </div>
+            </section>
+
+            <!-- TAB: STATS -->
+            <section id="tab-stats" class="admin-tab hidden section-fade text-center py-20">
+                <div class="text-6xl mb-4">📈</div>
+                <h2 class="text-2xl font-bold text-gray-400 italic">Statistiques en cours de déploiement...</h2>
+            </section>
         </div>
     </main>
 
+    <footer class="w-full bg-white border-t border-gray-100 py-8 mt-auto">
+        <p class="text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Panneau de Contrôle MindCompta • 2025</p>
+    </footer>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, limit, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
+        const firebaseConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-        let usersData = [];
-        let currentTab = 'users';
+        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
+        const APP_ID = "mindcompta-finance";
 
-        window.switchTab = (tab) => {
-            currentTab = tab;
-            document.getElementById('tab-users-content').classList.toggle('hidden', tab !== 'users');
-            document.getElementById('tab-logs-content').classList.toggle('hidden', tab !== 'logs');
-            document.getElementById('btn-users').className = tab === 'users' ? 'text-xs tab-active pb-1 uppercase tracking-widest' : 'text-xs text-blue-200 pb-1 uppercase tracking-widest';
-            document.getElementById('btn-logs').className = tab === 'logs' ? 'text-xs tab-active pb-1 uppercase tracking-widest' : 'text-xs text-blue-200 pb-1 uppercase tracking-widest';
+        // Tab Switching Logic
+        window.switchAdminTab = (tabName) => {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.admin-menu-item').forEach(m => {
+                if (m.id && m.id.startsWith('menu-')) {
+                    m.classList.remove('active', 'bg-brand-dark', 'text-white');
+                    m.classList.add('text-gray-600');
+                }
+            });
+
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            const activeMenu = document.getElementById(`menu-${tabName}`);
+            activeMenu.classList.add('active', 'bg-brand-dark', 'text-white');
+            activeMenu.classList.remove('text-gray-600');
         };
 
-        function formatTime(ts) {
-            if (!ts) return "Jamais";
-            const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
-            return date.toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+        function formatFSDate(ts) {
+            if (!ts) return 'N/A';
+            const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+            return d.toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
         }
 
-        // SYNC UTILISATEURS
-        function initUsers() {
-            // Utilisation du chemin dynamique appId
-            const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'user_profiles');
-            onSnapshot(usersRef, (snap) => {
-                usersData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderUsers();
-                document.getElementById('loading-overlay').classList.add('hidden');
-                if(currentTab === 'users') document.getElementById('tab-users-content').classList.remove('hidden');
+        // --- DATA FETCHING ---
+        function fetchUsers() {
+            onSnapshot(collection(db, "artifacts"), (snap) => {
+                const list = document.getElementById('user-list');
+                const counter = document.getElementById('user-count');
+                list.innerHTML = '';
+                let count = 0;
+                snap.forEach(docSnap => {
+                    const u = docSnap.data();
+                    if(!u.email) return;
+                    count++;
+                    const isOnline = u.status === 'EN LIGNE';
+                    list.innerHTML += `
+                        <tr class="hover:bg-gray-50 transition border-b border-gray-50">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 text-brand-dark flex items-center justify-center font-bold text-[10px] mr-3">${u.displayName ? u.displayName[0] : '?'}</div>
+                                    <span class="text-sm font-bold text-gray-800">${u.displayName || 'Utilisateur'}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-xs text-gray-500">${u.email}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 text-[9px] font-black rounded-full uppercase tracking-widest ${isOnline ? 'bg-green-100 text-green-600':'bg-gray-100 text-gray-400'}">
+                                    ${u.status || 'Hors Ligne'}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-xs text-gray-400 font-medium">${formatFSDate(u.lastLogin)}</td>
+                        </tr>`;
+                });
+                counter.innerText = `${count} Membres`;
             });
         }
 
-        function renderUsers() {
-            const list = document.getElementById('user-list-body');
-            const sortVal = document.getElementById('sort-users').value;
-            
-            const sorted = [...usersData].sort((a, b) => {
-                if (sortVal === 'alpha') return (a.username || '').localeCompare(b.username || '');
-                return (b.lastLogin?.seconds || 0) - (a.lastLogin?.seconds || 0);
-            });
-
-            list.innerHTML = sorted.map(u => {
-                const online = u.status === 'online' || u.status === 'EN LIGNE';
-                return `
-                <tr class="hover:bg-blue-50/20 transition-colors">
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs uppercase">
-                                ${(u.username || 'U').charAt(0)}
-                            </div>
-                            <span class="font-semibold text-slate-800">${u.username || 'Anonyme'}</span>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">${u.email || 'Non fourni'}</td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="px-2 py-0.5 text-[9px] font-black rounded-md border ${online ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-100 text-gray-400 border-gray-200'}">
-                            ${online ? 'EN LIGNE' : 'HORS LIGNE'}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-right text-xs font-medium text-gray-400">${formatTime(u.lastLogin)}</td>
-                </tr>`;
-            }).join('');
-        }
-
-        // SYNC ACTIVITÉS (LOGS)
-        function initLogs() {
-            const logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'activity_logs');
-            const q = query(logsRef, orderBy('timestamp', 'desc'), limit(100));
+        function fetchActivity() {
+            const q = query(collection(db, "activity_logs"), orderBy("timestamp", "desc"), limit(40));
             onSnapshot(q, (snap) => {
-                const list = document.getElementById('activity-list-body');
-                list.innerHTML = snap.docs.map(doc => {
-                    const l = doc.data();
-                    const isDl = l.action?.toLowerCase().includes('télécharg');
-                    return `
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 text-sm font-bold text-slate-700">${l.userEmail || l.username || 'Visiteur'}</td>
-                        <td class="px-6 py-4">
-                            <span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${isDl ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}">
-                                ${l.action || 'Action'}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-500 italic">"${l.target || 'N/A'}"</td>
-                        <td class="px-6 py-4 text-right text-xs text-gray-400">${formatTime(l.timestamp)}</td>
-                    </tr>`;
-                }).join('');
+                const list = document.getElementById('activity-list');
+                list.innerHTML = '';
+                snap.forEach(docSnap => {
+                    const log = docSnap.data();
+                    list.innerHTML += `
+                        <tr class="hover:bg-blue-50/50 transition">
+                            <td class="px-6 py-4 font-bold text-brand-dark">${log.userEmail ? log.userEmail.split('@')[0] : 'Anonyme'}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 rounded-md text-[10px] font-bold ${log.action.includes('Télé') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}">
+                                    ${log.action}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-500 italic truncate max-w-[150px]">"${log.target}"</td>
+                            <td class="px-6 py-4 text-xs text-gray-400">${formatFSDate(log.timestamp)}</td>
+                        </tr>`;
+                });
             });
         }
 
-        document.getElementById('sort-users').onchange = renderUsers;
+        // --- NOTIFICATIONS ---
+        const sendBtn = document.getElementById('send-notif-btn');
+        const notifInput = document.getElementById('notif-text');
+        const notifStatus = document.getElementById('notif-status');
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                initUsers();
-                initLogs();
+        sendBtn.onclick = async () => {
+            const text = notifInput.value.trim();
+            if(!text) return;
+            sendBtn.disabled = true;
+            try {
+                const notifRef = collection(db, "artifacts", APP_ID, "public", "data", "site_notifications");
+                await addDoc(notifRef, { text, timestamp: new Date().toISOString(), adminUid: auth.currentUser.uid });
+                notifStatus.innerText = "Diffusé !";
+                notifStatus.className = "mt-4 text-center font-bold text-green-600";
+                notifStatus.classList.remove('hidden');
+                notifInput.value = '';
+            } catch (e) {
+                notifStatus.innerText = "Erreur de permission.";
+                notifStatus.className = "mt-4 text-center font-bold text-red-500";
+                notifStatus.classList.remove('hidden');
+            } finally {
+                sendBtn.disabled = false;
+                setTimeout(() => notifStatus.classList.add('hidden'), 3000);
+            }
+        };
+
+        // --- AUTH GUARD ---
+        onAuthStateChanged(auth, (user) => {
+            const dAuth = document.getElementById('auth-actions-desktop');
+            if (user && user.uid === ADMIN_UID) {
+                document.getElementById('status-message').classList.add('hidden');
+                dAuth.innerHTML = `<button id="logout-btn" class="bg-red-500/10 text-red-500 border border-red-500/20 py-2 px-6 text-[10px] font-black uppercase rounded-xl tracking-widest">Déconnexion</button>`;
+                document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = 'index.html');
+                fetchUsers();
+                fetchActivity();
             } else {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                document.getElementById('status-message').innerHTML = `<div class="text-red-600 font-bold">🚫 Accès refusé. Redirection...</div>`;
+                setTimeout(() => window.location.href = 'index.html', 2000);
             }
         });
-
-        document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = 'index.html');
     </script>
 </body>
 </html>
+
 
