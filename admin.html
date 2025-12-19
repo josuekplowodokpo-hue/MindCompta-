@@ -7,333 +7,189 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        /* Import the Inter font */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
-        /* Brand Colors (Standardized) */
         :root {
-            --brand-dark: #1E3A8A; /* Deep Blue (Indigo-900) */
-            --accent: #F59E0B; /* Vivid Orange / Gold (Amber-500) */
-            --vibrant-green: #10B981; /* Bright Green (Emerald-500) */
+            --brand-dark: #1E3A8A;
+            --accent: #F59E0B;
+            --vibrant-green: #10B981;
             font-family: 'Inter', sans-serif;
         }
-
-        /* Custom Tailwind classes for colors */
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
         .hover-accent:hover { background-color: #D97706; }
-
-        /* Navigation Link Styles - Desktop */
-        .nav-link {
-            color: white;
-            font-weight: 500;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
-        }
-        .nav-link:hover {
-            background-color: #345b85;
-        }
-        .active-link-desktop {
-            background-color: var(--accent); 
-            font-weight: 600;
-            color: var(--brand-dark) !important;
-        }
-
-        /* Mobile Menu Styles (Off-Canvas) */
-        #mobile-menu {
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 50; 
-        }
-        #mobile-menu.open {
-            transform: translateX(0);
-        }
-        /* Overlay */
-        #mobile-menu-overlay {
-            display: none; 
-            z-index: 40;
-        }
-        #mobile-menu-overlay.open {
-            display: block;
-        }
-        .mobile-link {
-            display: block;
-            padding: 0.75rem 1rem;
-            color: white;
-            font-weight: 500;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
-        }
-        .mobile-link.active-link-mobile {
-            background-color: var(--accent);
-            color: var(--brand-dark);
-            font-weight: 700;
-        }
-        .mobile-link-btn {
-             display: block;
-             width: 100%;
-             text-align: center;
-        }
+        .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
+        .active-link-desktop { background-color: var(--accent); font-weight: 600; color: var(--brand-dark) !important; }
+        #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
+        #mobile-menu.open { transform: translateX(0); }
+        #mobile-menu-overlay { display: none; z-index: 40; }
+        #mobile-menu-overlay.open { display: block; }
+        .mobile-link { display: block; padding: 0.75rem 1rem; color: white; font-weight: 500; border-radius: 0.5rem; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col font-sans">
 
-    <!-- EN-TÊTE ET NAVIGATION -->
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between items-center">
-
-                <!-- LOGO/BRAND (CLICKABLE) -->
-                <a href="index.html" class="flex items-center group">
-                    <img src="logo.jpg" 
-                         alt="MindCompta Logo" 
-                         onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'"
-                         class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
-                    <span class="text-xl font-bold tracking-wider group-hover:text-accent transition">MindCompta Admin</span>
-                </a>
-
-                <!-- DESKTOP NAVIGATION -->
-                <nav id="desktop-nav" class="hidden sm:flex items-center space-x-4">
-                    <a href="index.html" class="nav-link">Accueil</a>
-                    <a href="services.html" class="nav-link">Services (Livre)</a>
-                    <a href="about.html" class="nav-link">À Propos</a>
-                    <a href="youtube.html" class="nav-link">Vidéos YouTube</a>
-                    <a href="admin.html" class="nav-link bg-red-500 py-2 px-4 active-link-desktop">Admin</a>
-
-                    <!-- Action Buttons and User Info (Managed by JS) -->
-                    <div id="auth-actions-desktop" class="flex items-center space-x-3">
-                        <!-- Content managed by JS (checkSessionAndRenderHeader) -->
-                        <a href="login.html" class="bg-accent py-2 px-5 text-sm font-semibold rounded-full shadow-lg hover-accent transition duration-300 text-white">
-                            Chargement...
-                        </a>
-                    </div>
-                </nav>
-
-                <!-- MOBILE MENU BUTTON -->
-                <button id="menu-button" class="sm:hidden p-2 rounded-lg hover:bg-[#345b85] transition duration-300" aria-label="Menu">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-            </div>
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center group">
+                <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
+                <span class="text-xl font-bold tracking-wider">MindCompta Admin</span>
+            </a>
+            <nav class="hidden sm:flex items-center space-x-4">
+                <a href="index.html" class="nav-link">Accueil</a>
+                <a href="services.html" class="nav-link">Services</a>
+                <a href="about.html" class="nav-link">À Propos</a>
+                <a href="youtube.html" class="nav-link">Vidéos</a>
+                <a href="admin.html" class="nav-link bg-red-500 active-link-desktop px-4">Admin</a>
+                <div id="auth-actions-desktop" class="flex items-center space-x-3 ml-4 border-l border-blue-800 pl-4"></div>
+            </nav>
+            <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
         </div>
     </header>
 
-    <!-- MOBILE MENU OFF-CANVAS -->
-    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
-    <nav id="mobile-menu" class="fixed top-0 right-0 w-64 max-w-xs h-full bg-brand-dark text-white shadow-2xl z-50 p-6">
-        <button id="close-menu-button" class="absolute top-4 right-4 text-4xl font-light hover:text-accent focus:outline-none">
-            &times;
-        </button>
-        <div class="pt-12 space-y-3">
-            <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4 text-accent">Navigation</h3>
-            <a href="index.html" class="mobile-link">Accueil</a>
-            <a href="services.html" class="mobile-link">Services (Livre)</a>
-            <a href="about.html" class="mobile-link">À Propos</a>
-            <a href="youtube.html" class="mobile-link">Vidéos YouTube</a>
-            <a href="admin.html" class="mobile-link bg-red-500 active-link-mobile">Admin</a>
-
-            <!-- Authentication Actions Container (Filled by JS) -->
-            <div class="pt-6 border-t border-gray-700 mt-6 space-y-3" id="auth-actions-mobile">
-                <a href="login.html" class="mobile-link bg-accent mobile-link-btn text-brand-dark">Chargement...</a>
-            </div>
-        </div>
-    </nav>
-    <!-- END MOBILE MENU -->
-
-    <!-- CONTENU PRINCIPAL -->
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
-        <h1 class="text-3xl font-extrabold text-brand-dark mb-6 mt-4">
-            Tableau de Bord Administrateur
-        </h1>
+        <h1 class="text-3xl font-extrabold text-brand-dark mb-6 mt-4">Tableau de Bord Administrateur</h1>
 
-        <!-- Conteneur d'état de chargement/erreur (utilisé aussi comme alerte) -->
-        <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-lg shadow-md transition duration-300" role="alert">
-            Vérification des droits d'accès et initialisation Firebase...
+        <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-lg shadow-md mb-6">
+            Initialisation en cours...
         </div>
 
-        <div class="mb-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg shadow-inner">
-            <p class="font-bold">⚠️ Note de Sécurité Importante :</p>
-            <p class="text-sm">Les informations affichées sont gérées par Firestore. Pour des raisons de sécurité, aucune fonctionnalité d'édition ou de suppression n'est disponible directement dans ce front-end. Les mots de passe ne sont jamais affichés.</p>
-        </div>
-
-        <!-- TABLEAU DES UTILISATEURS FIRESTORE -->
-        <div class="bg-white rounded-xl shadow-xl overflow-x-auto">
+        <h2 class="text-xl font-bold text-brand-dark mb-4 flex items-center">
+            <span class="bg-brand-dark text-white w-8 h-8 rounded-full flex items-center justify-center mr-2 text-sm">1</span>
+            Gestion des Utilisateurs
+        </h2>
+        <div class="bg-white rounded-xl shadow-lg overflow-x-auto mb-12">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom Utilisateur</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email (Identifiant)</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rôle</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dernière Connexion</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rôle</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dernière Connexion</th>
                     </tr>
                 </thead>
                 <tbody id="user-list" class="bg-white divide-y divide-gray-200">
-                    <!-- Les lignes seront insérées par JavaScript (Firestore) -->
+                    <tr><td colspan="5" class="py-12 text-center text-gray-400">Chargement des utilisateurs...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2 class="text-xl font-bold text-brand-dark mb-4 flex items-center">
+            <span class="bg-accent text-brand-dark w-8 h-8 rounded-full flex items-center justify-center mr-2 text-sm">2</span>
+            Activités Récentes (Lectures & Téléchargements)
+        </h2>
+        <div class="bg-white rounded-xl shadow-lg overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-brand-dark text-white">
                     <tr>
-                        <td colspan="5" class="py-12 text-center text-gray-400">En attente de l'authentification pour charger les données utilisateurs...</td>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Utilisateur</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Action</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Cible (Livre/Article)</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Date & Heure</th>
                     </tr>
+                </thead>
+                <tbody id="activity-list" class="bg-white divide-y divide-gray-200">
+                    <tr><td colspan="4" class="py-12 text-center text-gray-400">Aucune activité enregistrée pour le moment.</td></tr>
                 </tbody>
             </table>
         </div>
     </main>
 
-    <!-- PIED DE PAGE -->
     <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
         <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT GLOBALE & FIREBASE -->
     <script type="module">
-    // --- IMPORTS FIREBASE ---
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { 
-        getAuth, 
-        signOut, 
-        onAuthStateChanged, 
-        signInWithCustomToken, 
-        signInAnonymously 
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { 
-        getFirestore, 
-        collection, 
-        onSnapshot,
-        query
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
-        authDomain: "mindcompta-a61ef.firebaseapp.com",
-        projectId: "mindcompta-a61ef",
-        storageBucket: "mindcompta-a61ef.firebasestorage.app",
-        messagingSenderId: "578389020450",
-        appId: "1:578389020450:web:edf9dd48e394cff7601f7b",
-        measurementId: "G-CDS9XYT35Y"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
+            authDomain: "mindcompta-a61ef.firebaseapp.com",
+            projectId: "mindcompta-a61ef",
+            storageBucket: "mindcompta-a61ef.firebasestorage.app",
+            messagingSenderId: "578389020450",
+            appId: "1:578389020450:web:edf9dd48e394cff7601f7b"
+        };
 
-    const REDIRECTION_PAGE = 'login.html'; 
-    const ADMIN_EMAIL = 'admin@mindcompta.com'; 
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const ADMIN_EMAIL = 'admin@mindcompta.com';
 
-    let auth, db;
+        const statusMessage = document.getElementById('status-message');
 
-    const statusMessage = document.getElementById('status-message');
-    const userListElement = document.getElementById('user-list');
-
-    // --- Fonctions Utilitaires ---
-    function alertMessage(message, type = 'warning') {
-        statusMessage.textContent = message;
-        statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800', 'bg-green-100', 'text-green-800', 'bg-blue-100', 'text-blue-800');
-        if (type === 'error') statusMessage.classList.add('bg-red-100', 'text-red-800');
-        else if (type === 'success') statusMessage.classList.add('bg-green-100', 'text-green-800');
-        else statusMessage.classList.add('bg-yellow-100', 'text-yellow-800');
-    }
-
-    function formatFirestoreTimestamp(timestamp) {
-        if (!timestamp || !timestamp.seconds) return 'N/A';
-        const date = new Date(timestamp.seconds * 1000);
-        return date.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', ' à');
-    }
-
-    window.handleLogout = async () => {
-        try { await signOut(auth); } catch (error) { alertMessage("Erreur déconnexion", 'error'); }
-    };
-
-    function checkSessionAndRenderHeader(user) {
-        const desktopActions = document.getElementById('auth-actions-desktop');
-        const mobileActions = document.getElementById('auth-actions-mobile');
-        const isAuthenticated = !!user;
-        const userEmail = user ? user.email : null;
-        const isAdmin = userEmail === ADMIN_EMAIL;
-
-        if (isAuthenticated) {
-            if (!isAdmin) alertMessage(`Accès restreint : connecté en tant que ${userEmail}`, 'error');
-            else statusMessage.classList.add('hidden');
-
-            const displayName = userEmail ? userEmail.split('@')[0] : 'Invité';
-            desktopActions.innerHTML = `<span class="text-accent text-sm font-medium pr-2 border-r border-gray-600">Bienvenue, ${displayName}</span>
-                <button id="logout-desktop-btn" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full shadow-lg text-white">Déconnexion</button>`;
-            
-            mobileActions.innerHTML = `<button id="logout-mobile-btn" class="mobile-link bg-red-500 mobile-link-btn text-white">Déconnexion</button>`;
-
-            document.getElementById('logout-desktop-btn')?.addEventListener('click', window.handleLogout);
-            document.getElementById('logout-mobile-btn')?.addEventListener('click', window.handleLogout);
-
-            fetchUsersData(); // Appel de la fonction de chargement
-        } else {
-            setTimeout(() => { if (!auth.currentUser) window.location.href = REDIRECTION_PAGE; }, 2000);
+        function formatFSDate(ts) {
+            if (!ts) return 'N/A';
+            return new Date(ts.seconds * 1000).toLocaleString('fr-FR');
         }
-    }
 
-    // --- CORRECTION DE LA FONCTION FETCH ---
-    function fetchUsersData() {
-        const userProfilesPath = "artifacts"; 
-        const usersRef = collection(db, userProfilesPath);
-
-        onSnapshot(usersRef, (snapshot) => {
-            const userProfiles = [];
-            snapshot.forEach(doc => {
-                userProfiles.push({ id: doc.id, ...doc.data() });
+        // --- CHARGEMENT DES UTILISATEURS ---
+        function fetchUsersData() {
+            onSnapshot(collection(db, "artifacts"), (snap) => {
+                const list = document.getElementById('user-list');
+                list.innerHTML = '';
+                snap.forEach(doc => {
+                    const u = doc.data();
+                    const isOnline = u.status === 'EN LIGNE';
+                    list.innerHTML += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 text-sm font-bold text-brand-dark">${u.displayName || 'Utilisateur'}</td>
+                            <td class="px-6 py-4 text-sm">${u.email}</td>
+                            <td class="px-6 py-4 text-sm">${u.role || 'Client'}</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 text-[10px] font-bold rounded-full ${isOnline ? 'bg-green-500 text-white':'bg-gray-300'}">${u.status || 'HORS LIGNE'}</span></td>
+                            <td class="px-6 py-4 text-sm text-gray-500">${formatFSDate(u.lastLogin)}</td>
+                        </tr>`;
+                });
             });
-            renderUsersTable(userProfiles);
-        }, (error) => {
-            console.error("Erreur Firestore:", error);
-            userListElement.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-red-500 font-bold">Erreur : ${error.message}</td></tr>`;
-        });
-    }
-
-    function renderUsersTable(profiles) {
-        userListElement.innerHTML = '';
-        if (profiles.length === 0) {
-             userListElement.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-gray-500">Aucun utilisateur trouvé dans la collection "artifacts".</td></tr>`;
-            return;
         }
 
-        profiles.forEach(user => {
-            const userEmail = user.email || 'Inconnu';
-            const isOnline = user.status === 'EN LIGNE';
-            const statusColor = isOnline ? 'bg-emerald-500 text-white' : 'bg-gray-400 text-white';
+        // --- CHARGEMENT DES LOGS D'ACTIVITÉ ---
+        function fetchActivityLogs() {
+            // On récupère les 50 dernières actions, de la plus récente à la plus ancienne
+            const q = query(collection(db, "activity_logs"), orderBy("timestamp", "desc"), limit(50));
+            
+            onSnapshot(q, (snap) => {
+                const list = document.getElementById('activity-list');
+                list.innerHTML = '';
+                
+                if(snap.empty) {
+                    list.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-gray-400">Aucune activité trouvée.</td></tr>';
+                    return;
+                }
 
-            const row = document.createElement('tr');
-            row.className = 'hover:bg-gray-50 transition';
-            row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-brand-dark">${user.displayName || userEmail.split('@')[0]}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${userEmail}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${user.role || 'Client'}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full ${statusColor}">${user.status || 'HORS LIGNE'}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${formatFirestoreTimestamp(user.lastLogin || user.createdAt)}</td>
-            `;
-            userListElement.appendChild(row);
-        });
-    }
-
-    function initializeFirebase() {
-        try {
-            const app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            onAuthStateChanged(auth, checkSessionAndRenderHeader);
-        } catch (error) {
-            alertMessage(`Erreur d'initialisation : ${error.message}`, 'error');
+                snap.forEach(doc => {
+                    const log = doc.data();
+                    const actionColor = log.action.includes('Téléchargement') ? 'text-blue-600 font-bold' : 'text-emerald-600';
+                    
+                    list.innerHTML += `
+                        <tr class="hover:bg-blue-50 transition">
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">${log.userEmail}</td>
+                            <td class="px-6 py-4 text-sm ${actionColor}">${log.action}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600 italic">"${log.target}"</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">${formatFSDate(log.timestamp)}</td>
+                        </tr>`;
+                });
+            });
         }
-    }
 
-    // Gestion Menu Mobile
-    const menuBtn = document.getElementById('menu-button');
-    const closeBtn = document.getElementById('close-menu-button');
-    const menu = document.getElementById('mobile-menu');
-    const overlay = document.getElementById('mobile-menu-overlay');
+        // --- AUTHENTIFICATION ---
+        onAuthStateChanged(auth, (user) => {
+            const dAuth = document.getElementById('auth-actions-desktop');
+            if (user && user.email === ADMIN_EMAIL) {
+                statusMessage.classList.add('hidden');
+                dAuth.innerHTML = `<button onclick="auth.signOut()" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full text-white">Déconnexion</button>`;
+                fetchUsersData();
+                fetchActivityLogs(); // Lancer le traçage
+            } else {
+                statusMessage.innerHTML = "Accès refusé. Redirection...";
+                setTimeout(() => window.location.href = 'login.html', 2000);
+            }
+        });
 
-    [menuBtn, closeBtn, overlay].forEach(el => el?.addEventListener('click', () => {
-        menu.classList.toggle('open');
-        overlay.classList.toggle('open');
-    }));
-
-    document.addEventListener('DOMContentLoaded', initializeFirebase);
-</script>
+        window.auth = auth; // Pour le bouton déconnexion
+    </script>
 </body>
 </html>
