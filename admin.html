@@ -3,284 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCompta - Tableau de Bord Admin Pro</title>
+    <title>MindCompta - Admin Expert</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        :root {
-            --brand-dark: #1E3A8A;
-            --accent: #F59E0B;
-            --vibrant-green: #10B981;
-            font-family: 'Inter', sans-serif;
-        }
-        .bg-brand-dark { background-color: var(--brand-dark); }
-        .text-brand-dark { color: var(--brand-dark); }
-        .bg-accent { background-color: var(--accent); }
-        .admin-menu-item {
-            display: flex; align-items: center; padding: 1rem; border-radius: 12px;
-            transition: all 0.2s; cursor: pointer; border: 2px solid transparent;
-        }
-        .admin-menu-item:hover { background-color: rgba(30, 58, 138, 0.05); border-color: var(--brand-dark); }
-        .admin-menu-item.active { background-color: var(--brand-dark); color: white !important; }
-        .section-fade { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f3f4f6; color: #1e293b; }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+        .tab-active { color: #1e3a8a; border-bottom: 3px solid #1e3a8a; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col font-sans">
+<body class="min-h-screen pb-20">
 
-    <!-- HEADER -->
-    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
-            <a href="index.html" class="flex items-center group">
-                <div class="h-10 w-10 bg-white rounded-full flex items-center justify-center mr-3 border-2 border-white/20">
-                    <span class="text-brand-dark font-black text-xl">MC</span>
-                </div>
-                <span class="text-xl font-bold tracking-wider uppercase italic">MindCompta Admin</span>
-            </a>
-            <div id="auth-actions-desktop"></div>
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 border-b border-gray-200 p-4 mb-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-900 rounded-xl flex items-center justify-center text-white font-bold">MC</div>
+                <h1 class="font-extrabold text-xl tracking-tight text-blue-900">ADMIN CONTROL</h1>
+            </div>
+            <button id="logout-btn" class="text-sm font-bold text-red-600 bg-red-50 px-4 py-2 rounded-lg hover:bg-red-100 transition">Quitter</button>
         </div>
     </header>
 
-    <main class="w-full max-w-7xl mx-auto p-4 flex-grow flex flex-col md:flex-row gap-8">
-        <!-- SIDEBAR -->
-        <aside class="w-full md:w-72 flex flex-col gap-2 mt-4">
-            <h2 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 px-2">Navigation Publique</h2>
-            <a href="index.html" class="admin-menu-item group text-gray-600 bg-white shadow-sm border-gray-100">
-                <span class="mr-3 text-xl">🏠</span><span class="font-bold">Aller à l'Accueil</span>
-            </a>
-
-            <div class="my-6"></div>
-
-            <h2 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 px-2">Centre de Contrôle</h2>
-            <div onclick="switchAdminTab('users')" id="menu-users" class="admin-menu-item active group">
-                <span class="mr-3 text-xl">👥</span><span class="font-bold">Utilisateurs</span>
+    <main class="max-w-7xl mx-auto px-4">
+        
+        <!-- Stats Row -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <p class="text-xs font-semibold text-gray-400 uppercase">Utilisateurs</p>
+                <p id="stat-users" class="text-2xl font-black text-blue-900">0</p>
             </div>
-            <div onclick="switchAdminTab('notifications')" id="menu-notifications" class="admin-menu-item group text-gray-600">
-                <span class="mr-3 text-xl">🔔</span><span class="font-bold">Annonces</span>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <p class="text-xs font-semibold text-gray-400 uppercase">Commentaires</p>
+                <p id="stat-comments" class="text-2xl font-black text-blue-600">0</p>
             </div>
-            <div onclick="switchAdminTab('activity')" id="menu-activity" class="admin-menu-item group text-gray-600">
-                <span class="mr-3 text-xl">📜</span><span class="font-bold">Activités</span>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <p class="text-xs font-semibold text-gray-400 uppercase">Téléchargements</p>
+                <p id="stat-downloads" class="text-2xl font-black text-emerald-600">0</p>
             </div>
-            <div onclick="switchAdminTab('stats')" id="menu-stats" class="admin-menu-item group text-gray-600">
-                <span class="mr-3 text-xl">📊</span><span class="font-bold">Statistiques</span>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <p class="text-xs font-semibold text-gray-400 uppercase">Annonces</p>
+                <p id="stat-announces" class="text-2xl font-black text-orange-500">0</p>
             </div>
-        </aside>
-
-        <!-- CONTENT -->
-        <div class="flex-grow mt-4">
-            <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-2xl shadow-sm mb-6 flex items-center">
-                <span class="animate-pulse mr-2">⏳</span> Vérification des accès administrateur...
-            </div>
-
-            <!-- TAB: USERS -->
-            <section id="tab-users" class="admin-tab section-fade">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-black text-brand-dark uppercase tracking-tighter">Gestion Utilisateurs</h1>
-                    <span id="user-count" class="bg-brand-dark text-white px-4 py-1 rounded-full text-xs font-bold">0 Membres</span>
-                </div>
-                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-100">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Utilisateur</th>
-                                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Email</th>
-                                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Statut</th>
-                                </tr>
-                            </thead>
-                            <tbody id="user-list" class="bg-white divide-y divide-gray-50">
-                                <tr><td colspan="3" class="py-20 text-center text-gray-400 italic">Chargement des données...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB: ANNOUNCEMENTS (With Edit/Delete) -->
-            <section id="tab-notifications" class="admin-tab hidden section-fade">
-                <h1 class="text-3xl font-black text-brand-dark uppercase tracking-tighter mb-6">Gestion des Annonces</h1>
-                
-                <!-- Form -->
-                <div class="bg-white rounded-3xl shadow-xl p-8 border-t-8 border-vibrant-green mb-8">
-                    <input type="hidden" id="edit-id">
-                    <div class="mb-4">
-                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Titre</label>
-                        <input type="text" id="notif-title" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none focus:border-accent" placeholder="Ex: Maintenance prévue">
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Message</label>
-                        <textarea id="notif-text" rows="3" class="w-full p-5 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-vibrant-green outline-none transition" placeholder="Contenu de la notification..."></textarea>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <button id="cancel-edit" class="hidden text-gray-400 font-bold hover:text-red-500">Annuler modification</button>
-                        <button id="send-notif-btn" class="bg-vibrant-green text-white px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:shadow-lg transition">
-                            Publier l'annonce
-                        </button>
-                    </div>
-                    <div id="notif-status" class="mt-4 text-center hidden font-bold"></div>
-                </div>
-
-                <!-- List of existing announcements -->
-                <div class="space-y-4" id="announcements-list">
-                    <!-- Dynamic -->
-                </div>
-            </section>
-
-            <!-- TAB: ACTIVITY -->
-            <section id="tab-activity" class="admin-tab hidden section-fade">
-                <h1 class="text-3xl font-black text-brand-dark uppercase tracking-tighter mb-6">Logs d'Activités</h1>
-                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-                    <table class="min-w-full divide-y divide-gray-100">
-                        <thead class="bg-brand-dark text-white font-bold text-[10px] uppercase">
-                            <tr><th class="px-6 py-4 text-left">Utilisateur</th><th class="px-6 py-4 text-left">Action</th><th class="px-6 py-4 text-left">Heure</th></tr>
-                        </thead>
-                        <tbody id="activity-list" class="bg-white divide-y divide-gray-50 text-sm italic text-gray-400">
-                            <tr><td colspan="3" class="py-10 text-center">En attente de nouveaux logs...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- TAB: STATS -->
-            <section id="tab-stats" class="admin-tab hidden section-fade text-center py-20">
-                <div class="text-6xl mb-4">📈</div>
-                <h2 class="text-2xl font-bold text-gray-400 italic">Statistiques en cours de déploiement...</h2>
-            </section>
         </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-8 border-b border-gray-200 mb-6 px-2">
+            <button onclick="switchTab('users')" id="btn-users" class="pb-3 text-sm font-bold tab-active">MEMBRES</button>
+            <button onclick="switchTab('logs')" id="btn-logs" class="pb-3 text-sm font-bold text-gray-400 hover:text-gray-600">JOURNAL D'ACTIVITÉ</button>
+            <button onclick="switchTab('announces')" id="btn-announces" class="pb-3 text-sm font-bold text-gray-400 hover:text-gray-600">ANNONCES</button>
+        </div>
+
+        <!-- Tab: Users -->
+        <section id="sec-users" class="tab-content">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50 text-gray-400 text-[10px] font-bold uppercase">
+                        <tr>
+                            <th class="p-4">Utilisateur</th>
+                            <th class="p-4">Contact Email</th>
+                            <th class="p-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-list" class="divide-y divide-gray-50 text-sm">
+                        <!-- JS injected -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Tab: Activity Logs (The Missing Part) -->
+        <section id="sec-logs" class="tab-content hidden space-y-4">
+            <div id="activity-feed" class="space-y-3">
+                <!-- Activity cards will appear here -->
+            </div>
+        </section>
+
+        <!-- Tab: Announces -->
+        <section id="sec-announces" class="tab-content hidden">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
+                <h3 class="font-bold text-gray-800 mb-4">Nouvelle Annonce</h3>
+                <input type="hidden" id="edit-id">
+                <input type="text" id="ann-title" placeholder="Titre (ex: Maintenance)" class="w-full p-3 rounded-xl bg-gray-50 border-none mb-3 focus:ring-2 ring-blue-100">
+                <textarea id="ann-text" placeholder="Message aux utilisateurs..." class="w-full p-3 rounded-xl bg-gray-50 border-none h-24 mb-3 focus:ring-2 ring-blue-100"></textarea>
+                <div class="flex justify-end gap-2">
+                    <button id="btn-cancel" class="hidden px-4 py-2 text-sm font-bold text-gray-500">Annuler</button>
+                    <button id="btn-save" class="px-6 py-2 bg-blue-900 text-white rounded-xl text-sm font-bold">Publier</button>
+                </div>
+            </div>
+            <div id="ann-list" class="space-y-3"></div>
+        </section>
+
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
+        const firebaseConfig = JSON.parse('{"apiKey":"AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0","authDomain":"mindcompta-a61ef.firebaseapp.com","projectId":"mindcompta-a61ef","storageBucket":"mindcompta-a61ef.firebasestorage.app","messagingSenderId":"578389020450","appId":"1:578389020450:web:edf9dd48e394cff7601f7b"}');
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
+        const appId = "mindcompta-a61ef";
         const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
-        const APP_ID = "mindcompta-a61ef";
 
-        // TAB LOGIC
-        window.switchAdminTab = (tabName) => {
-            document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
-            document.querySelectorAll('.admin-menu-item').forEach(m => m.classList.remove('active', 'bg-brand-dark', 'text-white'));
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            document.getElementById(`menu-${tabName}`).classList.add('active', 'bg-brand-dark', 'text-white');
+        // Navigation
+        window.switchTab = (target) => {
+            document.querySelectorAll('.tab-content').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('[id^="btn-"]').forEach(b => b.classList.remove('tab-active', 'text-blue-900'));
+            document.getElementById(`sec-${target}`).classList.remove('hidden');
+            document.getElementById(`btn-${target}`).classList.add('tab-active');
         };
 
-        // FETCH USERS (Path corrected for artifacts structure)
-        function fetchUsers() {
-            const usersRef = collection(db, "artifacts", APP_ID, "users");
-            onSnapshot(usersRef, (snap) => {
-                const list = document.getElementById('user-list');
-                const counter = document.getElementById('user-count');
+        // UI Updates
+        const updateCount = (id, val) => { if(document.getElementById(id)) document.getElementById(id).innerText = val; };
+
+        // Data Management
+        function startSync() {
+            // 1. Members
+            onSnapshot(collection(db, 'artifacts', appId, 'users'), (snap) => {
+                updateCount('stat-users', snap.size);
+                const list = document.getElementById('users-list');
                 list.innerHTML = '';
-                let count = 0;
                 snap.forEach(d => {
                     const u = d.data();
-                    count++;
                     list.innerHTML += `
-                        <tr class="hover:bg-gray-50 transition border-b border-gray-50">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 rounded-full bg-blue-100 text-brand-dark flex items-center justify-center font-bold text-[10px] mr-3">${u.displayName ? u.displayName[0] : '?'}</div>
-                                    <span class="text-sm font-bold text-gray-800">${u.displayName || 'Anonyme'}</span>
-                                </div>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="p-4 font-bold text-blue-950">${u.displayName || 'Membres sans nom'}</td>
+                            <td class="p-4 text-gray-500 font-medium">${u.email || 'Email non fourni'}</td>
+                            <td class="p-4 text-right">
+                                <button onclick="deleteData('users', '${d.id}')" class="text-red-400 hover:text-red-600">Retirer</button>
                             </td>
-                            <td class="px-6 py-4 text-xs text-gray-500">${u.email || 'Pas d\'email'}</td>
-                            <td class="px-6 py-4">
-                                <span class="px-3 py-1 text-[9px] font-black rounded-full uppercase bg-green-100 text-green-600">MEMBRE ACTIF</span>
-                            </td>
-                        </tr>`;
+                        </tr>
+                    `;
                 });
-                counter.innerText = `${count} Membres`;
             });
-        }
 
-        // FETCH & MANAGE ANNOUNCEMENTS
-        function fetchAnnouncements() {
-            const annRef = collection(db, "artifacts", APP_ID, "public", "data", "announcements");
-            const q = query(annRef, orderBy("createdAt", "desc"));
+            // 2. Activity Aggregator (Downloads & Comments)
+            const downloadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'downloads');
+            const commentsRef = collection(db, 'artifacts', appId, 'public', 'data', 'comments');
             
-            onSnapshot(q, (snap) => {
-                const container = document.getElementById('announcements-list');
-                container.innerHTML = '';
-                snap.forEach(d => {
-                    const ann = d.data();
+            // Sync Counts
+            onSnapshot(downloadsRef, s => updateCount('stat-downloads', s.size));
+            onSnapshot(commentsRef, s => updateCount('stat-comments', s.size));
+
+            // Combined Feed
+            onSnapshot(query(commentsRef, orderBy("timestamp", "desc")), (cSnap) => {
+                const feed = document.getElementById('activity-feed');
+                // We clear and rebuild to maintain order (simplified version)
+                feed.innerHTML = '<h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Flux des derniers commentaires</h3>';
+                cSnap.forEach(cdoc => {
+                    const data = cdoc.data();
                     const card = document.createElement('div');
-                    card.className = "bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start group hover:shadow-md transition";
+                    card.className = "bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-600 flex justify-between items-center";
                     card.innerHTML = `
                         <div>
-                            <h3 class="font-black text-brand-dark uppercase text-sm">${ann.title}</h3>
-                            <p class="text-gray-600 text-sm mt-1">${ann.message}</p>
+                            <p class="text-xs font-bold text-blue-600 uppercase">Commentaire</p>
+                            <p class="text-sm font-medium text-gray-800">"${data.text}"</p>
+                            <p class="text-[10px] text-gray-400 mt-1">Par <b>${data.userName || 'Utilisateur'}</b> le ${data.timestamp?.toDate().toLocaleString() || 'récemment'}</p>
                         </div>
-                        <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition">
-                            <button onclick="editAnn('${d.id}', '${ann.title.replace(/'/g, "\\'")}', '${ann.message.replace(/'/g, "\\'")}')" class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white">✏️</button>
-                            <button onclick="deleteAnn('${d.id}')" class="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white">🗑️</button>
+                        <button onclick="deleteData('comments', '${cdoc.id}')" class="text-gray-300 hover:text-red-500">Supprimer</button>
+                    `;
+                    feed.appendChild(card);
+                });
+            });
+
+            // 3. Announcements
+            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'announcements'), orderBy("createdAt", "desc")), (snap) => {
+                updateCount('stat-announces', snap.size);
+                const list = document.getElementById('ann-list');
+                list.innerHTML = '';
+                snap.forEach(d => {
+                    const a = d.data();
+                    list.innerHTML += `
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center group">
+                            <div>
+                                <h4 class="text-xs font-black text-blue-900 uppercase">${a.title}</h4>
+                                <p class="text-sm text-gray-600">${a.message}</p>
+                            </div>
+                            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                                <button onclick="editAnn('${d.id}', '${a.title.replace(/'/g,"")}', '${a.message.replace(/'/g,"")}')" class="p-2 text-blue-600 bg-blue-50 rounded-lg">Modifier</button>
+                                <button onclick="deleteData('announcements', '${d.id}')" class="p-2 text-red-600 bg-red-50 rounded-lg">Effacer</button>
+                            </div>
                         </div>
                     `;
-                    container.appendChild(card);
                 });
             });
         }
 
-        // Action Buttons logic
-        window.deleteAnn = async (id) => {
-            if(confirm("Supprimer cette annonce ?")) {
-                await deleteDoc(doc(db, "artifacts", APP_ID, "public", "data", "announcements", id));
+        // Global Actions
+        window.deleteData = async (coll, id) => {
+            if(confirm("Voulez-vous vraiment supprimer cet élément ?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', coll, id));
             }
         };
 
         window.editAnn = (id, title, msg) => {
             document.getElementById('edit-id').value = id;
-            document.getElementById('notif-title').value = title;
-            document.getElementById('notif-text').value = msg;
-            document.getElementById('send-notif-btn').innerText = "Mettre à jour";
-            document.getElementById('cancel-edit').classList.remove('hidden');
-            document.getElementById('notif-title').focus();
+            document.getElementById('ann-title').value = title;
+            document.getElementById('ann-text').value = msg;
+            document.getElementById('btn-save').innerText = "Mettre à jour";
+            document.getElementById('btn-cancel').classList.remove('hidden');
+            switchTab('announces');
         };
 
-        document.getElementById('cancel-edit').onclick = () => {
+        document.getElementById('btn-cancel').onclick = () => {
             document.getElementById('edit-id').value = '';
-            document.getElementById('notif-title').value = '';
-            document.getElementById('notif-text').value = '';
-            document.getElementById('send-notif-btn').innerText = "Publier l'annonce";
-            document.getElementById('cancel-edit').classList.add('hidden');
+            document.getElementById('ann-title').value = '';
+            document.getElementById('ann-text').value = '';
+            document.getElementById('btn-save').innerText = "Publier";
+            document.getElementById('btn-cancel').classList.add('hidden');
         };
 
-        document.getElementById('send-notif-btn').onclick = async () => {
+        document.getElementById('btn-save').onclick = async () => {
             const id = document.getElementById('edit-id').value;
-            const title = document.getElementById('notif-title').value.trim();
-            const message = document.getElementById('notif-text').value.trim();
+            const title = document.getElementById('ann-title').value;
+            const message = document.getElementById('ann-text').value;
             if(!title || !message) return;
 
-            try {
-                const annRef = collection(db, "artifacts", APP_ID, "public", "data", "announcements");
-                if(id) {
-                    await updateDoc(doc(db, "artifacts", APP_ID, "public", "data", "announcements", id), { title, message });
-                } else {
-                    await addDoc(annRef, { title, message, createdAt: serverTimestamp() });
-                }
-                document.getElementById('cancel-edit').click();
-            } catch (e) { console.error(e); }
+            if(id) {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'announcements', id), { title, message });
+            } else {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'announcements'), {
+                    title, message, createdAt: serverTimestamp()
+                });
+            }
+            document.getElementById('btn-cancel').click();
         };
 
-        // AUTH GUARD
+        // Auth Gate
         onAuthStateChanged(auth, (user) => {
             if (user && user.uid === ADMIN_UID) {
-                document.getElementById('status-message').classList.add('hidden');
-                document.getElementById('auth-actions-desktop').innerHTML = `
-                    <button id="logout-btn" class="bg-red-500/10 text-red-500 border border-red-500/20 py-2 px-6 text-[10px] font-black uppercase rounded-xl tracking-widest">Déconnexion</button>`;
-                document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = 'index.html');
-                fetchUsers();
-                fetchAnnouncements();
+                startSync();
             } else {
-                document.getElementById('status-message').innerHTML = `<div class="text-red-600 font-bold">🚫 Accès refusé.</div>`;
-                setTimeout(() => window.location.href = 'index.html', 2000);
+                window.location.href = 'index.html';
             }
         });
+
+        document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = 'index.html');
+
     </script>
 </body>
 </html>
