@@ -18,178 +18,303 @@
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
         .hover-accent:hover { background-color: #D97706; }
+        
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
-        .active-link-desktop { background-color: var(--accent); font-weight: 600; color: var(--brand-dark) !important; }
-        #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
-        #mobile-menu.open { transform: translateX(0); }
-        #mobile-menu-overlay { display: none; z-index: 40; }
-        #mobile-menu-overlay.open { display: block; }
-        .mobile-link { display: block; padding: 0.75rem 1rem; color: white; font-weight: 500; border-radius: 0.5rem; }
+        
+        /* Sidebar Menu Styles */
+        .admin-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .admin-menu-item:hover {
+            background-color: rgba(30, 58, 138, 0.05);
+            border-color: var(--brand-dark);
+        }
+        .admin-menu-item.active {
+            background-color: var(--brand-dark);
+            color: white !important;
+        }
+        
+        .section-fade { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col font-sans">
 
-    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
-        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+    <!-- HEADER -->
+    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center group">
-                <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" class="h-10 w-auto rounded-full mr-3 border-2 border-white transition group-hover:scale-105">
+                <div class="h-10 w-10 bg-white rounded-full flex items-center justify-center mr-3 border-2 border-white/20">
+                    <span class="text-brand-dark font-black text-xl">MC</span>
+                </div>
                 <span class="text-xl font-bold tracking-wider">MindCompta Admin</span>
             </a>
-            <nav class="hidden sm:flex items-center space-x-4">
-                <a href="index.html" class="nav-link">Accueil</a>
-                <a href="services.html" class="nav-link">Services</a>
-                <a href="about.html" class="nav-link">À Propos</a>
-                <a href="youtube.html" class="nav-link">Vidéos</a>
-                <a href="admin.html" class="nav-link bg-red-500 active-link-desktop px-4">Admin</a>
-                <div id="auth-actions-desktop" class="flex items-center space-x-3 ml-4 border-l border-blue-800 pl-4"></div>
-            </nav>
-            <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+            <div id="auth-actions-desktop" class="flex items-center"></div>
         </div>
     </header>
 
-    <main class="w-full max-w-6xl mx-auto p-4 flex-grow">
-        <h1 class="text-3xl font-extrabold text-brand-dark mb-6 mt-4">Tableau de Bord Administrateur</h1>
+    <main class="w-full max-w-7xl mx-auto p-4 flex-grow flex flex-col md:flex-row gap-8">
+        
+        <!-- SIDEBAR MENU -->
+        <aside class="w-full md:w-72 flex flex-col gap-2 mt-4">
+            
+            <h2 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 px-2">Navigation Publique</h2>
+            <a href="index.html" class="admin-menu-item group text-gray-600 bg-white shadow-sm border-gray-100">
+                <span class="mr-3 text-xl">🏠</span>
+                <span class="font-bold">Aller à l'Accueil</span>
+            </a>
+            <a href="services.html" class="admin-menu-item group text-gray-600 bg-white shadow-sm border-gray-100">
+                <span class="mr-3 text-xl">📄</span>
+                <span class="font-bold">Voir les Articles</span>
+            </a>
 
-        <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-lg shadow-md mb-6">
-            Initialisation en cours...
-        </div>
+            <div class="my-6"></div>
 
-        <h2 class="text-xl font-bold text-brand-dark mb-4 flex items-center">
-            <span class="bg-brand-dark text-white w-8 h-8 rounded-full flex items-center justify-center mr-2 text-sm">1</span>
-            Gestion des Utilisateurs
-        </h2>
-        <div class="bg-white rounded-xl shadow-lg overflow-x-auto mb-12">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rôle</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dernière Connexion</th>
-                    </tr>
-                </thead>
-                <tbody id="user-list" class="bg-white divide-y divide-gray-200">
-                    <tr><td colspan="5" class="py-12 text-center text-gray-400">Chargement des utilisateurs...</td></tr>
-                </tbody>
-            </table>
-        </div>
+            <h2 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 px-2">Centre de Contrôle</h2>
+            <div onclick="switchAdminTab('users')" id="menu-users" class="admin-menu-item active group">
+                <span class="mr-3 text-xl group-[.active]:text-white">👥</span>
+                <span class="font-bold">Utilisateurs</span>
+            </div>
+            <div onclick="switchAdminTab('activity')" id="menu-activity" class="admin-menu-item group text-gray-600">
+                <span class="mr-3 text-xl">📜</span>
+                <span class="font-bold">Activités</span>
+            </div>
+            <div onclick="switchAdminTab('notifications')" id="menu-notifications" class="admin-menu-item group text-gray-600">
+                <span class="mr-3 text-xl">🔔</span>
+                <span class="font-bold">Notifications</span>
+            </div>
+            <div onclick="switchAdminTab('stats')" id="menu-stats" class="admin-menu-item group text-gray-600">
+                <span class="mr-3 text-xl">📊</span>
+                <span class="font-bold">Statistiques</span>
+            </div>
+            
+            <hr class="my-6 border-gray-200">
+            <a href="services.html" class="p-4 bg-accent/10 border-2 border-accent border-dashed rounded-2xl flex items-center justify-center text-accent hover:bg-accent hover:text-white transition group">
+                <span class="mr-2 text-xl">✍️</span>
+                <span class="font-black text-xs uppercase tracking-widest">Publier un article</span>
+            </a>
+        </aside>
 
-        <h2 class="text-xl font-bold text-brand-dark mb-4 flex items-center">
-            <span class="bg-accent text-brand-dark w-8 h-8 rounded-full flex items-center justify-center mr-2 text-sm">2</span>
-            Activités Récentes (Lectures & Téléchargements)
-        </h2>
-        <div class="bg-white rounded-xl shadow-lg overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-brand-dark text-white">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Utilisateur</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Action</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Cible (Livre/Article)</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Date & Heure</th>
-                    </tr>
-                </thead>
-                <tbody id="activity-list" class="bg-white divide-y divide-gray-200">
-                    <tr><td colspan="4" class="py-12 text-center text-gray-400">Aucune activité enregistrée pour le moment.</td></tr>
-                </tbody>
-            </table>
+        <!-- CONTENT AREA -->
+        <div class="flex-grow mt-4">
+            <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-2xl shadow-sm mb-6 flex items-center">
+                <span class="animate-pulse mr-2">⏳</span> Vérification des accès...
+            </div>
+
+            <!-- TAB: USERS -->
+            <section id="tab-users" class="admin-tab section-fade">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-black text-brand-dark uppercase tracking-tighter">Gestion Utilisateurs</h1>
+                    <span id="user-count" class="bg-brand-dark text-white px-4 py-1 rounded-full text-xs font-bold">0 Membres</span>
+                </div>
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-100">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Utilisateur</th>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Email</th>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Statut</th>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Dernière Connexion</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-list" class="bg-white divide-y divide-gray-50">
+                                <tr><td colspan="4" class="py-20 text-center text-gray-400 animate-pulse italic">Chargement...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: ACTIVITY -->
+            <section id="tab-activity" class="admin-tab hidden section-fade">
+                <h1 class="text-3xl font-black text-brand-dark uppercase tracking-tighter mb-6">Logs d'Activités</h1>
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-100">
+                            <thead class="bg-brand-dark text-white">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest">Utilisateur</th>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest">Action</th>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest">Cible</th>
+                                    <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest">Heure</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activity-list" class="bg-white divide-y divide-gray-50 text-sm">
+                                <tr><td colspan="4" class="py-20 text-center text-gray-400 italic">Aucune donnée récente.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: NOTIFICATIONS -->
+            <section id="tab-notifications" class="admin-tab hidden section-fade">
+                <h1 class="text-3xl font-black text-brand-dark uppercase tracking-tighter mb-6">Diffusion Cloche</h1>
+                <div class="bg-white rounded-3xl shadow-2xl p-8 border-t-8 border-vibrant-green">
+                    <div class="mb-6">
+                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Message à diffuser</label>
+                        <textarea id="notif-text" rows="4" class="w-full p-5 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-vibrant-green outline-none transition text-lg" placeholder="Ex: Une nouvelle formation est disponible !"></textarea>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs text-gray-400 max-w-sm">Ce message sera visible par tous les utilisateurs via la cloche flottante.</p>
+                        <button id="send-notif-btn" class="bg-vibrant-green text-white px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:shadow-lg hover:shadow-green-200 transition active:scale-95">
+                            Envoyer maintenant
+                        </button>
+                    </div>
+                    <div id="notif-status" class="mt-4 text-center hidden font-bold"></div>
+                </div>
+            </section>
+
+            <!-- TAB: STATS -->
+            <section id="tab-stats" class="admin-tab hidden section-fade text-center py-20">
+                <div class="text-6xl mb-4">📈</div>
+                <h2 class="text-2xl font-bold text-gray-400 italic">Statistiques en cours de déploiement...</h2>
+            </section>
         </div>
     </main>
 
-    <footer class="w-full bg-brand-dark border-t border-gray-700 py-6 mt-auto">
-        <p class="text-center text-sm text-gray-400">&copy; 2025 MindCompta. Tous droits réservés.</p>
+    <footer class="w-full bg-white border-t border-gray-100 py-8 mt-auto">
+        <p class="text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Panneau de Contrôle MindCompta • 2025</p>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, limit, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0",
-            authDomain: "mindcompta-a61ef.firebaseapp.com",
-            projectId: "mindcompta-a61ef",
-            storageBucket: "mindcompta-a61ef.firebasestorage.app",
-            messagingSenderId: "578389020450",
-            appId: "1:578389020450:web:edf9dd48e394cff7601f7b"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const ADMIN_EMAIL = 'admin@mindcompta.com';
+        
+        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
+        const APP_ID = "mindcompta-finance";
 
-        const statusMessage = document.getElementById('status-message');
+        // Tab Switching Logic
+        window.switchAdminTab = (tabName) => {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.admin-menu-item').forEach(m => {
+                if (m.id && m.id.startsWith('menu-')) {
+                    m.classList.remove('active', 'bg-brand-dark', 'text-white');
+                    m.classList.add('text-gray-600');
+                }
+            });
+
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            const activeMenu = document.getElementById(`menu-${tabName}`);
+            activeMenu.classList.add('active', 'bg-brand-dark', 'text-white');
+            activeMenu.classList.remove('text-gray-600');
+        };
 
         function formatFSDate(ts) {
             if (!ts) return 'N/A';
-            return new Date(ts.seconds * 1000).toLocaleString('fr-FR');
+            const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+            return d.toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
         }
 
-        // --- CHARGEMENT DES UTILISATEURS ---
-        function fetchUsersData() {
+        // --- DATA FETCHING ---
+        function fetchUsers() {
             onSnapshot(collection(db, "artifacts"), (snap) => {
                 const list = document.getElementById('user-list');
+                const counter = document.getElementById('user-count');
                 list.innerHTML = '';
-                snap.forEach(doc => {
-                    const u = doc.data();
+                let count = 0;
+                snap.forEach(docSnap => {
+                    const u = docSnap.data();
+                    if(!u.email) return;
+                    count++;
                     const isOnline = u.status === 'EN LIGNE';
                     list.innerHTML += `
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 text-sm font-bold text-brand-dark">${u.displayName || 'Utilisateur'}</td>
-                            <td class="px-6 py-4 text-sm">${u.email}</td>
-                            <td class="px-6 py-4 text-sm">${u.role || 'Client'}</td>
-                            <td class="px-6 py-4"><span class="px-2 py-1 text-[10px] font-bold rounded-full ${isOnline ? 'bg-green-500 text-white':'bg-gray-300'}">${u.status || 'HORS LIGNE'}</span></td>
-                            <td class="px-6 py-4 text-sm text-gray-500">${formatFSDate(u.lastLogin)}</td>
+                        <tr class="hover:bg-gray-50 transition border-b border-gray-50">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 text-brand-dark flex items-center justify-center font-bold text-[10px] mr-3">${u.displayName ? u.displayName[0] : '?'}</div>
+                                    <span class="text-sm font-bold text-gray-800">${u.displayName || 'Utilisateur'}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-xs text-gray-500">${u.email}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 text-[9px] font-black rounded-full uppercase tracking-widest ${isOnline ? 'bg-green-100 text-green-600':'bg-gray-100 text-gray-400'}">
+                                    ${u.status || 'Hors Ligne'}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-xs text-gray-400 font-medium">${formatFSDate(u.lastLogin)}</td>
                         </tr>`;
                 });
+                counter.innerText = `${count} Membres`;
             });
         }
 
-        // --- CHARGEMENT DES LOGS D'ACTIVITÉ ---
-        function fetchActivityLogs() {
-            // On récupère les 50 dernières actions, de la plus récente à la plus ancienne
-            const q = query(collection(db, "activity_logs"), orderBy("timestamp", "desc"), limit(50));
-            
+        function fetchActivity() {
+            const q = query(collection(db, "activity_logs"), orderBy("timestamp", "desc"), limit(40));
             onSnapshot(q, (snap) => {
                 const list = document.getElementById('activity-list');
                 list.innerHTML = '';
-                
-                if(snap.empty) {
-                    list.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-gray-400">Aucune activité trouvée.</td></tr>';
-                    return;
-                }
-
-                snap.forEach(doc => {
-                    const log = doc.data();
-                    const actionColor = log.action.includes('Téléchargement') ? 'text-blue-600 font-bold' : 'text-emerald-600';
-                    
+                snap.forEach(docSnap => {
+                    const log = docSnap.data();
                     list.innerHTML += `
-                        <tr class="hover:bg-blue-50 transition">
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900">${log.userEmail}</td>
-                            <td class="px-6 py-4 text-sm ${actionColor}">${log.action}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600 italic">"${log.target}"</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">${formatFSDate(log.timestamp)}</td>
+                        <tr class="hover:bg-blue-50/50 transition">
+                            <td class="px-6 py-4 font-bold text-brand-dark">${log.userEmail ? log.userEmail.split('@')[0] : 'Anonyme'}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 rounded-md text-[10px] font-bold ${log.action.includes('Télé') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}">
+                                    ${log.action}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-500 italic truncate max-w-[150px]">"${log.target}"</td>
+                            <td class="px-6 py-4 text-xs text-gray-400">${formatFSDate(log.timestamp)}</td>
                         </tr>`;
                 });
             });
         }
 
-        // --- AUTHENTIFICATION ---
+        // --- NOTIFICATIONS ---
+        const sendBtn = document.getElementById('send-notif-btn');
+        const notifInput = document.getElementById('notif-text');
+        const notifStatus = document.getElementById('notif-status');
+
+        sendBtn.onclick = async () => {
+            const text = notifInput.value.trim();
+            if(!text) return;
+            sendBtn.disabled = true;
+            try {
+                const notifRef = collection(db, "artifacts", APP_ID, "public", "data", "site_notifications");
+                await addDoc(notifRef, { text, timestamp: new Date().toISOString(), adminUid: auth.currentUser.uid });
+                notifStatus.innerText = "Diffusé !";
+                notifStatus.className = "mt-4 text-center font-bold text-green-600";
+                notifStatus.classList.remove('hidden');
+                notifInput.value = '';
+            } catch (e) {
+                notifStatus.innerText = "Erreur de permission.";
+                notifStatus.className = "mt-4 text-center font-bold text-red-500";
+                notifStatus.classList.remove('hidden');
+            } finally {
+                sendBtn.disabled = false;
+                setTimeout(() => notifStatus.classList.add('hidden'), 3000);
+            }
+        };
+
+        // --- AUTH GUARD ---
         onAuthStateChanged(auth, (user) => {
             const dAuth = document.getElementById('auth-actions-desktop');
-            if (user && user.email === ADMIN_EMAIL) {
-                statusMessage.classList.add('hidden');
-                dAuth.innerHTML = `<button onclick="auth.signOut()" class="bg-red-500 py-2 px-5 text-sm font-semibold rounded-full text-white">Déconnexion</button>`;
-                fetchUsersData();
-                fetchActivityLogs(); // Lancer le traçage
+            if (user && user.uid === ADMIN_UID) {
+                document.getElementById('status-message').classList.add('hidden');
+                dAuth.innerHTML = `<button id="logout-btn" class="bg-red-500/10 text-red-500 border border-red-500/20 py-2 px-6 text-[10px] font-black uppercase rounded-xl tracking-widest">Déconnexion</button>`;
+                document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = 'index.html');
+                fetchUsers();
+                fetchActivity();
             } else {
-                statusMessage.innerHTML = "Accès refusé. Redirection...";
-                setTimeout(() => window.location.href = 'login.html', 2000);
+                document.getElementById('status-message').innerHTML = `<div class="text-red-600 font-bold">🚫 Accès refusé. Redirection...</div>`;
+                setTimeout(() => window.location.href = 'index.html', 2000);
             }
         });
-
-        window.auth = auth; // Pour le bouton déconnexion
     </script>
 </body>
 </html>
+
