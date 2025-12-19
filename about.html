@@ -7,366 +7,115 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        :root {
-            --brand-dark: #1E3A8A;
-            --accent: #F59E0B;
-            font-family: 'Inter', sans-serif;
-        }
+        :root { --brand-dark: #1E3A8A; --accent: #F59E0B; font-family: 'Inter', sans-serif; }
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-
-        .nav-link {
-            color: white;
-            font-weight: 500;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
-        }
-        .active-link-desktop {
-            background-color: var(--accent);
-            color: var(--brand-dark) !important;
-            font-weight: 700;
-        }
-
-        /* Fixed Mobile Menu */
-        #mobile-menu {
-            position: fixed;
-            top: 0;
-            right: -100%; 
-            width: 85%;
-            max-width: 320px;
-            height: 100%;
-            background-color: var(--brand-dark);
-            z-index: 1000;
-            transition: right 0.3s ease-in-out;
-            box-shadow: -5px 0 25px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            padding: 1.5rem;
-        }
-        #mobile-menu.active {
-            right: 0;
-        }
-        #menu-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            display: none;
-            z-index: 900;
-            backdrop-filter: blur(2px);
-        }
-        #menu-overlay.active {
-            display: block;
-        }
-
-        /* Floating Bell Styles with Magnetism */
-        #floating-bell-container {
-            position: fixed;
-            bottom: 100px;
-            right: 10px;
-            z-index: 2000;
-            cursor: move;
-            touch-action: none;
-            transition: transform 0.1s ease-out, left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .bell-bounce {
-            animation: ring 2.5s infinite ease-in-out;
-        }
-        @keyframes ring {
-            0% { transform: rotate(0); }
-            10% { transform: rotate(12deg); }
-            20% { transform: rotate(-12deg); }
-            30% { transform: rotate(8deg); }
-            40% { transform: rotate(-8deg); }
-            50% { transform: rotate(0); }
-            100% { transform: rotate(0); }
-        }
+        .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: all 0.2s; }
+        .active-link-desktop { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 700; }
+        #mobile-menu { position: fixed; top: 0; right: -100%; width: 85%; max-width: 320px; height: 100%; background-color: var(--brand-dark); z-index: 1000; transition: right 0.3s ease; box-shadow: -5px 0 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; padding: 1.5rem; }
+        #mobile-menu.active { right: 0; }
+        #menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 900; backdrop-filter: blur(2px); }
+        #menu-overlay.active { display: block; }
+        #floating-bell-container { position: fixed; bottom: 100px; right: 10px; z-index: 2000; cursor: move; touch-action: none; transition: transform 0.1s, left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .bell-bounce { animation: ring 2.5s infinite ease-in-out; }
+        @keyframes ring { 0%, 100% { transform: rotate(0); } 10%, 30% { transform: rotate(12deg); } 20%, 40% { transform: rotate(-12deg); } 50% { transform: rotate(0); } }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
 
-    <!-- Floating Bell Notification -->
     <div id="floating-bell-container" class="select-none">
-        <div id="bell-icon" class="relative bg-accent p-3 md:p-4 rounded-full shadow-2xl border-4 border-white cursor-pointer hover:scale-110 active:scale-95 transition-transform">
-            <svg class="w-6 h-6 md:w-8 h-8 text-brand-dark bell-bounce" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-            </svg>
+        <div id="bell-icon" class="relative bg-accent p-4 rounded-full shadow-2xl border-4 border-white cursor-pointer hover:scale-110 active:scale-95 transition">
+            <svg class="w-6 h-6 text-brand-dark bell-bounce" fill="currentColor" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
             <div id="bell-badge" class="hidden absolute top-0 right-0 h-4 w-4 bg-red-600 rounded-full border-2 border-white animate-pulse"></div>
         </div>
-        
-        <!-- Notification Modal -->
-        <div id="notification-modal" class="hidden absolute bottom-16 right-0 md:right-auto md:left-auto w-64 md:w-72 bg-white rounded-2xl shadow-2xl border-2 border-accent overflow-hidden">
-            <div class="bg-accent p-3 flex justify-between items-center">
-                <span class="font-black text-brand-dark uppercase text-[10px] tracking-widest">Annonces MindCompta</span>
-                <button id="close-notif" class="text-brand-dark font-bold text-xl leading-none">&times;</button>
-            </div>
-            <div id="notification-content" class="p-4 text-xs md:text-sm text-gray-700 italic">
-                Aucune nouvelle mise à jour.
-            </div>
+        <div id="notification-modal" class="hidden absolute bottom-16 right-0 w-64 bg-white rounded-2xl shadow-2xl border-2 border-accent overflow-hidden">
+            <div class="bg-accent p-3 flex justify-between items-center"><span class="font-black text-brand-dark uppercase text-[10px] tracking-widest">Annonces</span><button id="close-notif" class="text-brand-dark font-bold text-xl">&times;</button></div>
+            <div id="notification-content" class="p-4 text-xs text-gray-700 italic">Aucune mise à jour.</div>
         </div>
     </div>
 
-    <!-- HEADER -->
     <header class="w-full bg-brand-dark py-4 shadow-lg text-white sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
-            <a href="index.html" class="flex items-center">
-                <div class="h-10 w-10 bg-white rounded-full flex items-center justify-center mr-3 border-2 border-white/20">
-                    <span class="text-brand-dark font-black text-xl">MC</span>
-                </div>
-                <span class="text-lg font-bold tracking-tight">MindCompta Finance</span>
-            </a>
-
-            <!-- Desktop Nav -->
-            <nav class="hidden md:flex items-center space-x-2">
-                <a href="index.html" class="nav-link">Accueil</a>
-                <a href="services.html" class="nav-link">Services</a>
-                <a href="about.html" class="nav-link active-link-desktop">À Propos</a>
-                <a href="youtube.html" class="nav-link">Vidéos</a>
-                <div id="auth-actions-desktop" class="flex items-center ml-4">
-                    <a href="login.html" id="login-btn-desktop" class="bg-accent text-brand-dark px-6 py-2 rounded-full font-black text-xs uppercase shadow-lg">Connexion</a>
-                </div>
-            </nav>
-
-            <button id="open-btn" class="md:hidden p-2 active:scale-90 transition-transform">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
+            <a href="index.html" class="flex items-center"><div class="h-10 w-10 bg-white rounded-full flex items-center justify-center mr-3"><span class="text-brand-dark font-black text-xl">MC</span></div><span class="text-lg font-bold">MindCompta Finance</span></a>
+            <nav class="hidden md:flex items-center space-x-2"><a href="index.html" class="nav-link">Accueil</a><a href="services.html" class="nav-link">Services</a><a href="about.html" class="nav-link active-link-desktop">À Propos</a><a href="youtube.html" class="nav-link">Vidéos</a><div id="auth-actions-desktop" class="ml-4"></div></nav>
+            <button id="open-btn" class="md:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
         </div>
     </header>
 
     <div id="menu-overlay"></div>
-
-    <!-- Mobile Side Menu -->
     <nav id="mobile-menu">
-        <div class="flex justify-between items-center mb-6 border-b border-white/20 pb-4">
-            <span class="text-white font-black text-xl uppercase tracking-widest">NAVIGATION</span>
-            <button id="close-btn" class="text-white text-4xl leading-none px-2">&times;</button>
-        </div>
-
-        <div id="user-info-mobile" class="mb-6 p-4 bg-white/10 rounded-2xl hidden border border-white/10">
-            <p class="text-[10px] font-black text-accent uppercase mb-1 tracking-widest">Compte Actif</p>
-            <p id="user-display-name" class="text-white font-bold truncate">Utilisateur</p>
-        </div>
-
+        <div class="flex justify-between items-center mb-6 border-b border-white/20 pb-4"><span class="text-white font-black">NAVIGATION</span><button id="close-btn" class="text-white text-4xl">&times;</button></div>
+        <div id="user-info-mobile" class="mb-6 p-4 bg-white/10 rounded-2xl hidden"><p id="user-display-name" class="text-white font-bold"></p></div>
         <div class="flex flex-col space-y-2">
-            <a href="index.html" class="text-white text-lg font-medium p-3 hover:bg-white/10 rounded-xl transition">Accueil</a>
-            <a href="services.html" class="text-white text-lg font-medium p-3 hover:bg-white/10 rounded-xl transition">Services</a>
-            <a href="about.html" class="bg-accent text-brand-dark text-lg font-bold p-3 rounded-xl shadow-lg">À Propos</a>
-            <a href="youtube.html" class="text-white text-lg font-medium p-3 hover:bg-white/10 rounded-xl transition">Vidéos YouTube</a>
-            <a href="admin.html" id="admin-link-mobile" class="hidden text-white text-lg font-medium p-3 border-2 border-accent/40 rounded-xl transition bg-accent/10">Tableau de Bord Admin</a>
-            
-            <div id="auth-actions-mobile" class="pt-6 border-t border-white/10 flex flex-col">
-                <a href="login.html" id="login-btn-mobile" class="bg-white text-brand-dark text-center py-4 rounded-xl font-black uppercase text-sm border-2 border-accent shadow-xl tracking-widest">Se Connecter</a>
-                <div id="logout-container-mobile"></div>
-            </div>
+            <a href="index.html" class="text-white p-3">Accueil</a><a href="services.html" class="text-white p-3">Services</a><a href="about.html" class="bg-accent text-brand-dark p-3 rounded-xl font-bold">À Propos</a><a href="youtube.html" class="text-white p-3">Vidéos</a>
+            <a href="admin.html" id="admin-link-mobile" class="hidden text-accent p-3 border border-accent rounded-xl">Admin</a>
+            <div id="auth-actions-mobile" class="pt-6 border-t border-white/10"></div>
         </div>
     </nav>
 
     <main class="w-full max-w-6xl mx-auto p-4 flex-grow py-12">
-        <div class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-black text-brand-dark mb-4 uppercase tracking-tighter">À Propos de MindCompta</h1>
-            <p class="text-xl text-gray-500 italic max-w-2xl mx-auto">Votre partenaire de confiance pour la finance et la comptabilité.</p>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-12 items-start mb-20">
+        <div class="text-center mb-16"><h1 class="text-4xl font-black text-brand-dark uppercase">À Propos</h1></div>
+        <div class="grid md:grid-cols-2 gap-12 mb-20">
             <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
-                <h2 class="text-2xl font-bold text-brand-dark mb-8 flex items-center">
-                    <span class="w-2 h-8 bg-accent mr-3 rounded-full"></span> Contact Officiel
-                </h2>
-                <div class="space-y-8">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mr-4 text-2xl">📍</div>
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Localisation</p>
-                            <p id="display-address" class="text-gray-700 font-medium">Chargement...</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mr-4 text-2xl">📞</div>
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Assistance</p>
-                            <p id="display-phone" class="text-gray-700 font-bold">Chargement...</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mr-4 text-2xl">📧</div>
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Email</p>
-                            <p id="display-email" class="text-gray-700 font-semibold">Chargement...</p>
-                        </div>
-                    </div>
+                <h2 class="text-2xl font-bold text-brand-dark mb-8 flex items-center"><span class="w-2 h-8 bg-accent mr-3 rounded-full"></span> Contact</h2>
+                <div class="space-y-6">
+                    <div><p class="text-[10px] font-black text-gray-400 uppercase">Adresse</p><p id="display-address" class="text-gray-700">Chargement...</p></div>
+                    <div><p class="text-[10px] font-black text-gray-400 uppercase">Téléphone</p><p id="display-phone" class="text-gray-700 font-bold">Chargement...</p></div>
+                    <div><p class="text-[10px] font-black text-gray-400 uppercase">Email</p><p id="display-email" class="text-gray-700">Chargement...</p></div>
                 </div>
             </div>
-
-            <div class="bg-brand-dark rounded-3xl p-10 text-white shadow-2xl relative overflow-hidden">
-                <h3 class="text-3xl font-black mb-6 italic underline decoration-accent underline-offset-8">Engagement</h3>
-                <p class="text-blue-100 leading-relaxed mb-8 text-lg">Nous simplifions les normes comptables OHADA pour permettre aux leaders de se concentrer sur leur réussite.</p>
-                <div class="p-6 bg-white/10 rounded-2xl border border-white/20 backdrop-blur-sm">
-                    <p class="text-accent font-black uppercase text-[10px] mb-2">Service Clients</p>
-                    <p class="text-sm">Disponible du Lundi au Vendredi.</p>
-                </div>
+            <div class="bg-brand-dark rounded-3xl p-10 text-white shadow-2xl">
+                <h3 class="text-2xl font-black mb-4 italic text-accent">Engagement</h3>
+                <p class="text-blue-100 leading-relaxed">Expertise OHADA au service des leaders.</p>
             </div>
         </div>
 
-        <!-- Admin Panel (Josué Only) -->
         <div id="admin-info-panel" class="hidden bg-white border-4 border-accent p-8 rounded-3xl shadow-2xl max-w-4xl mx-auto mb-20">
-            <h3 class="text-2xl font-black text-brand-dark flex items-center uppercase mb-8">
-                <span class="mr-3">⚙️</span> Édition du Contact
-            </h3>
-            <div class="grid md:grid-cols-3 gap-6 mb-8">
-                <input type="text" id="input-address" class="p-4 bg-gray-50 border rounded-xl" placeholder="Adresse">
-                <input type="text" id="input-phone" class="p-4 bg-gray-50 border rounded-xl" placeholder="Téléphone">
-                <input type="email" id="input-email" class="p-4 bg-gray-50 border rounded-xl" placeholder="Email">
+            <h3 class="text-xl font-black mb-6 uppercase">Édition des Infos</h3>
+            <div class="grid md:grid-cols-3 gap-4 mb-6">
+                <input type="text" id="input-address" class="p-3 bg-gray-50 border rounded-xl" placeholder="Adresse">
+                <input type="text" id="input-phone" class="p-3 bg-gray-50 border rounded-xl" placeholder="Tél">
+                <input type="email" id="input-email" class="p-3 bg-gray-50 border rounded-xl" placeholder="Email">
             </div>
-            <button id="update-info-btn" class="w-full bg-brand-dark text-white py-4 rounded-xl font-black uppercase tracking-widest">Enregistrer les modifications</button>
-            <p id="update-status" class="mt-4 text-center hidden font-bold"></p>
+            <button id="update-info-btn" class="w-full bg-brand-dark text-white py-4 rounded-xl font-black uppercase">Enregistrer</button>
+            <p id="update-status" class="mt-4 text-center hidden"></p>
         </div>
     </main>
-
-    <footer class="bg-brand-dark text-gray-500 py-10 text-center text-xs font-black uppercase tracking-widest">
-        MindCompta Finance © 2025
-    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- ENHANCED DRAG & MAGNETISM LOGIC ---
-        const bell = document.getElementById('floating-bell-container');
-        let active = false;
-        let currentX;
-        let currentY;
-        let initialX;
-        let initialY;
-        let xOffset = 0;
-        let yOffset = 0;
-        let moved = false;
-
-        const dragStart = (e) => {
-            moved = false;
-            if (e.type === "touchstart") {
-                initialX = e.touches[0].clientX - xOffset;
-                initialY = e.touches[0].clientY - yOffset;
-            } else {
-                initialX = e.clientX - xOffset;
-                initialY = e.clientY - yOffset;
-            }
-            if (e.target.closest('#bell-icon')) active = true;
-        };
-
-        const dragEnd = () => {
-            if (!active) return;
-            active = false;
-            
-            // Magnetism logic: Snap to closest side
-            const screenWidth = window.innerWidth;
-            const bellRect = bell.getBoundingClientRect();
-            const bellCenter = bellRect.left + bellRect.width / 2;
-
-            if (bellCenter < screenWidth / 2) {
-                // Snap Left
-                xOffset = -(bellRect.left - 10) + xOffset;
-            } else {
-                // Snap Right
-                xOffset = (screenWidth - bellRect.right - 10) + xOffset;
-            }
-            
-            // Boundaries for Y (Top/Bottom)
-            if (bellRect.top < 80) yOffset = yOffset + (80 - bellRect.top);
-            if (bellRect.bottom > window.innerHeight - 20) yOffset = yOffset - (bellRect.bottom - window.innerHeight + 20);
-
-            setTranslate(xOffset, yOffset, bell);
-        };
-
-        const drag = (e) => {
-            if (active) {
-                e.preventDefault();
-                moved = true;
-                if (e.type === "touchmove") {
-                    currentX = e.touches[0].clientX - initialX;
-                    currentY = e.touches[0].clientY - initialY;
-                } else {
-                    currentX = e.clientX - initialX;
-                    currentY = e.clientY - initialY;
-                }
-                xOffset = currentX;
-                yOffset = currentY;
-                setTranslate(currentX, currentY, bell);
-            }
-        };
-
-        const setTranslate = (xPos, yPos, el) => {
-            el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
-        };
-
-        bell.addEventListener("mousedown", dragStart);
-        window.addEventListener("mousemove", drag);
-        window.addEventListener("mouseup", dragEnd);
-        bell.addEventListener("touchstart", dragStart, {passive: false});
-        window.addEventListener("touchmove", drag, {passive: false});
-        window.addEventListener("touchend", dragEnd);
-
-        // Bell Interaction
-        const bellIcon = document.getElementById('bell-icon');
-        const modal = document.getElementById('notification-modal');
-        const closeNotif = document.getElementById('close-notif');
-
-        bellIcon.onclick = () => {
-            if (!moved) {
-                modal.classList.toggle('hidden');
-                document.getElementById('bell-badge').classList.add('hidden');
-                
-                // Adjust modal side based on bell position
-                const rect = bell.getBoundingClientRect();
-                if (rect.left < window.innerWidth / 2) {
-                    modal.style.right = "auto";
-                    modal.style.left = "0";
-                } else {
-                    modal.style.left = "auto";
-                    modal.style.right = "0";
-                }
-            }
-        };
-        closeNotif.onclick = () => modal.classList.add('hidden');
-
-        // Sidebar Control
-        const openBtn = document.getElementById('open-btn');
-        const closeBtn = document.getElementById('close-btn');
-        const menu = document.getElementById('mobile-menu');
-        const overlay = document.getElementById('menu-overlay');
-        openBtn.onclick = () => { menu.classList.add('active'); overlay.classList.add('active'); };
-        const closeMenu = () => { menu.classList.remove('active'); overlay.classList.remove('active'); };
-        closeBtn.onclick = closeMenu;
-        overlay.onclick = closeMenu;
-
         const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
         const APP_ID = "mindcompta-finance";
 
-        // Sync Notifications
-        const notifColRef = collection(db, "artifacts", APP_ID, "public", "data", "site_notifications");
-        onSnapshot(notifColRef, (snap) => {
+        // Notifs Logic
+        const notifQ = query(collection(db, "artifacts", APP_ID, "public", "data", "site_notifications"), orderBy("timestamp", "desc"), limit(1));
+        onSnapshot(notifQ, (snap) => {
             const content = document.getElementById('notification-content');
+            const badge = document.getElementById('bell-badge');
             if (!snap.empty) {
                 const latest = snap.docs[0].data();
-                content.innerHTML = `<p class="font-bold mb-1 text-brand-dark underline">Note de l'Admin :</p><p>${latest.text}</p><p class="text-[9px] mt-2 text-gray-400 text-right">${new Date(latest.timestamp).toLocaleDateString()}</p>`;
-                document.getElementById('bell-badge').classList.remove('hidden');
+                content.innerHTML = `<p class="font-bold text-brand-dark">Dernière annonce :</p><p>${latest.text || latest.message}</p>`;
+                badge.classList.remove('hidden');
             }
         });
 
-        // Sync Contact Data
-        const configDocRef = doc(db, "artifacts", APP_ID, "public", "data", "contactInfo");
-        onSnapshot(configDocRef, (snap) => {
+        // Contact Info Logic
+        const contactDoc = doc(db, "artifacts", APP_ID, "public", "data", "contactInfo");
+        onSnapshot(contactDoc, (snap) => {
             if (snap.exists()) {
                 const d = snap.data();
-                document.getElementById('display-address').innerText = d.address || "Non défini";
-                document.getElementById('display-phone').innerText = d.phone || "Non défini";
-                document.getElementById('display-email').innerText = d.email || "Non défini";
+                document.getElementById('display-address').innerText = d.address || "N/A";
+                document.getElementById('display-phone').innerText = d.phone || "N/A";
+                document.getElementById('display-email').innerText = d.email || "N/A";
                 if(document.getElementById('input-address')) {
                     document.getElementById('input-address').value = d.address || "";
                     document.getElementById('input-phone').value = d.phone || "";
@@ -375,65 +124,38 @@
             }
         });
 
-        // Auth Observer
         onAuthStateChanged(auth, (user) => {
-            const loginBtnDesktop = document.getElementById('login-btn-desktop');
-            const loginBtnMobile = document.getElementById('login-btn-mobile');
-            const logoutContainerMobile = document.getElementById('logout-container-mobile');
-            const authActionsDesktop = document.getElementById('auth-actions-desktop');
-            const userInfoBox = document.getElementById('user-info-mobile');
             const adminPanel = document.getElementById('admin-info-panel');
-            const adminLinkMobile = document.getElementById('admin-link-mobile');
-
+            const actionsDesktop = document.getElementById('auth-actions-desktop');
+            const actionsMobile = document.getElementById('auth-actions-mobile');
             if (user) {
                 const isAdmin = user.uid === ADMIN_UID;
-                loginBtnDesktop?.classList.add('hidden');
-                loginBtnMobile?.classList.add('hidden');
-                userInfoBox.classList.remove('hidden');
-                document.getElementById('user-display-name').innerText = isAdmin ? "Josué (Admin)" : (user.displayName || user.email.split('@')[0]);
-                if (isAdmin) {
-                    adminPanel?.classList.remove('hidden');
-                    adminLinkMobile?.classList.remove('hidden');
-                }
-                const handleSignOut = () => signOut(auth).then(() => window.location.reload());
-                authActionsDesktop.innerHTML = `<button id="logout-d" class="bg-red-600 text-white px-4 py-2 rounded-full font-black text-[10px] uppercase">Déconnexion</button>`;
-                document.getElementById('logout-d').onclick = handleSignOut;
-                logoutContainerMobile.innerHTML = `<button id="logout-m" class="bg-red-600 text-white font-black py-4 rounded-xl uppercase text-sm shadow-lg w-full mt-4">Se Déconnecter</button>`;
-                document.getElementById('logout-m').onclick = handleSignOut;
+                if (isAdmin) adminPanel?.classList.remove('hidden');
+                const btn = `<button onclick="location.reload()" id="logout-trigger" class="bg-red-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase">Quitter</button>`;
+                actionsDesktop.innerHTML = btn;
+                actionsMobile.innerHTML = btn.replace('px-4 py-2', 'p-4 w-full rounded-xl');
+                document.querySelectorAll('#logout-trigger').forEach(b => b.onclick = () => signOut(auth));
             } else {
-                loginBtnDesktop?.classList.remove('hidden');
-                loginBtnMobile?.classList.remove('hidden');
-                userInfoBox.classList.add('hidden');
-                adminPanel?.classList.add('hidden');
-                adminLinkMobile?.classList.add('hidden');
-                logoutContainerMobile.innerHTML = '';
+                actionsDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-6 py-2 rounded-full font-black text-xs">CONNEXION</a>`;
             }
         });
 
-        // Update Contact Action
         document.getElementById('update-info-btn').onclick = async () => {
-            const btn = document.getElementById('update-info-btn');
-            const s = document.getElementById('update-status');
-            btn.disabled = true; btn.innerText = "Synchronisation...";
             try {
-                await setDoc(configDocRef, {
+                await setDoc(contactDoc, {
                     address: document.getElementById('input-address').value,
                     phone: document.getElementById('input-phone').value,
                     email: document.getElementById('input-email').value,
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
-                s.innerText = "Mise à jour réussie !";
-                s.className = "mt-4 text-center font-bold text-green-600";
-                s.classList.remove('hidden');
-            } catch (e) {
-                s.innerText = "Erreur de permission.";
-                s.className = "mt-4 text-center font-bold text-red-500";
-                s.classList.remove('hidden');
-            } finally {
-                btn.disabled = false; btn.innerText = "Enregistrer les modifications";
-                setTimeout(() => s.classList.add('hidden'), 3000);
-            }
+                alert("Mis à jour !");
+            } catch (e) { alert("Erreur."); }
         };
+
+        // UI Controls
+        document.getElementById('bell-icon').onclick = () => document.getElementById('notification-modal').classList.toggle('hidden');
+        document.getElementById('open-btn').onclick = () => { document.getElementById('mobile-menu').classList.add('active'); document.getElementById('menu-overlay').classList.add('active'); };
+        document.getElementById('close-btn').onclick = () => { document.getElementById('mobile-menu').classList.remove('active'); document.getElementById('menu-overlay').classList.remove('active'); };
     </script>
 </body>
 </html>
