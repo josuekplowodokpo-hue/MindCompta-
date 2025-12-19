@@ -26,10 +26,9 @@
     </header>
 
     <main class="flex-grow flex items-center justify-center p-4">
-        <div class="w-full max-w-sm bg-white rounded-xl shadow-2xl p-8 border border-gray-100"> 
+        <div class="w-full max-w-md bg-white rounded-xl shadow-2xl p-8 border border-gray-100"> 
             <h2 id="form-title" class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
 
-            <!-- BOUTON GOOGLE RESTAURÉ -->
             <button id="google-btn" type="button" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3 rounded-lg mb-6 hover:bg-gray-50 transition shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
                     <path fill="#fbc02d" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
@@ -47,16 +46,28 @@
             </div>
 
             <form id="auth-form" class="space-y-4">
+                <!-- Champs Nom et Prénom (Cachés par défaut en mode Connexion) -->
+                <div id="register-fields" class="hidden grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 text-left">Prénom</label>
+                        <input type="text" id="auth-firstname" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none" placeholder="Jean">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 text-left">Nom</label>
+                        <input type="text" id="auth-lastname" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none" placeholder="Dupont">
+                    </div>
+                </div>
+
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Adresse Email</label>
+                    <label class="block text-sm font-medium text-gray-700 text-left">Adresse Email</label>
                     <input type="email" id="auth-email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none" placeholder="votre@email.com">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Mot de Passe</label>
+                    <label class="block text-sm font-medium text-gray-700 text-left">Mot de Passe</label>
                     <input type="password" id="auth-password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none" placeholder="••••••••">
                 </div>
 
-                <div class="text-right">
+                <div id="forgot-pw-container" class="text-right">
                     <button id="forgot-password" type="button" class="text-xs text-brand-dark hover:underline font-medium">Mot de passe oublié ?</button>
                 </div>
 
@@ -90,7 +101,7 @@
         import { 
             getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
             GoogleAuthProvider, signInWithPopup, setPersistence, browserSessionPersistence,
-            sendPasswordResetEmail, sendEmailVerification, signOut
+            sendPasswordResetEmail, sendEmailVerification, signOut, updateProfile
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -107,6 +118,8 @@
         const switchButton = document.getElementById('switch-button');
         const switchText = document.getElementById('switch-text');
         const authMessage = document.getElementById('auth-message');
+        const registerFields = document.getElementById('register-fields');
+        const forgotPwContainer = document.getElementById('forgot-pw-container');
 
         function showMsg(text, isSuccess) {
             authMessage.innerText = text;
@@ -121,6 +134,15 @@
             authButton.innerText = isSignInMode ? "Se Connecter" : "S'inscrire";
             switchText.innerText = isSignInMode ? "Pas encore de compte ?" : "Déjà un compte ?";
             switchButton.innerText = isSignInMode ? "Créer un compte" : "Se connecter";
+            
+            // Afficher/Cacher les champs Nom/Prénom
+            if (isSignInMode) {
+                registerFields.classList.add('hidden');
+                forgotPwContainer.classList.remove('hidden');
+            } else {
+                registerFields.classList.remove('hidden');
+                forgotPwContainer.classList.add('hidden');
+            }
             authMessage.classList.add('hidden');
         };
 
@@ -133,16 +155,24 @@
             } catch (err) { showMsg("Erreur : " + err.message, false); }
         };
 
-        // CONNEXION GOOGLE RESTAURÉE
         document.getElementById('google-btn').onclick = async () => {
             const provider = new GoogleAuthProvider();
             try {
                 await setPersistence(auth, browserSessionPersistence);
                 const res = await signInWithPopup(auth, provider);
-                await setDoc(doc(db, "artifacts", res.user.uid), {
-                    uid: res.user.uid,
-                    email: res.user.email,
-                    displayName: res.user.displayName,
+                const user = res.user;
+
+                if (!user.emailVerified && user.uid !== ADMIN_UID) {
+                    await sendEmailVerification(user);
+                    await signOut(auth);
+                    showMsg("Compte Google détecté, mais l'email doit être validé via le lien envoyé.", false);
+                    return;
+                }
+
+                await setDoc(doc(db, "artifacts", user.uid), {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
                     status: "EN LIGNE",
                     lastLogin: serverTimestamp()
                 }, { merge: true });
@@ -154,6 +184,13 @@
             e.preventDefault();
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value;
+            const firstName = document.getElementById('auth-firstname').value.trim();
+            const lastName = document.getElementById('auth-lastname').value.trim();
+
+            // Validation des champs obligatoires pour l'inscription
+            if (!isSignInMode && (!firstName || !lastName)) {
+                return showMsg("Le nom et le prénom sont obligatoires pour l'inscription.", false);
+            }
 
             authButton.disabled = true;
             authButton.innerText = "Traitement...";
@@ -181,14 +218,26 @@
 
                 } else {
                     const res = await createUserWithEmailAndPassword(auth, email, password);
+                    const fullName = `${firstName} ${lastName}`;
+                    
+                    // Mise à jour du profil Firebase Auth avec le nom complet
+                    await updateProfile(res.user, { displayName: fullName });
+                    
+                    // Envoi de l'email
                     await sendEmailVerification(res.user);
+                    
+                    // Enregistrement dans Firestore
                     await setDoc(doc(db, "artifacts", res.user.uid), {
                         uid: res.user.uid,
                         email: email,
+                        firstName: firstName,
+                        lastName: lastName,
+                        displayName: fullName,
                         role: "Client",
                         createdAt: serverTimestamp(),
                         status: "HORS LIGNE"
                     });
+
                     await signOut(auth);
                     document.getElementById('verify-modal').classList.remove('hidden');
                 }
