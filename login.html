@@ -102,146 +102,178 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-            GoogleAuthProvider, signInWithPopup, setPersistence, browserSessionPersistence,
-            sendPasswordResetEmail, sendEmailVerification, signOut, updateProfile
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+        getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+        GoogleAuthProvider, signInWithPopup, setPersistence, browserSessionPersistence,
+        sendPasswordResetEmail, sendEmailVerification, signOut, updateProfile
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", 
+        authDomain: "mindcompta-a61ef.firebaseapp.com", 
+        projectId: "mindcompta-a61ef", 
+        storageBucket: "mindcompta-a61ef.firebasestorage.app", 
+        messagingSenderId: "578389020450", 
+        appId: "1:578389020450:web:edf9dd48e394cff7601f7b" 
+    };
 
-        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
-        let isSignInMode = true;
-        let pendingGoogleUser = null;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        const formTitle = document.getElementById('form-title');
-        const authButton = document.getElementById('auth-button');
-        const switchButton = document.getElementById('switch-button');
-        const switchText = document.getElementById('switch-text');
-        const authMessage = document.getElementById('auth-message');
-        const registerFields = document.getElementById('register-fields');
-        const forgotPwContainer = document.getElementById('forgot-pw-container');
+    const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
+    let isSignInMode = true;
+    let pendingGoogleUser = null;
 
-        function showMsg(text, isSuccess) {
-            authMessage.innerText = text;
-            authMessage.className = `text-center p-3 rounded-lg text-sm border-l-4 mt-4 ${isSuccess ? 'bg-green-100 text-green-700 border-green-500' : 'bg-red-100 text-red-700 border-red-500'}`;
-            authMessage.classList.remove('hidden');
+    const formTitle = document.getElementById('form-title');
+    const authButton = document.getElementById('auth-button');
+    const switchButton = document.getElementById('switch-button');
+    const switchText = document.getElementById('switch-text');
+    const authMessage = document.getElementById('auth-message');
+    const registerFields = document.getElementById('register-fields');
+    const forgotPwContainer = document.getElementById('forgot-pw-container');
+
+    function showMsg(text, isSuccess) {
+        authMessage.innerText = text;
+        authMessage.className = `text-center p-3 rounded-lg text-sm border-l-4 mt-4 ${isSuccess ? 'bg-green-100 text-green-700 border-green-500' : 'bg-red-100 text-red-700 border-red-500'}`;
+        authMessage.classList.remove('hidden');
+    }
+
+    // SWITCH CONNEXION / INSCRIPTION
+    switchButton.onclick = (e) => {
+        e.preventDefault();
+        isSignInMode = !isSignInMode;
+        formTitle.innerText = isSignInMode ? "Connexion" : "Inscription";
+        authButton.innerText = isSignInMode ? "Se Connecter" : "S'inscrire";
+        switchText.innerText = isSignInMode ? "Pas encore de compte ?" : "Déjà un compte ?";
+        switchButton.innerText = isSignInMode ? "Créer un compte" : "Se connecter";
+        isSignInMode ? registerFields.classList.add('hidden') : registerFields.classList.remove('hidden');
+        isSignInMode ? forgotPwContainer.classList.remove('hidden') : forgotPwContainer.classList.add('hidden');
+        authMessage.classList.add('hidden');
+    };
+
+    // --- NOUVEAU : GESTION DU MOT DE PASSE OUBLIÉ ---
+    document.getElementById('forgot-password').onclick = async () => {
+        const email = document.getElementById('auth-email').value.trim();
+        if (!email) {
+            return showMsg("Veuillez saisir votre email dans le champ ci-dessus pour recevoir le lien de réinitialisation.", false);
+        }
+        try {
+            await sendPasswordResetEmail(auth, email);
+            showMsg("Lien de réinitialisation envoyé par email !", true);
+        } catch (err) {
+            console.error(err);
+            let message = "Erreur lors de l'envoi.";
+            if (err.code === 'auth/user-not-found') message = "Aucun utilisateur trouvé avec cet email.";
+            showMsg(message, false);
+        }
+    };
+
+    // GESTION GOOGLE
+    document.getElementById('google-btn').onclick = async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            await setPersistence(auth, browserSessionPersistence);
+            const res = await signInWithPopup(auth, provider);
+            const user = res.user;
+
+            // On vérifie dans la collection 'users' (pour correspondre à la suppression de compte)
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+
+            if (!userDoc.exists()) {
+                pendingGoogleUser = user;
+                document.getElementById('profile-modal').classList.remove('hidden');
+            } else {
+                window.location.href = 'index.html';
+            }
+        } catch (err) { showMsg(err.message, false); }
+    };
+
+    // SAUVEGARDE PROFIL MODAL (GOOGLE)
+    document.getElementById('save-profile-btn').onclick = async () => {
+        const fn = document.getElementById('modal-firstname').value.trim();
+        const ln = document.getElementById('modal-lastname').value.trim();
+        if (!fn || !ln || !pendingGoogleUser) return showMsg("Veuillez remplir les deux champs.", false);
+
+        try {
+            const fullName = `${fn} ${ln}`;
+            await updateProfile(pendingGoogleUser, { displayName: fullName });
+            // Stockage dans 'users'
+            await setDoc(doc(db, "users", pendingGoogleUser.uid), {
+                uid: pendingGoogleUser.uid,
+                email: pendingGoogleUser.email,
+                firstName: fn,
+                lastName: ln,
+                displayName: fullName,
+                role: "Client",
+                createdAt: serverTimestamp(),
+                status: "EN LIGNE"
+            });
+            window.location.href = 'index.html';
+        } catch (err) { showMsg(err.message, false); }
+    };
+
+    // FORMULAIRE PRINCIPAL (EMAIL/PASSWORD)
+    document.getElementById('auth-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('auth-email').value.trim();
+        const password = document.getElementById('auth-password').value;
+        const firstName = document.getElementById('auth-firstname').value?.trim();
+        const lastName = document.getElementById('auth-lastname').value?.trim();
+
+        if (!isSignInMode && (!firstName || !lastName)) {
+            return showMsg("Prénom et Nom sont requis.", false);
         }
 
-        switchButton.onclick = (e) => {
-            e.preventDefault();
-            isSignInMode = !isSignInMode;
-            formTitle.innerText = isSignInMode ? "Connexion" : "Inscription";
-            authButton.innerText = isSignInMode ? "Se Connecter" : "S'inscrire";
-            switchText.innerText = isSignInMode ? "Pas encore de compte ?" : "Déjà un compte ?";
-            switchButton.innerText = isSignInMode ? "Créer un compte" : "Se connecter";
-            isSignInMode ? registerFields.classList.add('hidden') : registerFields.classList.remove('hidden');
-            isSignInMode ? forgotPwContainer.classList.remove('hidden') : forgotPwContainer.classList.add('hidden');
-            authMessage.classList.add('hidden');
-        };
+        authButton.disabled = true;
+        authButton.innerText = "Traitement...";
 
-        // GESTION GOOGLE
-        document.getElementById('google-btn').onclick = async () => {
-            const provider = new GoogleAuthProvider();
-            try {
-                await setPersistence(auth, browserSessionPersistence);
-                const res = await signInWithPopup(auth, provider);
-                const user = res.user;
-
-                // On vérifie si l'utilisateur a un document Firestore
-                const userDoc = await getDoc(doc(db, "artifacts", user.uid));
-                
-                if (!userDoc.exists()) {
-                    // Nouveau compte Google -> On demande les noms
-                    pendingGoogleUser = user;
-                    document.getElementById('profile-modal').classList.remove('hidden');
-                } else {
-                    // Compte déjà complet -> Redirection
-                    window.location.href = 'index.html';
+        try {
+            await setPersistence(auth, browserSessionPersistence);
+            if (isSignInMode) {
+                const res = await signInWithEmailAndPassword(auth, email, password);
+                if (!res.user.emailVerified && res.user.uid !== ADMIN_UID) {
+                    await signOut(auth);
+                    showMsg("Veuillez vérifier votre email avant de vous connecter.", false);
+                    authButton.disabled = false; return;
                 }
-            } catch (err) { showMsg(err.message, false); }
-        };
-
-        // SAUVEGARDE PROFIL MODAL
-        document.getElementById('save-profile-btn').onclick = async () => {
-            const fn = document.getElementById('modal-firstname').value.trim();
-            const ln = document.getElementById('modal-lastname').value.trim();
-            if (!fn || !ln || !pendingGoogleUser) return showMsg("Veuillez remplir les deux champs.", false);
-
-            try {
-                const fullName = `${fn} ${ln}`;
-                await updateProfile(pendingGoogleUser, { displayName: fullName });
-                await setDoc(doc(db, "artifacts", pendingGoogleUser.uid), {
-                    uid: pendingGoogleUser.uid,
-                    email: pendingGoogleUser.email,
-                    firstName: fn,
-                    lastName: ln,
+                window.location.href = 'index.html';
+            } else {
+                const res = await createUserWithEmailAndPassword(auth, email, password);
+                const fullName = `${firstName} ${lastName}`;
+                await updateProfile(res.user, { displayName: fullName });
+                await sendEmailVerification(res.user);
+                
+                // Stockage dans 'users' pour être cohérent partout
+                await setDoc(doc(db, "users", res.user.uid), {
+                    uid: res.user.uid,
+                    email: email,
+                    firstName: firstName,
+                    lastName: lastName,
                     displayName: fullName,
                     role: "Client",
                     createdAt: serverTimestamp(),
-                    status: "EN LIGNE"
+                    status: "HORS LIGNE"
                 });
-                window.location.href = 'index.html';
-            } catch (err) { showMsg(err.message, false); }
-        };
-
-        // FORMULAIRE EMAIL/PASSWORD
-        document.getElementById('auth-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('auth-email').value.trim();
-            const password = document.getElementById('auth-password').value;
-            const firstName = document.getElementById('auth-firstname').value.trim();
-            const lastName = document.getElementById('auth-lastname').value.trim();
-
-            if (!isSignInMode && (!firstName || !lastName)) {
-                return showMsg("Prénom et Nom sont requis.", false);
-            }
-
-            authButton.disabled = true;
-            authButton.innerText = "Traitement...";
-
-            try {
-                await setPersistence(auth, browserSessionPersistence);
-                if (isSignInMode) {
-                    const res = await signInWithEmailAndPassword(auth, email, password);
-                    if (!res.user.emailVerified && res.user.uid !== ADMIN_UID) {
-                        await signOut(auth);
-                        showMsg("Veuillez vérifier votre email avant de vous connecter.", false);
-                        authButton.disabled = false; return;
-                    }
-                    window.location.href = 'index.html';
-                } else {
-                    const res = await createUserWithEmailAndPassword(auth, email, password);
-                    const fullName = `${firstName} ${lastName}`;
-                    await updateProfile(res.user, { displayName: fullName });
-                    await sendEmailVerification(res.user);
-                    await setDoc(doc(db, "artifacts", res.user.uid), {
-                        uid: res.user.uid,
-                        email: email,
-                        firstName: firstName,
-                        lastName: lastName,
-                        displayName: fullName,
-                        role: "Client",
-                        createdAt: serverTimestamp(),
-                        status: "HORS LIGNE"
-                    });
-                    await signOut(auth);
-                    showMsg("Compte créé ! Vérifiez vos emails pour valider votre compte.", true);
-                    authButton.disabled = false;
-                    isSignInMode = true;
-                    switchButton.click(); // Retour à la connexion
-                }
-            } catch (err) { 
-                showMsg("Erreur: " + err.message, false);
+                
+                await signOut(auth);
+                showMsg("Compte créé ! Vérifiez vos emails pour valider votre compte.", true);
                 authButton.disabled = false;
+                isSignInMode = true;
+                // Simule un retour au mode connexion
+                switchButton.click(); 
             }
-        };
-    </script>
+        } catch (err) { 
+            let errorMsg = err.message;
+            if (err.code === 'auth/wrong-password') errorMsg = "Mot de passe incorrect.";
+            if (err.code === 'auth/user-not-found') errorMsg = "Aucun compte trouvé avec cet email.";
+            showMsg("Erreur: " + errorMsg, false);
+            authButton.disabled = false;
+        }
+    };
+</script>
 </body>
 </html>
 
