@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Tableau de Bord Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
      crossorigin="anonymous"></script>
 
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         :root {
@@ -156,7 +157,6 @@
             return d.toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
         }
 
-        // --- USERS & LOGS (RESTAURÉ) ---
         function fetchUsers() {
             onSnapshot(collection(db, "artifacts"), (snap) => {
                 const list = document.getElementById('user-list');
@@ -182,7 +182,6 @@
             });
         }
 
-        // --- NOTIFICATIONS (GESTION COMPLÈTE) ---
         let currentEditId = null;
         function fetchNotificationsForEdit() {
             const q = query(collection(db, "artifacts", APP_ID, "public", "data", "site_notifications"), orderBy("timestamp", "desc"));
@@ -211,7 +210,6 @@
             document.getElementById('notif-text').value = '';
         };
 
-        // --- AUTH GUARD ---
         onAuthStateChanged(auth, (user) => {
             const dAuth = document.getElementById('auth-actions-desktop');
             if (user && user.uid === ADMIN_UID) {
