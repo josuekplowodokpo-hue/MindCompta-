@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Vidéos YouTube</title>
     <script src="https://cdn.tailwindcss.com"></script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
      crossorigin="anonymous"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -13,7 +13,7 @@
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-        
+
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: 0.2s; }
         .active-link { background-color: var(--accent); color: var(--brand-dark) !important; font-weight: 600; }
 
@@ -109,7 +109,7 @@
         </div>
     </main>
 
-   <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
+    <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
         <div class="max-w-6xl mx-auto text-center">
             <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic">MindCompta Finance</h2>
             <p class="text-sm text-gray-400 font-medium mb-8">L'expertise comptable simplifiée.</p>
@@ -118,6 +118,7 @@
             </div>
         </div>
     </footer>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -136,7 +137,6 @@
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        // MENU LOGIC
         const toggleMenu = () => {
             document.getElementById('mobile-menu').classList.toggle('open');
             document.getElementById('mobile-menu-overlay').classList.toggle('hidden');
@@ -149,7 +149,7 @@
             document.getElementById('loader')?.remove();
             const dAuth = document.getElementById('auth-actions-desktop');
             const mAuth = document.getElementById('auth-actions-mobile');
-            
+
             if (user) {
                 const isAdmin = user.uid === ADMIN_UID;
                 dAuth.innerHTML = `<button onclick="window.handleLogout()" class="nav-link border border-red-400 text-red-400 font-bold">Déconnexion</button>`;
@@ -174,7 +174,7 @@
             onSnapshot(query(collection(db, "youtube_videos"), orderBy("createdAt", "desc")), (snap) => {
                 const list = document.getElementById('videos-list'); list.innerHTML = '';
                 snap.forEach((ds, index) => {
-                    if (!currentUid && index > 0) return; // Limite à 1 vidéo pour non-connectés
+                    if (!currentUid && index > 0) return;
                     const v = ds.data(); const id = ds.id;
                     const card = document.createElement('div');
                     card.className = "bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col border border-gray-100";
@@ -205,7 +205,6 @@
             });
         }
 
-        // LOGIQUE NOTIFICATIONS (CORRIGÉE)
         const bell = document.getElementById('notification-bell');
         const panel = document.getElementById('notif-panel');
         const bellDot = document.getElementById('bell-dot');
