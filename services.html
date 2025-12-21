@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Ressources & Bibliothèque</title>
     <script src="https://cdn.tailwindcss.com"></script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
      crossorigin="anonymous"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -19,7 +19,7 @@
         .content-collapsed { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .content-expanded { display: block; }
         .tab-btn.active { border-bottom: 4px solid var(--accent); color: var(--brand-dark); font-weight: 900; }
-        
+
         /* NAVIGATION & MENU */
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
@@ -34,6 +34,7 @@
         @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         #notif-panel { position: fixed; width: 300px; max-height: 400px; background: white; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); display: none; flex-direction: column; overflow: hidden; z-index: 101; border: 1px solid #e5e7eb; }
     </style>
+</head>
 <body class="bg-gray-50 min-h-screen flex flex-col font-inter">
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
@@ -70,7 +71,6 @@
             <div id="auth-actions-mobile" class="pt-8 mt-4 border-t border-white/10 flex flex-col space-y-4"></div>
         </div>
     </nav>
-
     <div id="notification-bell" class="bg-brand-dark rounded-full shadow-2xl border-2 border-white/20 select-none">
         <span class="text-2xl">🔔</span>
         <div id="bell-dot" class="bell-dot"></div>
@@ -138,6 +138,7 @@
             </div>
         </div>
     </footer>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -150,7 +151,6 @@
 
     setPersistence(auth, browserSessionPersistence);
 
-    // MENU MOBILE (Update for transition)
     const toggleMenu = () => {
         document.getElementById('mobile-menu').classList.toggle('open');
         document.getElementById('mobile-menu-overlay').classList.toggle('hidden');
@@ -167,23 +167,17 @@
         if(activeBtn) { activeBtn.classList.add('active', 'text-brand-dark'); activeBtn.classList.remove('text-gray-400'); }
     };
 
-    // AUTHENTICATION & UI SYNC (Style Partner Page Applied)
     onAuthStateChanged(auth, (user) => {
         document.getElementById('loader').classList.add('hidden');
         const dAuth = document.getElementById('auth-actions-desktop');
         const mAuth = document.getElementById('auth-actions-mobile');
-        
         if (user) {
             document.getElementById('documents-list').classList.remove('hidden');
             document.getElementById('library-list').classList.remove('hidden');
             const isAdmin = user.uid === ADMIN_UID;
-            
             dAuth.innerHTML = `<button onclick="window.handleLogout()" class="nav-link border border-red-400 text-red-400 font-bold">Déconnexion</button>`;
             mAuth.innerHTML = `<button onclick="window.handleLogout()" class="btn-auth-mobile btn-logout">Deconnexion</button>`;
-
-            if (isAdmin) {
-                document.querySelectorAll('#admin-articles, #admin-library, #admin-link-desktop, #admin-link-mobile').forEach(el => el?.classList.remove('hidden'));
-            }
+            if (isAdmin) { document.querySelectorAll('#admin-articles, #admin-library, #admin-link-desktop, #admin-link-mobile').forEach(el => el?.classList.remove('hidden')); }
             loadArticles(isAdmin, user.uid);
             loadLibrary(isAdmin);
             listenToAnnouncements();
@@ -196,9 +190,7 @@
 
     window.handleLogout = () => signOut(auth).then(() => window.location.reload());
 
-    // EDIT ARTICLE LOGIC (MODIFIER)
-    window.prepareEdit = async (docId) => {
-        const snap = await getDoc(doc(db, "resources", docId));
+    window.prepareEdit = async (docId) => {        const snap = await getDoc(doc(db, "resources", docId));
         if (snap.exists()) {
             const data = snap.data();
             document.getElementById('edit-doc-id').value = docId;
@@ -214,22 +206,10 @@
     document.getElementById('add-doc-form').onsubmit = async (e) => {
         e.preventDefault();
         const id = document.getElementById('edit-doc-id').value;
-        const data = {
-            title: document.getElementById('doc-title').value,
-            content: document.getElementById('doc-content').value,
-            imageUrl: document.getElementById('doc-image').value || null,
-            updatedAt: serverTimestamp()
-        };
-        if (id) {
-            await updateDoc(doc(db, "resources", id), data);
-            alert("Article mis à jour !");
-        } else {
-            await addDoc(collection(db, "resources"), { ...data, likesCount: 0, createdAt: serverTimestamp() });
-        }
-        e.target.reset();
-        document.getElementById('edit-doc-id').value = "";
-        document.getElementById('admin-form-title').innerText = "Publier un Article";
-        document.getElementById('submit-doc-btn').innerText = "Diffuser sur le flux";
+        const data = { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null, updatedAt: serverTimestamp() };
+        if (id) { await updateDoc(doc(db, "resources", id), data); alert("Article mis à jour !"); }
+        else { await addDoc(collection(db, "resources"), { ...data, likesCount: 0, createdAt: serverTimestamp() }); }
+        e.target.reset(); document.getElementById('edit-doc-id').value = ""; document.getElementById('admin-form-title').innerText = "Publier un Article"; document.getElementById('submit-doc-btn').innerText = "Diffuser sur le flux";
     };
 
     function loadArticles(isAdmin, currentUid) {
@@ -266,8 +246,7 @@
                     </div>`;
                 list.appendChild(art);
                 onSnapshot(doc(db, "resources", docId, "likes", currentUid), (lSnap) => {
-                    const icon = document.getElementById(`like-icon-${docId}`);
-                    const count = document.getElementById(`like-count-${docId}`);
+                    const icon = document.getElementById(`like-icon-${docId}`); const count = document.getElementById(`like-count-${docId}`);
                     if (lSnap.exists()) { icon.classList.replace('text-gray-400', 'text-red-500'); icon.setAttribute('fill', 'currentColor'); count?.classList.replace('text-gray-500', 'text-red-500'); }
                     else { icon.classList.replace('text-red-500', 'text-gray-400'); icon.setAttribute('fill', 'none'); count?.classList.replace('text-red-500', 'text-gray-500'); }
                 });
@@ -292,13 +271,12 @@
             const c = document.getElementById('notif-content'); if (!c) return;
             c.innerHTML = snap.empty ? '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>' : '';
             snap.forEach(docSnap => { const d = docSnap.data(); c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`; });
-            if (!snap.empty && bellDot) bellDot.style.display = 'block';
+            if (!snap.empty && document.getElementById('bell-dot')) document.getElementById('bell-dot').style.display = 'block';
         });
     }
 
     window.toggleReadMore = (btn) => { const container = btn.parentElement.querySelector('.content-text'); const isCollapsed = container.classList.contains('content-collapsed'); container.classList.toggle('content-collapsed', !isCollapsed); container.classList.toggle('content-expanded', isCollapsed); btn.innerText = isCollapsed ? "Voir moins" : "Lire la suite"; };
-    window.handleLike = async (docId) => { const user = auth.currentUser; if (!user) return; const likeRef = doc(db, "resources", docId, "likes", user.uid); const docRef = doc(db, "resources", docId); await runTransaction(db, async (t) => { const snap = await t.get(docRef); const likeSnap = await t.get(likeRef); let count = snap.data().likesCount || 0; if (likeSnap.exists()) { t.delete(likeRef); t.update(docRef, { likesCount: Math.max(0, count - 1) }); } else { t.set(likeRef, { uid: user.uid }); t.update(docRef, { likesCount: count + 1 }); } }); };
-    window.postComment = async (docId) => { const input = document.getElementById(`comment-input-${docId}`); const text = input.value.trim(); if (!text || !auth.currentUser) return; await addDoc(collection(db, "resources", docId, "comments"), { userId: auth.currentUser.uid, userEmail: auth.currentUser.email, text: text, createdAt: serverTimestamp() }); input.value = ""; };
+    window.handleLike = async (docId) => { const user = auth.currentUser; if (!user) return; const likeRef = doc(db, "resources", docId, "likes", user.uid); const docRef = doc(db, "resources", docId); await runTransaction(db, async (t) => { const snap = await t.get(docRef); const likeSnap = await t.get(likeRef); let count = snap.data().likesCount || 0; if (likeSnap.exists()) { t.delete(likeRef); t.update(docRef, { likesCount: Math.max(0, count - 1) }); } else { t.set(likeRef, { uid: user.uid }); t.update(docRef, { likesCount: count + 1 }); } }); };    window.postComment = async (docId) => { const input = document.getElementById(`comment-input-${docId}`); const text = input.value.trim(); if (!text || !auth.currentUser) return; await addDoc(collection(db, "resources", docId, "comments"), { userId: auth.currentUser.uid, userEmail: auth.currentUser.email, text: text, createdAt: serverTimestamp() }); input.value = ""; };
     window.deletePublication = async (id, coll) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, coll, id)); };
     document.getElementById('add-book-form').onsubmit = async (e) => { e.preventDefault(); await addDoc(collection(db, "library"), { title: document.getElementById('book-title').value, author: document.getElementById('book-author').value, imageUrl: document.getElementById('book-image').value, bookUrl: document.getElementById('book-url').value, description: document.getElementById('book-desc').value, createdAt: serverTimestamp() }); e.target.reset(); };
     function loadComments(docId, isAdmin, currentUid) {
@@ -308,89 +286,33 @@
             snap.forEach(cSnap => { const c = cSnap.data(); container.innerHTML += `<div class="text-sm"><b>${c.userEmail.split('@')[0]}:</b> ${c.text}</div>`; });
         });
     }
-         // ==========================================
-// LOGIQUE DE LA CLOCHE DE NOTIFICATION CORRIGÉE
-// ==========================================
+
 const bell = document.getElementById('notification-bell');
 const panel = document.getElementById('notif-panel');
 const bellDot = document.getElementById('bell-dot');
 let isDragging = false, hasMoved = false, startX, startY;
 
 if (bell && panel) {
-    // 1. GESTION DU DÉPLACEMENT (DRAG)
-    bell.addEventListener('mousedown', (e) => { 
-        isDragging = true; 
-        hasMoved = false; 
-        startX = e.clientX - bell.offsetLeft; 
-        startY = e.clientY - bell.offsetTop;
-        bell.style.cursor = 'grabbing';
-    });
-
-    window.addEventListener('mousemove', (e) => { 
-        if (!isDragging) return; 
-        hasMoved = true; 
-        
-        // Mise à jour de la position de la cloche
-        const newX = e.clientX - startX;
-        const newY = e.clientY - startY;
-        
-        bell.style.left = `${newX}px`; 
-        bell.style.top = `${newY}px`; 
-        bell.style.right = 'auto'; 
-        bell.style.bottom = 'auto';
-
-        // Si le panneau est ouvert pendant qu'on déplace, on le cache pour éviter les bugs visuels
-        panel.style.display = 'none';
-    });
-
-    window.addEventListener('mouseup', () => { 
-        isDragging = false; 
-        bell.style.cursor = 'grab';
-    });
-
-    // 2. GESTION DU CLIC ET POSITIONNEMENT DU PANNEAU
+    bell.addEventListener('mousedown', (e) => { isDragging = true; hasMoved = false; startX = e.clientX - bell.offsetLeft; startY = e.clientY - bell.offsetTop; bell.style.cursor = 'grabbing'; });
+    window.addEventListener('mousemove', (e) => { if (!isDragging) return; hasMoved = true; const newX = e.clientX - startX; const newY = e.clientY - startY; bell.style.left = `${newX}px`; bell.style.top = `${newY}px`; bell.style.right = 'auto'; bell.style.bottom = 'auto'; panel.style.display = 'none'; });
+    window.addEventListener('mouseup', () => { isDragging = false; bell.style.cursor = 'grab'; });
     bell.onclick = (e) => {
-        // Si la cloche a été déplacée, on ne considère pas ça comme un clic d'ouverture
         if (hasMoved) return;
-
-        if (panel.style.display === 'flex') {
-            panel.style.display = 'none';
-        } else {
+        if (panel.style.display === 'flex') { panel.style.display = 'none'; } else {
             panel.style.display = 'flex';
-            
-            // Calcul de la position pour "coller" à la cloche
             const rect = bell.getBoundingClientRect();
-            const panelWidth = 300; // Largeur définie dans votre CSS
-            
-            // Calcul horizontal (on centre le panneau par rapport à la cloche)
+            const panelWidth = 300;
             let leftPos = rect.left - (panelWidth / 2) + (rect.width / 2);
-            
-            // Empêcher le panneau de sortir de l'écran (gauche/droite)
             if (leftPos < 10) leftPos = 10;
             if (leftPos + panelWidth > window.innerWidth) leftPos = window.innerWidth - panelWidth - 10;
-
-            // Calcul vertical (on le place par défaut au-dessus de la cloche)
             let topPos = rect.top - panel.offsetHeight - 15;
-
-            // Si pas assez de place en haut, on le place en dessous
-            if (topPos < 10) {
-                topPos = rect.bottom + 15;
-            }
-
-            panel.style.left = `${leftPos}px`;
-            panel.style.top = `${topPos}px`;
-            panel.style.bottom = 'auto';
-            panel.style.right = 'auto';
-
+            if (topPos < 10) { topPos = rect.bottom + 15; }
+            panel.style.left = `${leftPos}px`; panel.style.top = `${topPos}px`; panel.style.bottom = 'auto'; panel.style.right = 'auto';
             if (bellDot) bellDot.style.display = 'none';
         }
     };
 }
-
-// Fermeture via le bouton X
-document.getElementById('close-notif').onclick = () => { 
-    if(panel) panel.style.display = 'none'; 
-};
-
+document.getElementById('close-notif').onclick = () => { if(panel) panel.style.display = 'none'; };
 </script>
+</body>
 </html>
