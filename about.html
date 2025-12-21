@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - À Propos</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
      crossorigin="anonymous"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         :root {
@@ -56,9 +58,8 @@
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: all 0.2s; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="bg-gray-50 min-h-screen flex flex-col font-inter">
 
-   <body class="bg-gray-50 min-h-screen flex flex-col font-inter">
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center group">
@@ -76,10 +77,9 @@
                 <div id="auth-actions-desktop"></div>
             </nav>
             <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
-        
+        </div>
     </header>
 
-   
     <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
     <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark text-white p-8 shadow-2xl">
         <div class="flex justify-between items-center mb-10">
@@ -95,7 +95,7 @@
             <div id="auth-actions-mobile" class="pt-8 mt-4 border-t border-white/10 flex flex-col space-y-4"></div>
         </div>
     </nav>
-    
+
     <main class="w-full max-w-6xl mx-auto p-4 py-12 flex-grow">
     <div class="text-center mb-16">
         <h1 class="text-4xl md:text-5xl font-black text-brand-dark italic tracking-tighter uppercase mb-4">
@@ -105,7 +105,6 @@
     </div>
 
     <div class="grid md:grid-cols-2 gap-12 items-start">
-        
         <div class="space-y-8">
             <section class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
                 <h2 class="text-2xl font-black text-brand-dark mb-4 flex items-center">
@@ -128,9 +127,7 @@
 
         <div class="bg-brand-dark text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden">
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full"></div>
-            
             <h2 class="text-2xl font-black mb-8 border-b border-white/20 pb-4">COORDONNÉES</h2>
-            
             <div class="space-y-6">
                 <div class="flex items-start">
                     <div class="bg-accent text-brand-dark p-3 rounded-xl mr-4">📍</div>
@@ -139,7 +136,6 @@
                         <p class="text-gray-200">Lomé, Togo (Quartier Administratif)</p>
                     </div>
                 </div>
-
                 <div class="flex items-start">
                     <div class="bg-accent text-brand-dark p-3 rounded-xl mr-4">📞</div>
                     <div>
@@ -147,7 +143,6 @@
                         <p class="text-gray-200">+228 79 59 27 17</p>
                     </div>
                 </div>
-
                 <div class="flex items-start">
                     <div class="bg-accent text-brand-dark p-3 rounded-xl mr-4">📧</div>
                     <div>
@@ -156,17 +151,14 @@
                     </div>
                 </div>
             </div>
-
             <div class="mt-10">
                 <a href="mailto:mindcompta@gmail.com" class="block w-full text-center bg-accent text-brand-dark font-black py-4 rounded-xl hover:scale-105 transition shadow-lg">
                     NOUS CONTACTER PAR EMAIL
                 </a>
             </div>
         </div>
-
     </div>
-</main>
-
+    </main>
 
     <div id="notification-bell" class="bg-brand-dark rounded-full shadow-2xl border-2 border-white/20 select-none">
         <span class="text-2xl">🔔</span>
@@ -180,6 +172,7 @@
         </div>
         <div id="notif-content" class="p-4 space-y-4 overflow-y-auto bg-gray-50 flex-grow max-h-[300px]"></div>
     </div>
+
     <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
         <div class="max-w-6xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-center mb-12 space-y-8 md:text-left text-center">
@@ -194,14 +187,11 @@
         </div>
     </footer>
 
-
 <script type="module">
-    // 1. IMPORTS (Firebase App, Auth et Firestore)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // 2. CONFIGURATION ET INITIALISATION
     const firebaseConfig = { 
         apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", 
         authDomain: "mindcompta-a61ef.firebaseapp.com", 
@@ -214,47 +204,36 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // 3. GESTION DE L'AUTHENTIFICATION (CONNEXION / ADMIN)
     const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
 
     onAuthStateChanged(auth, (user) => {
         if (!user) signInAnonymously(auth);
-
         const adminDesktop = document.getElementById('admin-link-desktop');
         const adminMobile = document.getElementById('admin-link-mobile');
         const authDesktop = document.getElementById('auth-actions-desktop');
         const authMobile = document.getElementById('auth-actions-mobile');
 
         if (user && !user.isAnonymous) {
-            // Si c'est l'Admin (David), on montre le Tableau de Bord
             if (user.uid === ADMIN_UID) {
                 if (adminDesktop) adminDesktop.classList.remove('hidden');
                 if (adminMobile) adminMobile.classList.remove('hidden');
             }
-
-            // Boutons de déconnexion
             if (authDesktop) authDesktop.innerHTML = `<button id="logout-btn" class="text-xs font-bold text-red-400">Quitter</button>`;
             if (authMobile) authMobile.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl w-full">Déconnexion</button>`;
-            
             const handleLogout = () => signOut(auth).then(() => window.location.reload());
             document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
             document.getElementById('logout-btn-m')?.addEventListener('click', handleLogout);
         } else {
-            // Boutons de connexion
             if (authDesktop) authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold">Connexion</a>`;
             if (authMobile) authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center w-full">Se Connecter</a>`;
         }
-        
-        // Charger les notifications une fois l'utilisateur prêt
         listenToAnnouncements();
     });
 
-    // 4. LOGIQUE DU MENU MOBILE
     const menuBtn = document.getElementById('menu-button');
     const closeBtn = document.getElementById('close-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
     const overlay = document.getElementById('mobile-menu-overlay');
-
     const toggleMenu = () => {
         mobileMenu.classList.toggle('open');
         overlay.classList.toggle('active');
@@ -263,7 +242,6 @@
     if (closeBtn) closeBtn.onclick = toggleMenu;
     if (overlay) overlay.onclick = toggleMenu;
 
-    // 5. LOGIQUE DE LA CLOCHE DE NOTIFICATION (DRAG & CLICK)
     const bell = document.getElementById('notification-bell');
     const panel = document.getElementById('notif-panel');
     const bellDot = document.getElementById('bell-dot');
@@ -277,7 +255,6 @@
             bell.style.right = 'auto'; bell.style.bottom = 'auto';
         };
         window.onmouseup = () => { isDragging = false; };
-
         bell.onclick = () => {
             if (hasMoved) return;
             panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
@@ -292,7 +269,6 @@
     }
     document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
 
-    // 6. RÉCUPÉRATION DES NOTIFICATIONS FIREBASE
     function listenToAnnouncements() {
         const q = query(collection(db, 'artifacts', 'mindcompta-finance', 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
         onSnapshot(q, (snap) => {
