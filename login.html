@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Authentification</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
      crossorigin="anonymous"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         :root { --brand-dark: #1E3A8A; --accent: #F59E0B; font-family: 'Inter', sans-serif; }
@@ -24,6 +26,12 @@
                      class="h-10 w-10 rounded-full mr-3 border-2 border-white object-cover">
                 <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
             </a>
+            <a href="index.html" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 border border-white/20">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Retour à l'accueil
+            </a>
         </div>
     </header>
 
@@ -31,7 +39,6 @@
         <div id="auth-container" class="w-full max-w-md bg-white rounded-xl shadow-2xl p-8 border border-gray-100"> 
             <h2 id="form-title" class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
 
-            <!-- Bouton Google -->
             <button id="google-btn" type="button" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3 rounded-lg mb-6 hover:bg-gray-50 transition shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
                     <path fill="#fbc02d" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
@@ -49,7 +56,6 @@
             </div>
 
             <form id="auth-form" class="space-y-4 text-left">
-                <!-- Champs Nom et Prénom (Affichés uniquement en mode Inscription) -->
                 <div id="register-fields" class="hidden grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Prénom</label>
@@ -90,11 +96,9 @@
         </div>
     </main>
 
-    <!-- Modal de finalisation de profil pour les nouveaux utilisateurs Google -->
     <div id="profile-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
         <div class="bg-white p-8 rounded-2xl max-w-sm w-full shadow-2xl">
             <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase text-center">Finalisez votre profil</h2>
-            <p class="text-gray-600 text-sm mb-4 text-center">Veuillez entrer votre nom et prénom pour continuer.</p>
             <div class="space-y-4">
                 <input type="text" id="modal-firstname" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none" placeholder="Prénom">
                 <input type="text" id="modal-lastname" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none" placeholder="Nom">
@@ -102,6 +106,20 @@
             </div>
         </div>
     </div>
+
+    <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-12 space-y-8 md:text-left text-center">
+                <div class="max-w-xs">
+                    <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic">MindCompta Finance</h2>
+                    <p class="text-sm text-gray-400 font-medium">L'expertise comptable simplifiée.</p>
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-8 text-center text-[10px] text-gray-500 font-black uppercase tracking-widest">
+                &copy; 2025 MindCompta Finance.
+            </div>
+        </div>
+    </footer>
 
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -132,10 +150,7 @@
     const formTitle = document.getElementById('form-title');
     const authButton = document.getElementById('auth-button');
     const switchButton = document.getElementById('switch-button');
-    const switchText = document.getElementById('switch-text');
     const authMessage = document.getElementById('auth-message');
-    const registerFields = document.getElementById('register-fields');
-    const forgotPwContainer = document.getElementById('forgot-pw-container');
 
     function showMsg(text, isSuccess) {
         authMessage.innerText = text;
@@ -143,94 +158,21 @@
         authMessage.classList.remove('hidden');
     }
 
-    // SWITCH CONNEXION / INSCRIPTION
     switchButton.onclick = (e) => {
         e.preventDefault();
         isSignInMode = !isSignInMode;
         formTitle.innerText = isSignInMode ? "Connexion" : "Inscription";
         authButton.innerText = isSignInMode ? "Se Connecter" : "S'inscrire";
-        switchText.innerText = isSignInMode ? "Pas encore de compte ?" : "Déjà un compte ?";
-        switchButton.innerText = isSignInMode ? "Créer un compte" : "Se connecter";
-        isSignInMode ? registerFields.classList.add('hidden') : registerFields.classList.remove('hidden');
-        isSignInMode ? forgotPwContainer.classList.remove('hidden') : forgotPwContainer.classList.add('hidden');
-        authMessage.classList.add('hidden');
+        document.getElementById('register-fields').classList.toggle('hidden', isSignInMode);
+        document.getElementById('forgot-pw-container').classList.toggle('hidden', !isSignInMode);
     };
 
-    // --- NOUVEAU : GESTION DU MOT DE PASSE OUBLIÉ ---
-    document.getElementById('forgot-password').onclick = async () => {
-        const email = document.getElementById('auth-email').value.trim();
-        if (!email) {
-            return showMsg("Veuillez saisir votre email dans le champ ci-dessus pour recevoir le lien de réinitialisation.", false);
-        }
-        try {
-            await sendPasswordResetEmail(auth, email);
-            showMsg("Lien de réinitialisation envoyé par email !", true);
-        } catch (err) {
-            console.error(err);
-            let message = "Erreur lors de l'envoi.";
-            if (err.code === 'auth/user-not-found') message = "Aucun utilisateur trouvé avec cet email.";
-            showMsg(message, false);
-        }
-    };
-
-    // GESTION GOOGLE
-    document.getElementById('google-btn').onclick = async () => {
-        const provider = new GoogleAuthProvider();
-        try {
-            await setPersistence(auth, browserSessionPersistence);
-            const res = await signInWithPopup(auth, provider);
-            const user = res.user;
-
-            // On vérifie dans la collection 'users' (pour correspondre à la suppression de compte)
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-
-            if (!userDoc.exists()) {
-                pendingGoogleUser = user;
-                document.getElementById('profile-modal').classList.remove('hidden');
-            } else {
-                window.location.href = 'index.html';
-            }
-        } catch (err) { showMsg(err.message, false); }
-    };
-
-    // SAUVEGARDE PROFIL MODAL (GOOGLE)
-    document.getElementById('save-profile-btn').onclick = async () => {
-        const fn = document.getElementById('modal-firstname').value.trim();
-        const ln = document.getElementById('modal-lastname').value.trim();
-        if (!fn || !ln || !pendingGoogleUser) return showMsg("Veuillez remplir les deux champs.", false);
-
-        try {
-            const fullName = `${fn} ${ln}`;
-            await updateProfile(pendingGoogleUser, { displayName: fullName });
-            // Stockage dans 'users'
-            await setDoc(doc(db, "users", pendingGoogleUser.uid), {
-                uid: pendingGoogleUser.uid,
-                email: pendingGoogleUser.email,
-                firstName: fn,
-                lastName: ln,
-                displayName: fullName,
-                role: "Client",
-                createdAt: serverTimestamp(),
-                status: "EN LIGNE"
-            });
-            window.location.href = 'index.html';
-        } catch (err) { showMsg(err.message, false); }
-    };
-
-    // FORMULAIRE PRINCIPAL (EMAIL/PASSWORD)
     document.getElementById('auth-form').onsubmit = async (e) => {
         e.preventDefault();
-        const email = document.getElementById('auth-email').value.trim();
-        const password = document.getElementById('auth-password').value;
-        const firstName = document.getElementById('auth-firstname').value?.trim();
-        const lastName = document.getElementById('auth-lastname').value?.trim();
-
-        if (!isSignInMode && (!firstName || !lastName)) {
-            return showMsg("Prénom et Nom sont requis.", false);
-        }
-
         authButton.disabled = true;
         authButton.innerText = "Traitement...";
+        const email = document.getElementById('auth-email').value;
+        const password = document.getElementById('auth-password').value;
 
         try {
             await setPersistence(auth, browserSessionPersistence);
@@ -238,44 +180,41 @@
                 const res = await signInWithEmailAndPassword(auth, email, password);
                 if (!res.user.emailVerified && res.user.uid !== ADMIN_UID) {
                     await signOut(auth);
-                    showMsg("Veuillez vérifier votre email avant de vous connecter.", false);
+                    showMsg("Vérifiez votre email.", false);
                     authButton.disabled = false; return;
                 }
                 window.location.href = 'index.html';
             } else {
+                const fn = document.getElementById('auth-firstname').value;
+                const ln = document.getElementById('auth-lastname').value;
                 const res = await createUserWithEmailAndPassword(auth, email, password);
-                const fullName = `${firstName} ${lastName}`;
-                await updateProfile(res.user, { displayName: fullName });
+                await updateProfile(res.user, { displayName: `${fn} ${ln}` });
                 await sendEmailVerification(res.user);
-                
-                // Stockage dans 'users' pour être cohérent partout
                 await setDoc(doc(db, "users", res.user.uid), {
-                    uid: res.user.uid,
-                    email: email,
-                    firstName: firstName,
-                    lastName: lastName,
-                    displayName: fullName,
-                    role: "Client",
-                    createdAt: serverTimestamp(),
-                    status: "HORS LIGNE"
+                    uid: res.user.uid, email, firstName: fn, lastName: ln,
+                    role: "Client", createdAt: serverTimestamp(), status: "HORS LIGNE"
                 });
-                
                 await signOut(auth);
-                showMsg("Compte créé ! Vérifiez vos emails pour valider votre compte.", true);
+                showMsg("Compte créé ! Vérifiez vos emails.", true);
                 authButton.disabled = false;
-                isSignInMode = true;
-                // Simule un retour au mode connexion
-                switchButton.click(); 
+                switchButton.click();
             }
-        } catch (err) { 
-            let errorMsg = err.message;
-            if (err.code === 'auth/wrong-password') errorMsg = "Mot de passe incorrect.";
-            if (err.code === 'auth/user-not-found') errorMsg = "Aucun compte trouvé avec cet email.";
-            showMsg("Erreur: " + errorMsg, false);
+        } catch (err) {
+            showMsg("Erreur: " + err.message, false);
             authButton.disabled = false;
         }
     };
-</script>
+
+    document.getElementById('google-btn').onclick = async () => {
+        try {
+            const res = await signInWithPopup(auth, new GoogleAuthProvider());
+            const userDoc = await getDoc(doc(db, "users", res.user.uid));
+            if (!userDoc.exists()) {
+                pendingGoogleUser = res.user;
+                document.getElementById('profile-modal').classList.remove('hidden');
+            } else { window.location.href = 'index.html'; }
+        } catch (err) { showMsg(err.message, false); }
+    };
+    </script>
 </body>
 </html>
-
