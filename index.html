@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta Finance - Accueil</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
      crossorigin="anonymous"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         :root {
@@ -86,7 +88,7 @@
                 <div id="auth-actions-desktop"></div>
             </nav>
             <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
-        
+        </div>
     </header>
 
     <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
@@ -139,7 +141,8 @@
             <button id="close-notif" class="text-white/50 text-xl hover:text-white transition">&times;</button>
         </div>
         <div id="notif-content" class="p-4 space-y-4 overflow-y-auto bg-gray-50 flex-grow max-h-[300px]"></div>
-    </div>, 
+    </div>
+
 <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
     <div class="max-w-6xl mx-auto">
         <div class="flex flex-col md:flex-row justify-between items-center mb-12 space-y-8 md:text-left text-center">
@@ -158,8 +161,8 @@
         </div>
     </div>
 </footer>
+
 <script type="module">
-    // 1. IMPORTATIONS UNIQUES ET NETTOYÉES
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { 
         getAuth, onAuthStateChanged, signInAnonymously, signOut, 
@@ -170,7 +173,6 @@
         getFirestore, collection, onSnapshot, query, orderBy, limit 
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // 2. CONFIGURATION ET INITIALISATION
     const firebaseConfig = { 
         apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", 
         authDomain: "mindcompta-a61ef.firebaseapp.com", 
@@ -179,7 +181,7 @@
         messagingSenderId: "578389020450", 
         appId: "1:578389020450:web:edf9dd48e394cff7601f7b" 
     };
-    
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -189,7 +191,6 @@
 
     setPersistence(auth, browserSessionPersistence);
 
-    // 3. GESTION DE L'ÉTAT D'AUTHENTIFICATION
     onAuthStateChanged(auth, (user) => {
         const adminDesktop = document.getElementById('admin-link-desktop');
         const adminMobile = document.getElementById('admin-link-mobile');
@@ -202,26 +203,18 @@
         }
 
         if (user && !user.isAnonymous) {
-            // Affichage admin
             if (user.uid === ADMIN_UID) {
                 if(adminDesktop) adminDesktop.classList.remove('hidden');
                 if(adminMobile) adminMobile.classList.remove('hidden');
             }
-            
-            // Bouton déconnexion
             authDesktop.innerHTML = `<button id="logout-btn" class="text-xs font-bold text-red-400">Quitter</button>`;
             authMobile.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl w-full">Déconnexion</button>`;
-            
-            // Affichage bouton suppression compte
             if(deleteZone) deleteZone.classList.remove('hidden');
-
             const handleLogout = () => signOut(auth).then(() => window.location.reload());
             document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
             document.getElementById('logout-btn-m')?.addEventListener('click', handleLogout);
-            
             listenToAnnouncements();
         } else {
-            // État déconnecté / Anonyme
             authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold">Connexion</a>`;
             authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center w-full">Se Connecter</a>`;
             if(deleteZone) deleteZone.classList.add('hidden');
@@ -229,22 +222,17 @@
         loadRecentUpdates();
     });
 
-    // 4. FLUX DES DERNIÈRES PUBLICATIONS (Articles, Vidéos, Livres)
     async function loadRecentUpdates() {
         const grid = document.getElementById('recent-updates-grid');
         if (!grid) return;
-
         try {
             const qArticle = query(collection(db, "resources"), orderBy("createdAt", "desc"), limit(1));
             const qVideo = query(collection(db, "youtube_videos"), orderBy("createdAt", "desc"), limit(1));
             const qBook = query(collection(db, "library"), orderBy("createdAt", "desc"), limit(1));
-
             grid.innerHTML = ''; 
-
             onSnapshot(qArticle, (snap) => snap.forEach(ds => renderUpdateCard(ds.data(), 'Article', 'services.html', 'bg-brand-dark')));
             onSnapshot(qVideo, (snap) => snap.forEach(ds => renderUpdateCard(ds.data(), 'Vidéo', 'youtube.html', 'bg-red-600')));
             onSnapshot(qBook, (snap) => snap.forEach(ds => renderUpdateCard(ds.data(), 'Livre', 'services.html', 'bg-accent')));
-
         } catch (error) {
             console.error("Erreur flux:", error);
             grid.innerHTML = `<p class="col-span-full text-center text-gray-400 italic text-[10px] py-10">Mises à jour non disponibles</p>`;
@@ -275,7 +263,6 @@
             </div>`;
     }
 
-    // 5. CLOCHE DE NOTIFICATION (DRAGGABLE)
     const bell = document.getElementById('notification-bell');
     const panel = document.getElementById('notif-panel');
     const bellDot = document.getElementById('bell-dot');
@@ -290,7 +277,6 @@
             panel.style.display = 'none';
         });
         window.addEventListener('mouseup', () => isDragging = false);
-
         bell.onclick = () => {
             if (hasMoved) return;
             const isVisible = panel.style.display === 'flex';
@@ -321,7 +307,6 @@
         });
     }
 
-    // 6. MENU MOBILE
     document.getElementById('menu-button').onclick = () => { 
         document.getElementById('mobile-menu').classList.add('open'); 
         document.getElementById('mobile-menu-overlay').classList.remove('hidden'); 
@@ -331,14 +316,11 @@
         document.getElementById('mobile-menu-overlay').classList.add('hidden'); 
     };
 
-    // 7. SUPPRESSION DE COMPTE SÉCURISÉE
     window.handleDeleteAccount = async () => {
         const user = auth.currentUser;
         if (!user || user.isAnonymous) return;
-
         const firstCheck = confirm("ATTENTION : Cette action est irréversible. Voulez-vous vraiment supprimer votre compte ?");
         if (!firstCheck) return;
-
         const password = prompt("Pour confirmer, veuillez saisir votre mot de passe :");
         if (password) {
             try {
@@ -354,6 +336,5 @@
         }
     };
 </script>
-
 </body>
 </html>
