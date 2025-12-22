@@ -144,7 +144,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
-const APP_ID = "mindcompta-finance"; // Identifiant utilisé par votre page Admin
 
 let isSignInMode = true;
 let pendingGoogleUser = null;
@@ -160,9 +159,9 @@ function showMsg(text, isSuccess) {
     authMessage.classList.remove('hidden');
 }
 
-// Fonction pour synchroniser les infos avec le dossier Admin
+// Fonction modifiée pour enregistrer directement dans le dossier "artifacts" racine
 async function syncUserToAdmin(user, extraData = {}) {
-    const userRef = doc(db, "artifacts", APP_ID, "users", user.uid);
+    const userRef = doc(db, "artifacts", user.uid);
     const data = {
         uid: user.uid,
         email: user.email,
@@ -198,7 +197,7 @@ document.getElementById('auth-form').onsubmit = async (e) => {
                 showMsg("Vérifiez votre email.", false);
                 authButton.disabled = false; return;
             }
-            // Mettre à jour les infos pour l'admin à la connexion
+            // Enregistre la connexion dans artifacts/uid
             await syncUserToAdmin(res.user);
             window.location.href = 'index.html';
         } else {
@@ -208,7 +207,7 @@ document.getElementById('auth-form').onsubmit = async (e) => {
             await updateProfile(res.user, { displayName: `${fn} ${ln}` });
             await sendEmailVerification(res.user);
             
-            // Création initiale dans le dossier Admin
+            // Crée le profil initial dans artifacts/uid
             await syncUserToAdmin(res.user, {
                 firstName: fn,
                 lastName: ln,
@@ -231,7 +230,7 @@ document.getElementById('auth-form').onsubmit = async (e) => {
 document.getElementById('google-btn').onclick = async () => {
     try {
         const res = await signInWithPopup(auth, new GoogleAuthProvider());
-        const userRef = doc(db, "artifacts", APP_ID, "users", res.user.uid);
+        const userRef = doc(db, "artifacts", res.user.uid);
         const userDoc = await getDoc(userRef);
         
         if (!userDoc.exists()) {
