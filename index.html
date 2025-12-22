@@ -162,9 +162,8 @@
         </div>
     </div>
 </footer>
-
 <script type="module">
-    // 1. IMPORTATIONS UNIQUES ET NETTOYÉES
+    // 1. IMPORTATIONS
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { 
         getAuth, onAuthStateChanged, signInAnonymously, signOut, 
@@ -175,7 +174,7 @@
         getFirestore, collection, onSnapshot, query, orderBy, limit 
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // 2. CONFIGURATION ET INITIALISATION
+    // 2. CONFIGURATION
     const firebaseConfig = { 
         apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", 
         authDomain: "mindcompta-a61ef.firebaseapp.com", 
@@ -194,7 +193,10 @@
 
     setPersistence(auth, browserSessionPersistence);
 
-    // 3. GESTION DE L'ÉTAT D'AUTHENTIFICATION
+    // Helper: Check if truly logged in (not anonymous)
+    const isRealUser = () => auth.currentUser && !auth.currentUser.isAnonymous;
+
+          // 3. GESTION DE L'ÉTAT D'AUTHENTIFICATION
     onAuthStateChanged(auth, (user) => {
         const adminDesktop = document.getElementById('admin-link-desktop');
         const adminMobile = document.getElementById('admin-link-mobile');
@@ -202,102 +204,184 @@
         const authMobile = document.getElementById('auth-actions-mobile');
         const deleteZone = document.getElementById('delete-account-zone');
 
-        if (!user) {
-            signInAnonymously(auth);
-        }
+        // Toujours charger les données
+        loadGlobalUpdates();
+
+        // LOG POUR DEBUG (À vérifier dans la console F12)
+        console.log("État Auth changé. User:", user ? (user.isAnonymous ? "Anonyme" : user.email) : "Aucun");
 
         if (user && !user.isAnonymous) {
-            // Affichage admin
+            // --- ÉTAT CONNECTÉ (COMPTE RÉEL) ---
+
+            // 1. Affichage Admin (si UID correspond)
             if (user.uid === ADMIN_UID) {
+                console.log("Accès Admin détecté");
                 if(adminDesktop) adminDesktop.classList.remove('hidden');
                 if(adminMobile) adminMobile.classList.remove('hidden');
             }
+
+            // 2. Bouton Déconnexion (Desktop)
+            if(authDesktop) {
+                authDesktop.innerHTML = `<button id="logout-btn" class="text-xs font-bold text-red-400 cursor-pointer">Quitter</button>`;
+            }
             
-            // Bouton déconnexion
-            authDesktop.innerHTML = `<button id="logout-btn" class="text-xs font-bold text-red-400">Quitter</button>`;
-            authMobile.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl w-full">Déconnexion</button>`;
-            
-            // Affichage bouton suppression compte
+            // 3. Bouton Déconnexion (Mobile)
+            if(authMobile) {
+                authMobile.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl w-full font-bold">Déconnexion</button>`;
+            }
+
+            // 4. Zone de suppression
             if(deleteZone) deleteZone.classList.remove('hidden');
 
-            const handleLogout = () => signOut(auth).then(() => window.location.reload());
+            // 5. Attacher les événements de déconnexion
+            const handleLogout = (e) => {
+                e.preventDefault();
+                signOut(auth).then(() => {
+                    console.log("Déconnexion réussie");
+                    window.location.reload();
+                });
+            };
+
             document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
             document.getElementById('logout-btn-m')?.addEventListener('click', handleLogout);
-            
-            listenToAnnouncements();
+
         } else {
-            // État déconnecté / Anonyme
-            authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold">Connexion</a>`;
-            authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center w-full">Se Connecter</a>`;
+            // --- ÉTAT VISITEUR (ANONYME OU DÉCONNECTÉ) ---
+
+            if (!user) {
+                signInAnonymously(auth);
+            }
+
+            // 1. Cacher les menus Admin
+            if(adminDesktop) adminDesktop.classList.add('hidden');
+            if(adminMobile) adminMobile.classList.add('hidden');
+
+            // 2. Bouton Connexion (Desktop)
+            if(authDesktop) {
+                authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold">Connexion</a>`;
+            }
+
+            // 3. Bouton Connexion (Mobile)
+            if(authMobile) {
+                authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center w-full font-bold">Se Connecter</a>`;
+            }
+            
             if(deleteZone) deleteZone.classList.add('hidden');
         }
-        loadRecentUpdates();
     });
+    // 4 & 5. FLUX DES MISES À JOUR ET NOTIFICATIONS (MERGED)
+    async function loadGlobalUpdates() {
+        const grid = document.getElementById('recent-updates-grid');
+        const notifContent = document.getElementById('notif-content');
+        const bellDot = document.getElementById('bell-dot');
 
-// 4. FLUX DES DERNIÈRES PUBLICATIONS
-async function loadRecentUpdates() {
-    const grid = document.getElementById('recent-updates-grid');
-    if (!grid) return;
+        if (!grid && !notifContent) return;
 
-    try {
-        // 1. Increase the limit (e.g., 10 instead of 1)
-        const qArticle = query(collection(db, "resources"), orderBy("createdAt", "desc"), limit(10));
-        const qVideo = query(collection(db, "youtube_videos"), orderBy("createdAt", "desc"), limit(10));
-        const qBook = query(collection(db, "library"), orderBy("createdAt", "desc"), limit(10));
+        const categories = [
+            { id: 'article', coll: "resources", label: "Article", link: "services.html", color: "bg-brand-dark", border: "border-brand-dark" },
+            { id: 'video', coll: "youtube_videos", label: "Vidéo", link: "youtube.html", color: "bg-red-600", border: "border-red-600" },
+            { id: 'book', coll: "library", label: "Livre", link: "services.html", color: "bg-accent", border: "border-accent" }
+        ];
 
-        grid.innerHTML = ''; 
+        if (notifContent) notifContent.innerHTML = ''; 
 
-        // 2. Use a function to manage the list for each type
-        onSnapshot(qArticle, (snap) => {
-            updateCategoryInGrid('Article', snap, 'services.html', 'bg-brand-dark');
+        categories.forEach(cat => {
+            const q = query(collection(db, cat.coll), orderBy("createdAt", "desc"), limit(5));
+
+            onSnapshot(q, (snap) => {
+                if (snap.empty) return;
+
+                // Allumer le point rouge si nouvelles données
+                if (bellDot) bellDot.style.display = 'block';
+
+                // 1. Mise à jour de la grille (Home Page)
+                if (grid) {
+                    // Supprime les anciennes cartes de cette catégorie
+                    const oldCards = grid.querySelectorAll(`.card-${cat.id}`);
+                    oldCards.forEach(c => c.remove());
+
+                    snap.forEach(doc => {
+                        const data = doc.data();
+                        renderGridCard(grid, data, cat);
+                    });
+                }
+
+                // 2. Mise à jour de la cloche (Notification Panel)
+                if (notifContent) {
+                    const oldNotifs = notifContent.querySelectorAll(`.notif-${cat.id}`);
+                    oldNotifs.forEach(n => n.remove());
+
+                    snap.forEach(doc => {
+                        renderNotifItem(notifContent, doc.data(), cat);
+                    });
+                }
+            });
         });
-        
-        onSnapshot(qVideo, (snap) => {
-            updateCategoryInGrid('Vidéo', snap, 'youtube.html', 'bg-red-600');
-        });
 
-        onSnapshot(qBook, (snap) => {
-            updateCategoryInGrid('Livre', snap, 'services.html', 'bg-accent');
+        // Charger aussi les annonces générales (site_notifications)
+        const qAnnounce = query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
+        onSnapshot(qAnnounce, (snap) => {
+            if (snap.empty) return;
+            snap.forEach(doc => {
+                const d = doc.data();
+                const announceHtml = `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`;
+                if(notifContent) notifContent.insertAdjacentHTML('afterbegin', announceHtml);
+            });
         });
-
-    } catch (error) {
-        console.error("Erreur flux:", error);
-        grid.innerHTML = `<p class="col-span-full text-center text-gray-400 italic text-[10px] py-10">Mises à jour non disponibles</p>`;
     }
-}
 
-// 3. New helper function to handle multiple cards per category
-function updateCategoryInGrid(type, snapshot, link, colorClass) {
-    const grid = document.getElementById('recent-updates-grid');
-    
-    // Remove existing cards of this type to avoid duplicates during updates
-    const existingCards = grid.querySelectorAll(`.card-${type}`);
-    existingCards.forEach(card => card.remove());
+    function renderGridCard(container, data, cat) {
+        const loggedIn = isRealUser();
+        // Les vidéos sont publiques, mais Articles/Livres demandent une connexion
+        const canAccess = (loggedIn || cat.id === 'video');
+        const finalLink = canAccess ? cat.link : 'login.html';
+        const actionText = canAccess ? 'Consulter &rarr;' : 'Se connecter pour lire &rarr;';
 
-    snapshot.forEach(doc => {
-        const data = doc.data();
         const card = document.createElement('div');
-        // Add a class specific to the type to manage them
-        card.className = `card-${type} group bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition duration-300`;
-        
+        card.className = `card-${cat.id} group bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition duration-300`;
         card.innerHTML = `
             <div class="h-48 bg-gray-200 relative overflow-hidden">
                 <img src="${data.imageUrl || (data.youtubeId ? 'https://img.youtube.com/vi/'+data.youtubeId+'/mqdefault.jpg' : 'logo.jpg')}" 
                      class="w-full h-full object-cover group-hover:scale-110 transition duration-500" onerror="this.src='logo.jpg'">
                 <div class="absolute top-4 left-4">
-                    <span class="${colorClass} text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">${type}</span>
+                    <span class="${cat.color} text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">Nouveau ${cat.label}</span>
                 </div>
             </div>
             <div class="p-6">
                 <h3 class="font-bold text-brand-dark mb-2 line-clamp-2">${data.title}</h3>
-                <a href="${link}" class="text-brand-dark font-black text-[10px] uppercase border-b-2 border-accent pb-1 inline-block">Consulter &rarr;</a>
+                <a href="${finalLink}" class="text-brand-dark font-black text-[10px] uppercase border-b-2 border-accent pb-1 inline-block">${actionText}</a>
             </div>`;
-        
-        grid.appendChild(card);
-    });
-}
+        container.appendChild(card);
+    }
 
-    // 5. CLOCHE DE NOTIFICATION (DRAGGABLE)
+    function renderNotifItem(container, data, cat) {
+        const loggedIn = isRealUser();
+        const date = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'Récemment';
+        
+        const item = document.createElement('div');
+        item.className = `notif-${cat.id} bg-white p-3 rounded-xl shadow-sm border-l-4 ${cat.border} mb-2 hover:bg-gray-50 transition cursor-pointer`;
+        
+        item.onclick = () => {
+            if (loggedIn || cat.id === 'video') {
+                window.location.href = cat.link;
+            } else {
+                alert("Veuillez vous connecter pour lire cet article ou télécharger ce livre.");
+                window.location.href = 'login.html';
+            }
+        };
+
+        item.innerHTML = `
+            <div class="flex justify-between items-start">
+                <h4 class="font-bold text-brand-dark text-[9px] uppercase">${cat.label}</h4>
+                <span class="text-[8px] text-gray-400">${date}</span>
+            </div>
+            <p class="text-[11px] text-gray-700 font-medium line-clamp-2 mt-1">${data.title}</p>
+            ${(!loggedIn && cat.id !== 'video') ? '<span class="text-[7px] text-red-500 font-bold uppercase mt-1 block">Accès restreint</span>' : ''}
+        `;
+        container.prepend(item);
+    }
+
+    // GESTION CLOCHE (DRAGGABLE & CLICK)
     const bell = document.getElementById('notification-bell');
     const panel = document.getElementById('notif-panel');
     const bellDot = document.getElementById('bell-dot');
@@ -325,22 +409,7 @@ function updateCategoryInGrid(type, snapshot, link, colorClass) {
                 if(bellDot) bellDot.style.display = 'none';
             }
         };
-    }
-    document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
-
-    function listenToAnnouncements() {
-        const q = query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
-        onSnapshot(q, (snap) => {
-            const c = document.getElementById('notif-content');
-            if (!c) return;
-            if (snap.empty) { c.innerHTML = '<div class="text-center py-8 text-gray-400 text-[10px]">AUCUNE NOUVELLE</div>'; return; }
-            c.innerHTML = '';
-            snap.forEach(doc => {
-                const d = doc.data();
-                c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`;
-            });
-            if(bellDot) bellDot.style.display = 'block';
-        });
+        document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
     }
 
     // 6. MENU MOBILE
@@ -353,29 +422,24 @@ function updateCategoryInGrid(type, snapshot, link, colorClass) {
         document.getElementById('mobile-menu-overlay').classList.add('hidden'); 
     };
 
-    // 7. SUPPRESSION DE COMPTE SÉCURISÉE
+    // 7. SUPPRESSION DE COMPTE
     window.handleDeleteAccount = async () => {
         const user = auth.currentUser;
         if (!user || user.isAnonymous) return;
-
-        const firstCheck = confirm("ATTENTION : Cette action est irréversible. Voulez-vous vraiment supprimer votre compte ?");
-        if (!firstCheck) return;
-
-        const password = prompt("Pour confirmer, veuillez saisir votre mot de passe :");
+        if (!confirm("ATTENTION : Action irréversible. Confirmer ?")) return;
+        const password = prompt("Saisir votre mot de passe pour confirmer :");
         if (password) {
             try {
                 const credential = EmailAuthProvider.credential(user.email, password);
                 await reauthenticateWithCredential(user, credential);
                 await deleteUser(user);
-                alert("Compte supprimé avec succès.");
+                alert("Compte supprimé.");
                 window.location.href = "index.html";
             } catch (error) {
-                console.error(error);
-                alert(error.code === 'auth/wrong-password' ? "Mot de passe incorrect." : "Erreur lors de la suppression.");
+                alert("Erreur de mot de passe ou de procédure.");
             }
         }
     };
 </script>
-
 </body>
 </html>
