@@ -171,7 +171,7 @@
         reauthenticateWithCredential, deleteUser 
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { 
-        getFirestore, collection, onSnapshot, query, orderBy, limit 
+        getFirestore, collection, onSnapshot, query, orderBy, limit, deleteDoc, doc 
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // 2. CONFIGURATION
@@ -422,21 +422,29 @@
         document.getElementById('mobile-menu-overlay').classList.add('hidden'); 
     };
 
-    // 7. SUPPRESSION DE COMPTE
+    // 7. SUPPRESSION DE COMPTE (MODIFIÉ : AUTH + FIRESTORE)
     window.handleDeleteAccount = async () => {
         const user = auth.currentUser;
         if (!user || user.isAnonymous) return;
-        if (!confirm("ATTENTION : Action irréversible. Confirmer ?")) return;
-        const password = prompt("Saisir votre mot de passe pour confirmer :");
+        if (!confirm("ATTENTION : Cette action supprimera votre compte et vos données de façon irréversible. Confirmer ?")) return;
+        
+        const password = prompt("Veuillez saisir votre mot de passe pour confirmer :");
         if (password) {
             try {
                 const credential = EmailAuthProvider.credential(user.email, password);
                 await reauthenticateWithCredential(user, credential);
+                
+                // 1. Suppression du document dans Firestore
+                await deleteDoc(doc(db, "artifacts", user.uid));
+                
+                // 2. Suppression de l'utilisateur dans Firebase Auth
                 await deleteUser(user);
-                alert("Compte supprimé.");
+                
+                alert("Compte et données supprimés définitivement.");
                 window.location.href = "index.html";
             } catch (error) {
-                alert("Erreur de mot de passe ou de procédure.");
+                console.error(error);
+                alert("Erreur : Mot de passe incorrect ou problème de connexion.");
             }
         }
     };
