@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCompta - Authentification</title>
-    
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
-     crossorigin="anonymous"></script>
-<meta name="google-adsense-account" content="ca-pub-7972578599056246">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -23,14 +18,12 @@
     <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
             <a href="index.html" class="flex items-center">
-                <img src="logo.jpg" alt="Logo" onerror="this.src='https://placehold.co/40x40/1E3A8A/ffffff?text=MC'" 
-                     class="h-10 w-10 rounded-full mr-3 border-2 border-white object-cover">
+                <div class="h-10 w-10 bg-white rounded-full flex items-center justify-center mr-3 border-2 border-white/20">
+                    <span class="text-brand-dark font-black text-xl">MC</span>
+                </div>
                 <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
             </a>
             <a href="index.html" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 border border-white/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
                 Retour à l'accueil
             </a>
         </div>
@@ -78,7 +71,7 @@
                 </div>
 
                 <div id="forgot-pw-container" class="text-right">
-                    <button id="forgot-password" type="button" class="text-xs text-brand-dark hover:underline font-medium">Mot de passe oublié ?</button>
+                    <button id="forgot-password-btn" type="button" class="text-xs text-brand-dark hover:underline font-medium">Mot de passe oublié ?</button>
                 </div>
 
                 <div id="auth-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4"></div>
@@ -109,16 +102,9 @@
     </div>
 
     <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
-        <div class="max-w-6xl mx-auto">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-12 space-y-8 md:text-left text-center">
-                <div class="max-w-xs">
-                    <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic">MindCompta Finance</h2>
-                    <p class="text-sm text-gray-400 font-medium">L'expertise comptable simplifiée.</p>
-                </div>
-            </div>
-            <div class="border-t border-white/10 pt-8 text-center text-[10px] text-gray-500 font-black uppercase tracking-widest">
-                &copy; 2025 MindCompta Finance.
-            </div>
+        <div class="max-w-6xl mx-auto text-center">
+            <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic">MindCompta Finance</h2>
+            <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest">&copy; 2025 MindCompta Finance.</p>
         </div>
     </footer>
 
@@ -146,7 +132,6 @@
 
     const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
     let isSignInMode = true;
-    let pendingGoogleUser = null;
 
     const formTitle = document.getElementById('form-title');
     const authButton = document.getElementById('auth-button');
@@ -159,8 +144,7 @@
         authMessage.classList.remove('hidden');
     }
 
-    switchButton.onclick = (e) => {
-        e.preventDefault();
+    switchButton.onclick = () => {
         isSignInMode = !isSignInMode;
         formTitle.innerText = isSignInMode ? "Connexion" : "Inscription";
         authButton.innerText = isSignInMode ? "Se Connecter" : "S'inscrire";
@@ -168,10 +152,24 @@
         document.getElementById('forgot-pw-container').classList.toggle('hidden', !isSignInMode);
     };
 
+    // MOT DE PASSE OUBLIÉ
+    document.getElementById('forgot-password-btn').onclick = async () => {
+        const email = document.getElementById('auth-email').value;
+        if (!email) {
+            showMsg("Veuillez entrer votre email d'abord.", false);
+            return;
+        }
+        try {
+            await sendPasswordResetEmail(auth, email);
+            showMsg("Email de réinitialisation envoyé !", true);
+        } catch (err) {
+            showMsg("Erreur: " + err.message, false);
+        }
+    };
+
     document.getElementById('auth-form').onsubmit = async (e) => {
         e.preventDefault();
         authButton.disabled = true;
-        authButton.innerText = "Traitement...";
         const email = document.getElementById('auth-email').value;
         const password = document.getElementById('auth-password').value;
 
@@ -181,7 +179,7 @@
                 const res = await signInWithEmailAndPassword(auth, email, password);
                 if (!res.user.emailVerified && res.user.uid !== ADMIN_UID) {
                     await signOut(auth);
-                    showMsg("Vérifiez votre email.", false);
+                    showMsg("Veuillez vérifier votre email avant de vous connecter.", false);
                     authButton.disabled = false; return;
                 }
                 window.location.href = 'index.html';
@@ -191,12 +189,20 @@
                 const res = await createUserWithEmailAndPassword(auth, email, password);
                 await updateProfile(res.user, { displayName: `${fn} ${ln}` });
                 await sendEmailVerification(res.user);
-                await setDoc(doc(db, "users", res.user.uid), {
-                    uid: res.user.uid, email, firstName: fn, lastName: ln,
-                    role: "Client", createdAt: serverTimestamp(), status: "HORS LIGNE"
+                
+                // CORRECTION: Utiliser le chemin autorisé par les Security Rules
+                await setDoc(doc(db, "artifacts", res.user.uid), {
+                    uid: res.user.uid, 
+                    email, 
+                    firstName: fn, 
+                    lastName: ln,
+                    role: "Client", 
+                    createdAt: serverTimestamp(), 
+                    status: "HORS LIGNE"
                 });
+                
                 await signOut(auth);
-                showMsg("Compte créé ! Vérifiez vos emails.", true);
+                showMsg("Compte créé ! Vérifiez vos emails pour valider votre compte.", true);
                 authButton.disabled = false;
                 switchButton.click();
             }
@@ -209,13 +215,24 @@
     document.getElementById('google-btn').onclick = async () => {
         try {
             const res = await signInWithPopup(auth, new GoogleAuthProvider());
-            const userDoc = await getDoc(doc(db, "users", res.user.uid));
+            // CORRECTION: Vérifier le profil dans 'artifacts'
+            const userDoc = await getDoc(doc(db, "artifacts", res.user.uid));
             if (!userDoc.exists()) {
-                pendingGoogleUser = res.user;
                 document.getElementById('profile-modal').classList.remove('hidden');
+                document.getElementById('save-profile-btn').onclick = async () => {
+                    const fn = document.getElementById('modal-firstname').value;
+                    const ln = document.getElementById('modal-lastname').value;
+                    if(!fn || !ln) return;
+                    await setDoc(doc(db, "artifacts", res.user.uid), {
+                        uid: res.user.uid, email: res.user.email, firstName: fn, lastName: ln,
+                        role: "Client", createdAt: serverTimestamp(), status: "EN LIGNE"
+                    });
+                    window.location.href = 'index.html';
+                };
             } else { window.location.href = 'index.html'; }
         } catch (err) { showMsg(err.message, false); }
     };
     </script>
 </body>
 </html>
+
