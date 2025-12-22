@@ -127,7 +127,7 @@ import {
     GoogleAuthProvider, signInWithPopup, setPersistence, browserSessionPersistence,
     sendPasswordResetEmail, sendEmailVerification, signOut, updateProfile
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const firebaseConfig = { 
     apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", 
@@ -143,7 +143,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
-
 let isSignInMode = true;
 let pendingGoogleUser = null;
 
@@ -158,21 +157,32 @@ function showMsg(text, isSuccess) {
     authMessage.classList.remove('hidden');
 }
 
-// FONCTION CORRIGÉE : Elle inclut maintenant les champs firstName et lastName explicitement
 async function syncUserToAdmin(user, extraData = {}) {
     const userRef = doc(db, "artifacts", user.uid);
-    
-    // On prépare les données de base
     const data = {
         uid: user.uid,
         email: user.email,
         lastLogin: serverTimestamp(),
         status: "EN LIGNE",
-        ...extraData // On fusionne avec les données supplémentaires (Nom, Prénom, etc.)
+        ...extraData
     };
-    
     await setDoc(userRef, data, { merge: true });
 }
+
+// --- GESTION DU MOT DE PASSE OUBLIÉ ---
+document.getElementById('forgot-password').onclick = async () => {
+    const email = document.getElementById('auth-email').value;
+    if (!email) {
+        showMsg("Veuillez entrer votre email dans le champ ci-dessus.", false);
+        return;
+    }
+    try {
+        await sendPasswordResetEmail(auth, email);
+        showMsg("Email de réinitialisation envoyé !", true);
+    } catch (err) {
+        showMsg("Erreur : " + err.message, false);
+    }
+};
 
 switchButton.onclick = (e) => {
     e.preventDefault();
@@ -202,30 +212,19 @@ document.getElementById('auth-form').onsubmit = async (e) => {
             await syncUserToAdmin(res.user);
             window.location.href = 'index.html';
         } else {
-            // INSCRIPTION : On récupère le prénom et le nom ici
             const fn = document.getElementById('auth-firstname').value;
             const ln = document.getElementById('auth-lastname').value;
-            
             const res = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(res.user, { displayName: `${fn} ${ln}` });
             await sendEmailVerification(res.user);
-            
-            // On envoie bien fn et ln dans extraData
-            await syncUserToAdmin(res.user, {
-                firstName: fn,
-                lastName: ln,
-                role: "Client",
-                createdAt: serverTimestamp(),
-                status: "INSCRIT"
-            });
-
+            await syncUserToAdmin(res.user, { firstName: fn, lastName: ln, role: "Client", createdAt: serverTimestamp(), status: "INSCRIT" });
             await signOut(auth);
             showMsg("Compte créé ! Vérifiez vos emails.", true);
             authButton.disabled = false;
             switchButton.click();
         }
     } catch (err) {
-        showMsg("Erreur: " + err.message, false);
+        showMsg("Erreur : " + err.message, false);
         authButton.disabled = false;
     }
 };
@@ -233,9 +232,7 @@ document.getElementById('auth-form').onsubmit = async (e) => {
 document.getElementById('google-btn').onclick = async () => {
     try {
         const res = await signInWithPopup(auth, new GoogleAuthProvider());
-        const userRef = doc(db, "artifacts", res.user.uid);
-        const userDoc = await getDoc(userRef);
-        
+        const userDoc = await getDoc(doc(db, "artifacts", res.user.uid));
         if (!userDoc.exists()) {
             pendingGoogleUser = res.user;
             document.getElementById('profile-modal').classList.remove('hidden');
@@ -250,18 +247,9 @@ document.getElementById('save-profile-btn').onclick = async () => {
     if(!pendingGoogleUser) return;
     const fn = document.getElementById('modal-firstname').value;
     const ln = document.getElementById('modal-lastname').value;
-    
-    // On enregistre les noms issus du modal Google
-    await syncUserToAdmin(pendingGoogleUser, {
-        firstName: fn,
-        lastName: ln,
-        role: "Client",
-        createdAt: serverTimestamp()
-    });
+    await syncUserToAdmin(pendingGoogleUser, { firstName: fn, lastName: ln, role: "Client", createdAt: serverTimestamp() });
     window.location.href = 'index.html';
 };
 </script>
-
-
 </body>
 </html>
