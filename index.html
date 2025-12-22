@@ -146,19 +146,62 @@
 
 <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
     <div class="max-w-6xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-12 space-y-8 md:text-left text-center">
-            <div class="max-w-xs">
-                <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic">MindCompta Finance</h2>
-                <p class="text-sm text-gray-400 font-medium">L'expertise comptable simplifiée.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+            
+            <div class="space-y-6">
+                <div>
+                    <h2 class="text-xl font-black uppercase tracking-tighter italic">MindCompta Finance</h2>
+                    <p class="text-xs text-gray-400 mt-2 leading-relaxed">me facilitant le quotidien des étudiants de la faculté des sciences économiques et de gestion en leur fournissant des articles qui expliquent les cours qui reçoivent dans les amphithéâtres et des vidéos qui montent des exemples concrets et des explications très claires de plusieurs notions dont ils ont besoin pour valider leur unités d'enseignement en fin de semestre.</p>
+                </div>
+                
+                <div class="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
+                    <div class="h-2 w-2 bg-accent rounded-full shadow-[0_0_5px_#F59E0B]"></div>
+                    <div class="flex flex-col">
+                        <span class="text-[8px] text-gray-500 uppercase font-bold tracking-widest">Utilisateur</span>
+                        <span id="footer-user-name" class="text-xs font-medium text-gray-200 italic">Visiteur</span>
+                    </div>
+                </div>
             </div>
-            <div id="delete-account-zone" class="hidden">
-                <button onclick="handleDeleteAccount()" class="text-[9px] text-red-400/60 hover:text-red-500 font-bold uppercase tracking-widest transition border border-red-500/20 px-3 py-2 rounded-lg hover:border-red-500 hover:bg-red-500/5">
-                    Supprimer mon compte !
-                </button>
+
+            <div>
+                <h3 class="text-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">Nos Services</h3>
+                <ul class="space-y-4 text-sm text-gray-400 font-medium">
+                    <li><a href="services.html" class="hover:text-white transition">Comptabilité</a></li>
+                    <li><a href="services.html" class="hover:text-white transition">Conseil Fiscal</a></li>
+                    <li><a href="youtube.html" class="hover:text-white transition">Formations Vidéo</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">Support</h3>
+                <ul class="space-y-4 text-sm text-gray-400 font-medium">
+                    <li><a href="#" class="hover:text-white transition">Centre d'aide</a></li>
+                    <li><a href="#" class="hover:text-white transition">Contactez-nous</a></li>
+                    <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">Mon Compte</h3>
+                <div class="space-y-4">
+                    <a href="login.html" class="block text-sm text-gray-400 hover:text-white transition font-medium">Espace Client</a>
+                    <div id="delete-account-zone" class="hidden pt-4">
+                        <button onclick="handleDeleteAccount()" class="text-[9px] text-red-400/80 hover:text-red-400 font-bold uppercase tracking-widest border border-red-500/30 px-3 py-2 rounded-lg transition hover:bg-red-500/5">
+                            Supprimer mon compte
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="border-t border-white/10 pt-8 text-center text-[10px] text-gray-500 font-black uppercase tracking-widest">
-            &copy; 2025 MindCompta Finance.
+
+        <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest">
+                &copy; 2025 MindCompta Finance. Tous droits réservés.
+            </p>
+            <div class="flex gap-6 text-[9px] text-gray-500 font-bold uppercase">
+                <a href="#" class="hover:text-white transition">Mentions Légales</a>
+                <a href="#" class="hover:text-white transition">Confidentialité</a>
+            </div>
         </div>
     </div>
 </footer>
@@ -203,15 +246,21 @@
         const authDesktop = document.getElementById('auth-actions-desktop');
         const authMobile = document.getElementById('auth-actions-mobile');
         const deleteZone = document.getElementById('delete-account-zone');
+        const footerUserName = document.getElementById('footer-user-name'); // Ajout pour le footer
 
         // Toujours charger les données
         loadGlobalUpdates();
 
-        // LOG POUR DEBUG (À vérifier dans la console F12)
+        // LOG POUR DEBUG
         console.log("État Auth changé. User:", user ? (user.isAnonymous ? "Anonyme" : user.email) : "Aucun");
 
         if (user && !user.isAnonymous) {
             // --- ÉTAT CONNECTÉ (COMPTE RÉEL) ---
+
+            // Mise à jour du nom dans le footer
+            if (footerUserName) {
+                footerUserName.innerText = user.displayName || user.email.split('@')[0];
+            }
 
             // 1. Affichage Admin (si UID correspond)
             if (user.uid === ADMIN_UID) {
@@ -248,6 +297,8 @@
         } else {
             // --- ÉTAT VISITEUR (ANONYME OU DÉCONNECTÉ) ---
 
+            if (footerUserName) footerUserName.innerText = "Visiteur";
+
             if (!user) {
                 signInAnonymously(auth);
             }
@@ -269,6 +320,7 @@
             if(deleteZone) deleteZone.classList.add('hidden');
         }
     });
+
     // 4 & 5. FLUX DES MISES À JOUR ET NOTIFICATIONS (MERGED)
     async function loadGlobalUpdates() {
         const grid = document.getElementById('recent-updates-grid');
@@ -296,7 +348,6 @@
 
                 // 1. Mise à jour de la grille (Home Page)
                 if (grid) {
-                    // Supprime les anciennes cartes de cette catégorie
                     const oldCards = grid.querySelectorAll(`.card-${cat.id}`);
                     oldCards.forEach(c => c.remove());
 
@@ -318,7 +369,6 @@
             });
         });
 
-        // Charger aussi les annonces générales (site_notifications)
         const qAnnounce = query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
         onSnapshot(qAnnounce, (snap) => {
             if (snap.empty) return;
@@ -332,7 +382,6 @@
 
     function renderGridCard(container, data, cat) {
         const loggedIn = isRealUser();
-        // Les vidéos sont publiques, mais Articles/Livres demandent une connexion
         const canAccess = (loggedIn || cat.id === 'video');
         const finalLink = canAccess ? cat.link : 'login.html';
         const actionText = canAccess ? 'Consulter &rarr;' : 'Se connecter pour lire &rarr;';
