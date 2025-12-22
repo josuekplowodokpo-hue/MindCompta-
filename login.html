@@ -3,235 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindCompta - Authentification</title>
+    <title>MindCompta - Tableau de Bord Admin</title>
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
+     crossorigin="anonymous"></script>
+<meta name="google-adsense-account" content="ca-pub-7972578599056246">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        :root { --brand-dark: #1E3A8A; --accent: #F59E0B; font-family: 'Inter', sans-serif; }
+        :root {
+            --brand-dark: #1E3A8A;
+            --accent: #F59E0B;
+            --vibrant-green: #10B981;
+            font-family: 'Inter', sans-serif;
+        }
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
+        .admin-menu-item { display: flex; align-items: center; padding: 1rem; border-radius: 12px; transition: all 0.2s; cursor: pointer; border: 2px solid transparent; }
+        .admin-menu-item:hover { background-color: rgba(30, 58, 138, 0.05); border-color: var(--brand-dark); }
+        .admin-menu-item.active { background-color: var(--brand-dark); color: white !important; }
+        .section-fade { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans">
 
-    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
-        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
-            <a href="index.html" class="flex items-center">
+    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center group">
                 <div class="h-10 w-10 bg-white rounded-full flex items-center justify-center mr-3 border-2 border-white/20">
                     <span class="text-brand-dark font-black text-xl">MC</span>
                 </div>
-                <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
+                <span class="text-xl font-bold tracking-wider">MindCompta Admin</span>
             </a>
-            <a href="index.html" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 border border-white/20">
-                Retour à l'accueil
-            </a>
+            <div id="auth-actions-desktop" class="flex items-center"></div>
         </div>
     </header>
 
-    <main class="flex-grow flex items-center justify-center p-4">
-        <div id="auth-container" class="w-full max-w-md bg-white rounded-xl shadow-2xl p-8 border border-gray-100"> 
-            <h2 id="form-title" class="text-3xl font-bold text-brand-dark mb-6 text-center">Connexion</h2>
+    <main class="w-full max-w-7xl mx-auto p-4 flex-grow flex flex-col md:flex-row gap-8">
 
-            <button id="google-btn" type="button" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3 rounded-lg mb-6 hover:bg-gray-50 transition shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
-                    <path fill="#fbc02d" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
-                    <path fill="#e53935" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
-                    <path fill="#4caf50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
-                    <path fill="#1565c0" d="M43.611,20.083L43.595,20L42,20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
-                </svg>
-                <span class="text-gray-700 font-semibold">Continuer avec Google</span>
-            </button>
+        <aside class="w-full md:w-72 flex flex-col gap-2 mt-4">
+            <h2 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 px-2">Navigation Publique</h2>
+            <a href="index.html" class="admin-menu-item group text-gray-600 bg-white shadow-sm border-gray-100">
+                <span class="mr-3 text-xl">🏠</span><span class="font-bold">Aller à l'Accueil</span>
+            </a>
+            <a href="services.html" class="admin-menu-item group text-gray-600 bg-white shadow-sm border-gray-100">
+                <span class="mr-3 text-xl">📄</span><span class="font-bold">Voir les Articles</span>
+            </a>
 
-            <div class="relative flex py-4 items-center">
-                <div class="flex-grow border-t border-gray-300"></div>
-                <span class="flex-shrink mx-4 text-gray-400 text-xs uppercase">Ou</span>
-                <div class="flex-grow border-t border-gray-300"></div>
+            <div class="my-6"></div>
+
+            <h2 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 px-2">Centre de Contrôle</h2>
+            <div onclick="switchAdminTab('users')" id="menu-users" class="admin-menu-item active group"><span class="mr-3 text-xl group-[.active]:text-white">👥</span><span class="font-bold">Utilisateurs</span></div>
+            <div onclick="switchAdminTab('activity')" id="menu-activity" class="admin-menu-item group text-gray-600"><span class="mr-3 text-xl">📜</span><span class="font-bold">Activités</span></div>
+            <div onclick="switchAdminTab('notifications')" id="menu-notifications" class="admin-menu-item group text-gray-600"><span class="mr-3 text-xl">🔔</span><span class="font-bold">Notifications</span></div>
+            <div onclick="switchAdminTab('stats')" id="menu-stats" class="admin-menu-item group text-gray-600"><span class="mr-3 text-xl">📊</span><span class="font-bold">Vos Statistiques</span></div>
+
+            <hr class="my-6 border-gray-200">
+            <a href="services.html" class="p-4 bg-accent/10 border-2 border-accent border-dashed rounded-2xl flex items-center justify-center text-accent hover:bg-accent hover:text-white transition group">
+                <span class="mr-2 text-xl">✍️</span><span class="font-black text-xs uppercase tracking-widest">Publier un article</span>
+            </a>
+        </aside>
+
+        <div class="flex-grow mt-4">
+            <div id="status-message" class="p-4 bg-yellow-100 text-yellow-800 rounded-2xl shadow-sm mb-6 flex items-center">
+                <span class="animate-pulse mr-2">⏳</span> Vérification des accès...
             </div>
 
-            <form id="auth-form" class="space-y-4 text-left">
-                <div id="register-fields" class="hidden grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Prénom</label>
-                        <input type="text" id="auth-firstname" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none" placeholder="Max">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Nom</label>
-                        <input type="text" id="auth-lastname" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none" placeholder="Dupont">
-                    </div>
+            <section id="tab-users" class="admin-tab section-fade">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-black text-brand-dark uppercase tracking-tighter">Gestion Utilisateurs</h1>
+                    <span id="user-count" class="bg-brand-dark text-white px-4 py-1 rounded-full text-xs font-bold">0 Membres</span>
                 </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Adresse Email</label>
-                    <input type="email" id="auth-email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none" placeholder="votre@email.com">
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                    <table class="min-w-full divide-y divide-gray-100">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Utilisateur</th>
+                                <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Email</th>
+                                <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Statut</th>
+                                <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Dernière Connexion</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-list" class="bg-white divide-y divide-gray-50 text-sm"></tbody>
+                    </table>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Mot de Passe</label>
-                    <input type="password" id="auth-password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent outline-none" placeholder="••••••••">
+            </section>
+
+            <section id="tab-activity" class="admin-tab hidden section-fade">
+                <h1 class="text-3xl font-black text-brand-dark uppercase tracking-tighter mb-6">Logs d'Activités</h1>
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                    <table class="min-w-full divide-y divide-gray-100 text-sm">
+                        <thead class="bg-brand-dark text-white">
+                            <tr><th class="px-6 py-4 text-left font-black uppercase tracking-widest text-[10px]">Utilisateur</th><th class="px-6 py-4 text-left font-black uppercase tracking-widest text-[10px]">Action</th><th class="px-6 py-4 text-left font-black uppercase tracking-widest text-[10px]">Cible</th><th class="px-6 py-4 text-left font-black uppercase tracking-widest text-[10px]">Heure</th></tr>
+                        </thead>
+                        <tbody id="activity-list" class="divide-y divide-gray-50"></tbody>
+                    </table>
                 </div>
+            </section>
 
-                <div id="forgot-pw-container" class="text-right">
-                    <button id="forgot-password-btn" type="button" class="text-xs text-brand-dark hover:underline font-medium">Mot de passe oublié ?</button>
+            <section id="tab-notifications" class="admin-tab hidden section-fade">
+                <h1 class="text-3xl font-black text-brand-dark uppercase tracking-tighter mb-6">Diffusion Cloche</h1>
+                <div class="bg-white rounded-3xl shadow-2xl p-8 border-t-8 border-vibrant-green mb-8">
+                    <textarea id="notif-text" rows="4" class="w-full p-5 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-vibrant-green outline-none mb-6" placeholder="Message à diffuser..."></textarea>
+                    <button id="send-notif-btn" class="bg-vibrant-green text-white px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest">Envoyer</button>
+                    <div id="notif-status" class="mt-4 hidden font-bold"></div>
                 </div>
+                <h2 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Gérer les messages envoyés</h2>
+                <div id="existing-notifs-list" class="grid gap-4"></div>
+            </section>
 
-                <div id="auth-message" class="text-center p-3 rounded-lg text-sm hidden border-l-4 mt-4"></div>
-
-                <button type="submit" id="auth-button" class="w-full bg-brand-dark text-white font-semibold py-3 rounded-lg shadow-md hover:opacity-90 transition mt-2 uppercase tracking-wider">
-                    Se Connecter
-                </button>
-            </form>
-
-            <div class="mt-6 text-center text-sm">
-                <p class="text-gray-600">
-                    <span id="switch-text">Pas encore de compte ?</span>
-                    <button id="switch-button" type="button" class="text-brand-dark font-semibold hover:underline ml-1">Créer un compte</button>
-                </p>
-            </div>
+            <section id="tab-stats" class="admin-tab hidden section-fade text-center py-20">
+                <div class="text-6xl mb-4">📈</div>
+                <h2 class="text-2xl font-bold text-gray-400 italic">Statistiques en cours de déploiement...</h2>
+            </section>
         </div>
     </main>
 
-    <div id="profile-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-        <div class="bg-white p-8 rounded-2xl max-w-sm w-full shadow-2xl">
-            <h2 class="text-xl font-bold text-brand-dark mb-4 uppercase text-center">Finalisez votre profil</h2>
-            <div class="space-y-4">
-                <input type="text" id="modal-firstname" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none" placeholder="Prénom">
-                <input type="text" id="modal-lastname" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none" placeholder="Nom">
-                <button id="save-profile-btn" class="w-full bg-accent text-white font-bold py-3 rounded-xl uppercase">Valider mon profil</button>
+    <!-- Global Footer -->
+    <footer class="bg-brand-dark text-white pt-24 pb-12 px-4 border-t border-white/10 mt-20">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
+                <div class="col-span-1 md:col-span-2 space-y-6">
+                    <div class="flex items-center">
+                        <div class="h-12 w-12 bg-white rounded-xl flex items-center justify-center mr-3">
+                            <span class="text-brand-dark font-black text-2xl italic">MC</span>
+                        </div>
+                        <span class="text-3xl font-black uppercase italic tracking-tighter">MindCompta</span>
+                    </div>
+                    <p class="text-blue-100/60 max-w-sm font-medium leading-relaxed">
+                        L'excellence au service de votre réussite financière. Nous transformons vos chiffres en leviers de croissance.
+                    </p>
+                </div>
+                <div>
+                    <h5 class="font-black uppercase tracking-widest text-xs mb-6 text-yellow-400">Liens Rapides</h5>
+                    <ul class="space-y-4 text-sm font-bold text-blue-100/80">
+                        <li><a href="index.html" class="hover:text-white transition">Accueil</a></li>
+                        <li><a href="services.html" class="hover:text-white transition">Nos Services</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-black uppercase tracking-widest text-xs mb-6 text-yellow-400">Suivez-nous</h5>
+                    <div class="flex space-x-4">
+                        <a href="#" class="h-10 w-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all text-sm font-black">LI</a>
+                        <a href="#" class="h-10 w-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all text-sm font-black">X</a>
+                    </div>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-white/5 text-center">
+                <p class="text-[10px] text-gray-500 font-black uppercase tracking-[0.4em]">
+                    &copy; 2025 MindCompta Finance. Tous droits réservés.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-3xl p-8">
+            <h3 class="text-xl font-black text-brand-dark uppercase mb-6">Modifier l'annonce</h3>
+            <textarea id="edit-notif-text" rows="4" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none mb-6"></textarea>
+            <div class="flex gap-4">
+                <button onclick="closeEditModal()" class="flex-1 py-3 font-bold text-gray-400">Annuler</button>
+                <button id="save-edit-btn" class="flex-1 py-3 font-black bg-brand-dark text-white rounded-xl">Enregistrer</button>
             </div>
         </div>
     </div>
 
-    <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
-        <div class="max-w-6xl mx-auto text-center">
-            <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic">MindCompta Finance</h2>
-            <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest">&copy; 2025 MindCompta Finance.</p>
-        </div>
-    </footer>
-
     <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { 
-        getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-        GoogleAuthProvider, signInWithPopup, setPersistence, browserSessionPersistence,
-        sendPasswordResetEmail, sendEmailVerification, signOut, updateProfile
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, limit, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const firebaseConfig = { 
-        apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", 
-        authDomain: "mindcompta-a61ef.firebaseapp.com", 
-        projectId: "mindcompta-a61ef", 
-        storageBucket: "mindcompta-a61ef.firebasestorage.app", 
-        messagingSenderId: "578389020450", 
-        appId: "1:578389020450:web:edf9dd48e394cff7601f7b" 
-    };
+        const firebaseConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
+        const APP_ID = "mindcompta-finance";
 
-    const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
-    let isSignInMode = true;
+        window.switchAdminTab = (tabName) => {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.admin-menu-item').forEach(m => m.classList.remove('active', 'bg-brand-dark', 'text-white'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`menu-${tabName}`).classList.add('active', 'bg-brand-dark', 'text-white');
+        };
 
-    const formTitle = document.getElementById('form-title');
-    const authButton = document.getElementById('auth-button');
-    const switchButton = document.getElementById('switch-button');
-    const authMessage = document.getElementById('auth-message');
-
-    function showMsg(text, isSuccess) {
-        authMessage.innerText = text;
-        authMessage.className = `text-center p-3 rounded-lg text-sm border-l-4 mt-4 ${isSuccess ? 'bg-green-100 text-green-700 border-green-500' : 'bg-red-100 text-red-700 border-red-500'}`;
-        authMessage.classList.remove('hidden');
-    }
-
-    switchButton.onclick = () => {
-        isSignInMode = !isSignInMode;
-        formTitle.innerText = isSignInMode ? "Connexion" : "Inscription";
-        authButton.innerText = isSignInMode ? "Se Connecter" : "S'inscrire";
-        document.getElementById('register-fields').classList.toggle('hidden', isSignInMode);
-        document.getElementById('forgot-pw-container').classList.toggle('hidden', !isSignInMode);
-    };
-
-    // MOT DE PASSE OUBLIÉ
-    document.getElementById('forgot-password-btn').onclick = async () => {
-        const email = document.getElementById('auth-email').value;
-        if (!email) {
-            showMsg("Veuillez entrer votre email d'abord.", false);
-            return;
+        function formatFSDate(ts) {
+            const d = ts?.seconds ? new Date(ts.seconds * 1000) : new Date(ts || Date.now());
+            return d.toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
         }
-        try {
-            await sendPasswordResetEmail(auth, email);
-            showMsg("Email de réinitialisation envoyé !", true);
-        } catch (err) {
-            showMsg("Erreur: " + err.message, false);
-        }
-    };
 
-    document.getElementById('auth-form').onsubmit = async (e) => {
-        e.preventDefault();
-        authButton.disabled = true;
-        const email = document.getElementById('auth-email').value;
-        const password = document.getElementById('auth-password').value;
+        // --- GESTION DES DEUX SOURCES D'UTILISATEURS ---
+        function fetchUsers() {
+            const allUsersMap = new Map();
+            const listContainer = document.getElementById('user-list');
+            const counter = document.getElementById('user-count');
 
-        try {
-            await setPersistence(auth, browserSessionPersistence);
-            if (isSignInMode) {
-                const res = await signInWithEmailAndPassword(auth, email, password);
-                if (!res.user.emailVerified && res.user.uid !== ADMIN_UID) {
-                    await signOut(auth);
-                    showMsg("Veuillez vérifier votre email avant de vous connecter.", false);
-                    authButton.disabled = false; return;
-                }
-                window.location.href = 'index.html';
-            } else {
-                const fn = document.getElementById('auth-firstname').value;
-                const ln = document.getElementById('auth-lastname').value;
-                const res = await createUserWithEmailAndPassword(auth, email, password);
-                await updateProfile(res.user, { displayName: `${fn} ${ln}` });
-                await sendEmailVerification(res.user);
-                
-                // CORRECTION: Utiliser le chemin autorisé par les Security Rules
-                await setDoc(doc(db, "artifacts", res.user.uid), {
-                    uid: res.user.uid, 
-                    email, 
-                    firstName: fn, 
-                    lastName: ln,
-                    role: "Client", 
-                    createdAt: serverTimestamp(), 
-                    status: "HORS LIGNE"
+            const renderMergedList = () => {
+                listContainer.innerHTML = '';
+                let count = 0;
+                allUsersMap.forEach((u) => {
+                    count++;
+                    listContainer.innerHTML += `
+                        <tr class="border-b border-gray-50">
+                            <td class="px-6 py-4 font-bold text-gray-800 italic uppercase tracking-tighter">${u.firstName || ''} ${u.lastName || u.displayName || 'Utilisateur'}</td>
+                            <td class="px-6 py-4 text-xs text-gray-500">${u.email}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 text-[9px] font-black rounded-full ${u.status === 'EN LIGNE' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}">
+                                    ${u.status || 'INSCRIT'}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-xs text-gray-400">${formatFSDate(u.lastLogin)}</td>
+                        </tr>`;
                 });
-                
-                await signOut(auth);
-                showMsg("Compte créé ! Vérifiez vos emails pour valider votre compte.", true);
-                authButton.disabled = false;
-                switchButton.click();
-            }
-        } catch (err) {
-            showMsg("Erreur: " + err.message, false);
-            authButton.disabled = false;
-        }
-    };
+                counter.innerText = `${count} Membres`;
+            };
 
-    document.getElementById('google-btn').onclick = async () => {
-        try {
-            const res = await signInWithPopup(auth, new GoogleAuthProvider());
-            // CORRECTION: Vérifier le profil dans 'artifacts'
-            const userDoc = await getDoc(doc(db, "artifacts", res.user.uid));
-            if (!userDoc.exists()) {
-                document.getElementById('profile-modal').classList.remove('hidden');
-                document.getElementById('save-profile-btn').onclick = async () => {
-                    const fn = document.getElementById('modal-firstname').value;
-                    const ln = document.getElementById('modal-lastname').value;
-                    if(!fn || !ln) return;
-                    await setDoc(doc(db, "artifacts", res.user.uid), {
-                        uid: res.user.uid, email: res.user.email, firstName: fn, lastName: ln,
-                        role: "Client", createdAt: serverTimestamp(), status: "EN LIGNE"
-                    });
-                    window.location.href = 'index.html';
-                };
-            } else { window.location.href = 'index.html'; }
-        } catch (err) { showMsg(err.message, false); }
-    };
+            // Source 1 : Dossier d'origine (racine "artifacts")
+            onSnapshot(collection(db, "artifacts"), (snap) => {
+                snap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if(data.email) allUsersMap.set(data.email, data);
+                });
+                renderMergedList();
+            });
+
+            // Source 2 : Nouveau dossier (login page /artifacts/mindcompta-finance/users)
+            onSnapshot(collection(db, "artifacts", APP_ID, "users"), (snap) => {
+                snap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if(data.email) allUsersMap.set(data.email, data);
+                });
+                renderMergedList();
+            });
+        }
+
+        function fetchActivity() {
+            const q = query(collection(db, "activity_logs"), orderBy("timestamp", "desc"), limit(40));
+            onSnapshot(q, (snap) => {
+                const list = document.getElementById('activity-list');
+                list.innerHTML = '';
+                snap.forEach(docSnap => {
+                    const log = docSnap.data();
+                    list.innerHTML += `<tr class="hover:bg-blue-50/50 transition"><td class="px-6 py-4 font-bold text-brand-dark">${log.userEmail?.split('@')[0] || 'Anonyme'}</td><td class="px-6 py-4"><span class="px-2 py-1 rounded-md text-[10px] bg-gray-200">${log.action}</span></td><td class="px-6 py-4 text-gray-500 italic truncate max-w-[150px]">"${log.target}"</td><td class="px-6 py-4 text-xs text-gray-400">${formatFSDate(log.timestamp)}</td></tr>`;
+                });
+            });
+        }
+
+        let currentEditId = null;
+        function fetchNotificationsForEdit() {
+            const q = query(collection(db, "artifacts", APP_ID, "public", "data", "site_notifications"), orderBy("timestamp", "desc"));
+            onSnapshot(q, (snap) => {
+                const list = document.getElementById('existing-notifs-list');
+                list.innerHTML = '';
+                snap.forEach(docSnap => {
+                    const data = docSnap.data(); const id = docSnap.id;
+                    list.innerHTML += `<div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-sm text-gray-700">${data.text || data.message}</p><span class="text-[9px] text-gray-400 uppercase font-bold">${formatFSDate(data.timestamp)}</span></div><div class="flex gap-2"><button onclick="openEditModal('${id}', \`${data.text || data.message}\`)" class="p-2 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black uppercase">Éditer</button><button onclick="deleteNotification('${id}')" class="p-2 bg-red-50 text-red-600 rounded-lg text-[10px] font-black uppercase">X</button></div></div>`;
+                });
+            });
+        }
+
+        window.openEditModal = (id, text) => { currentEditId = id; document.getElementById('edit-notif-text').value = text; document.getElementById('edit-modal').classList.replace('hidden', 'flex'); };
+        window.closeEditModal = () => { document.getElementById('edit-modal').classList.replace('flex', 'hidden'); };
+        window.deleteNotification = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "artifacts", APP_ID, "public", "data", "site_notifications", id)); };
+
+        document.getElementById('save-edit-btn').onclick = async () => {
+            await updateDoc(doc(db, "artifacts", APP_ID, "public", "data", "site_notifications", currentEditId), { text: document.getElementById('edit-notif-text').value.trim() });
+            closeEditModal();
+        };
+
+        document.getElementById('send-notif-btn').onclick = async () => {
+            const text = document.getElementById('notif-text').value.trim(); if(!text) return;
+            await addDoc(collection(db, "artifacts", APP_ID, "public", "data", "site_notifications"), { text, timestamp: new Date().toISOString(), adminUid: auth.currentUser.uid });
+            document.getElementById('notif-text').value = '';
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            const dAuth = document.getElementById('auth-actions-desktop');
+            if (user && user.uid === ADMIN_UID) {
+                document.getElementById('status-message').classList.add('hidden');
+                dAuth.innerHTML = `<button id="logout-btn" class="bg-red-500/10 text-red-500 py-2 px-6 text-[10px] font-black uppercase rounded-xl">Déconnexion</button>`;
+                document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = 'index.html');
+                fetchUsers(); fetchActivity(); fetchNotificationsForEdit();
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+  // PATH 1: Exact folder from login.html
+            onSnapshot(collection(db, "users"), (snap) => {
+                snap.forEach(d => usersMap.set(d.id, d.data()));
+                render();
+            });
+
     </script>
 </body>
 </html>
