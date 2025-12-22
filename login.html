@@ -120,7 +120,6 @@
             </div>
         </div>
     </footer>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { 
@@ -159,16 +158,19 @@ function showMsg(text, isSuccess) {
     authMessage.classList.remove('hidden');
 }
 
-// Fonction modifiée pour enregistrer directement dans le dossier "artifacts" racine
+// FONCTION CORRIGÉE : Elle inclut maintenant les champs firstName et lastName explicitement
 async function syncUserToAdmin(user, extraData = {}) {
     const userRef = doc(db, "artifacts", user.uid);
+    
+    // On prépare les données de base
     const data = {
         uid: user.uid,
         email: user.email,
         lastLogin: serverTimestamp(),
         status: "EN LIGNE",
-        ...extraData
+        ...extraData // On fusionne avec les données supplémentaires (Nom, Prénom, etc.)
     };
+    
     await setDoc(userRef, data, { merge: true });
 }
 
@@ -197,17 +199,18 @@ document.getElementById('auth-form').onsubmit = async (e) => {
                 showMsg("Vérifiez votre email.", false);
                 authButton.disabled = false; return;
             }
-            // Enregistre la connexion dans artifacts/uid
             await syncUserToAdmin(res.user);
             window.location.href = 'index.html';
         } else {
+            // INSCRIPTION : On récupère le prénom et le nom ici
             const fn = document.getElementById('auth-firstname').value;
             const ln = document.getElementById('auth-lastname').value;
+            
             const res = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(res.user, { displayName: `${fn} ${ln}` });
             await sendEmailVerification(res.user);
             
-            // Crée le profil initial dans artifacts/uid
+            // On envoie bien fn et ln dans extraData
             await syncUserToAdmin(res.user, {
                 firstName: fn,
                 lastName: ln,
@@ -248,6 +251,7 @@ document.getElementById('save-profile-btn').onclick = async () => {
     const fn = document.getElementById('modal-firstname').value;
     const ln = document.getElementById('modal-lastname').value;
     
+    // On enregistre les noms issus du modal Google
     await syncUserToAdmin(pendingGoogleUser, {
         firstName: fn,
         lastName: ln,
@@ -257,6 +261,7 @@ document.getElementById('save-profile-btn').onclick = async () => {
     window.location.href = 'index.html';
 };
 </script>
+
 
 </body>
 </html>
