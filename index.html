@@ -143,7 +143,54 @@
         </div>
         <div id="notif-content" class="p-4 space-y-4 overflow-y-auto bg-gray-50 flex-grow max-h-[300px]"></div>
     </div>
+<div id="maintenance-popup" class="fixed inset-0 z-[9999] hidden flex items-center justify-center px-4 bg-brand-dark/80 backdrop-blur-md">
+    
+    <div class="relative max-w-2xl w-full bg-brand-dark rounded-3xl border border-white/10 shadow-2xl overflow-hidden transform transition-all">
+        
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-accent/20 blur-[80px] rounded-full"></div>
 
+        <div class="p-8 md:p-12 relative">
+            <button onclick="closePopup()" class="absolute top-6 right-6 text-gray-500 hover:text-white transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div class="text-center space-y-6">
+                <div class="mx-auto w-20 h-20 bg-accent/10 rounded-3xl flex items-center justify-center border border-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-accent animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="text-white text-2xl md:text-3xl font-black uppercase tracking-tighter italic">
+                        Note Importante <span class="text-accent text-4xl font-normal not-italic">.</span>
+                    </h3>
+                    <p class="text-gray-400 text-sm md:text-base leading-relaxed">
+                        Suite à une maintenance ce <span class="text-white font-bold">Lundi 22 Décembre</span>, les comptes créés aujourd'hui ont pu être impactés par une perte d'accès.
+                    </p>
+                </div>
+
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <p class="text-xs text-gray-300">
+                        <span class="text-accent font-bold uppercase tracking-[0.2em] block mb-2">Pas d'inquiétude :</span>
+                        Il vous suffit de vous <span class="text-white font-bold underline decoration-accent">inscrire une nouvelle fois</span> pour retrouver un accès complet et sécurisé.
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                    <a href="login.html" class="flex-1 bg-accent hover:bg-amber-500 text-brand-dark px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all text-center">
+                        Recréer mon compte
+                    </a>
+                    <button onclick="closePopup()" class="flex-1 bg-white/5 hover:bg-white/10 text-white px-6 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all border border-white/10">
+                        J'ai compris
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
     <div class="max-w-6xl mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
@@ -236,139 +283,92 @@
 
     setPersistence(auth, browserSessionPersistence);
 
-    // Helper: Check if truly logged in (not anonymous)
     const isRealUser = () => auth.currentUser && !auth.currentUser.isAnonymous;
 
-          // 3. GESTION DE L'ÉTAT D'AUTHENTIFICATION
+    // --- LOGIQUE DU POP-UP ---
+    // On définit la fonction de fermeture globalement pour qu'elle soit vue par le HTML
+    window.closePopup = () => {
+        const popup = document.getElementById('maintenance-popup');
+        if(popup) {
+            popup.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+    };
+
+    // 3. GESTION DE L'ÉTAT D'AUTHENTIFICATION
     onAuthStateChanged(auth, (user) => {
         const adminDesktop = document.getElementById('admin-link-desktop');
         const adminMobile = document.getElementById('admin-link-mobile');
         const authDesktop = document.getElementById('auth-actions-desktop');
         const authMobile = document.getElementById('auth-actions-mobile');
         const deleteZone = document.getElementById('delete-account-zone');
-        const footerUserName = document.getElementById('footer-user-name'); // Ajout pour le footer
+        const footerUserName = document.getElementById('footer-user-name');
+        
+        // --- DÉCLENCHEMENT DU POP-UP ---
+        const popup = document.getElementById('maintenance-popup');
+        if(popup && popup.classList.contains('hidden')) {
+            popup.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
 
-        // Toujours charger les données
         loadGlobalUpdates();
 
-        // LOG POUR DEBUG
-        console.log("État Auth changé. User:", user ? (user.isAnonymous ? "Anonyme" : user.email) : "Aucun");
-
         if (user && !user.isAnonymous) {
-            // --- ÉTAT CONNECTÉ (COMPTE RÉEL) ---
-
-            // Mise à jour du nom dans le footer
-            if (footerUserName) {
-                footerUserName.innerText = user.displayName || user.email.split('@')[0];
-            }
-
-            // 1. Affichage Admin (si UID correspond)
+            if (footerUserName) footerUserName.innerText = user.displayName || user.email.split('@')[0];
             if (user.uid === ADMIN_UID) {
-                console.log("Accès Admin détecté");
                 if(adminDesktop) adminDesktop.classList.remove('hidden');
                 if(adminMobile) adminMobile.classList.remove('hidden');
             }
-
-            // 2. Bouton Déconnexion (Desktop)
-            if(authDesktop) {
-                authDesktop.innerHTML = `<button id="logout-btn" class="text-xs font-bold text-red-400 cursor-pointer">Quitter</button>`;
-            }
-            
-            // 3. Bouton Déconnexion (Mobile)
-            if(authMobile) {
-                authMobile.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl w-full font-bold">Déconnexion</button>`;
-            }
-
-            // 4. Zone de suppression
+            if(authDesktop) authDesktop.innerHTML = `<button id="logout-btn" class="text-xs font-bold text-red-400 cursor-pointer">Quitter</button>`;
+            if(authMobile) authMobile.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl w-full font-bold">Déconnexion</button>`;
             if(deleteZone) deleteZone.classList.remove('hidden');
 
-            // 5. Attacher les événements de déconnexion
             const handleLogout = (e) => {
                 e.preventDefault();
-                signOut(auth).then(() => {
-                    console.log("Déconnexion réussie");
-                    window.location.reload();
-                });
+                signOut(auth).then(() => { window.location.reload(); });
             };
-
             document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
             document.getElementById('logout-btn-m')?.addEventListener('click', handleLogout);
-
         } else {
-            // --- ÉTAT VISITEUR (ANONYME OU DÉCONNECTÉ) ---
-
             if (footerUserName) footerUserName.innerText = "Visiteur";
-
-            if (!user) {
-                signInAnonymously(auth);
-            }
-
-            // 1. Cacher les menus Admin
+            if (!user) signInAnonymously(auth);
             if(adminDesktop) adminDesktop.classList.add('hidden');
             if(adminMobile) adminMobile.classList.add('hidden');
-
-            // 2. Bouton Connexion (Desktop)
-            if(authDesktop) {
-                authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold">Connexion</a>`;
-            }
-
-            // 3. Bouton Connexion (Mobile)
-            if(authMobile) {
-                authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center w-full font-bold">Se Connecter</a>`;
-            }
-            
+            if(authDesktop) authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold">Connexion</a>`;
+            if(authMobile) authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center w-full font-bold">Se Connecter</a>`;
             if(deleteZone) deleteZone.classList.add('hidden');
         }
     });
 
-    // 4 & 5. FLUX DES MISES À JOUR ET NOTIFICATIONS (MERGED)
+    // --- LE RESTE DU SCRIPT RESTE INCHANGÉ ---
     async function loadGlobalUpdates() {
         const grid = document.getElementById('recent-updates-grid');
         const notifContent = document.getElementById('notif-content');
         const bellDot = document.getElementById('bell-dot');
-
         if (!grid && !notifContent) return;
-
         const categories = [
             { id: 'article', coll: "resources", label: "Article", link: "services.html", color: "bg-brand-dark", border: "border-brand-dark" },
             { id: 'video', coll: "youtube_videos", label: "Vidéo", link: "youtube.html", color: "bg-red-600", border: "border-red-600" },
             { id: 'book', coll: "library", label: "Livre", link: "services.html", color: "bg-accent", border: "border-accent" }
         ];
-
         if (notifContent) notifContent.innerHTML = ''; 
-
         categories.forEach(cat => {
             const q = query(collection(db, cat.coll), orderBy("createdAt", "desc"), limit(5));
-
             onSnapshot(q, (snap) => {
                 if (snap.empty) return;
-
-                // Allumer le point rouge si nouvelles données
                 if (bellDot) bellDot.style.display = 'block';
-
-                // 1. Mise à jour de la grille (Home Page)
                 if (grid) {
                     const oldCards = grid.querySelectorAll(`.card-${cat.id}`);
                     oldCards.forEach(c => c.remove());
-
-                    snap.forEach(doc => {
-                        const data = doc.data();
-                        renderGridCard(grid, data, cat);
-                    });
+                    snap.forEach(doc => { renderGridCard(grid, doc.data(), cat); });
                 }
-
-                // 2. Mise à jour de la cloche (Notification Panel)
                 if (notifContent) {
                     const oldNotifs = notifContent.querySelectorAll(`.notif-${cat.id}`);
                     oldNotifs.forEach(n => n.remove());
-
-                    snap.forEach(doc => {
-                        renderNotifItem(notifContent, doc.data(), cat);
-                    });
+                    snap.forEach(doc => { renderNotifItem(notifContent, doc.data(), cat); });
                 }
             });
         });
-
         const qAnnounce = query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
         onSnapshot(qAnnounce, (snap) => {
             if (snap.empty) return;
@@ -385,57 +385,29 @@
         const canAccess = (loggedIn || cat.id === 'video');
         const finalLink = canAccess ? cat.link : 'login.html';
         const actionText = canAccess ? 'Consulter &rarr;' : 'Se connecter pour lire &rarr;';
-
         const card = document.createElement('div');
         card.className = `card-${cat.id} group bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition duration-300`;
-        card.innerHTML = `
-            <div class="h-48 bg-gray-200 relative overflow-hidden">
-                <img src="${data.imageUrl || (data.youtubeId ? 'https://img.youtube.com/vi/'+data.youtubeId+'/mqdefault.jpg' : 'logo.jpg')}" 
-                     class="w-full h-full object-cover group-hover:scale-110 transition duration-500" onerror="this.src='logo.jpg'">
-                <div class="absolute top-4 left-4">
-                    <span class="${cat.color} text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">Nouveau ${cat.label}</span>
-                </div>
-            </div>
-            <div class="p-6">
-                <h3 class="font-bold text-brand-dark mb-2 line-clamp-2">${data.title}</h3>
-                <a href="${finalLink}" class="text-brand-dark font-black text-[10px] uppercase border-b-2 border-accent pb-1 inline-block">${actionText}</a>
-            </div>`;
+        card.innerHTML = `<div class="h-48 bg-gray-200 relative overflow-hidden"><img src="${data.imageUrl || (data.youtubeId ? 'https://img.youtube.com/vi/'+data.youtubeId+'/mqdefault.jpg' : 'logo.jpg')}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" onerror="this.src='logo.jpg'"><div class="absolute top-4 left-4"><span class="${cat.color} text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">Nouveau ${cat.label}</span></div></div><div class="p-6"><h3 class="font-bold text-brand-dark mb-2 line-clamp-2">${data.title}</h3><a href="${finalLink}" class="text-brand-dark font-black text-[10px] uppercase border-b-2 border-accent pb-1 inline-block">${actionText}</a></div>`;
         container.appendChild(card);
     }
 
     function renderNotifItem(container, data, cat) {
         const loggedIn = isRealUser();
         const date = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'Récemment';
-        
         const item = document.createElement('div');
         item.className = `notif-${cat.id} bg-white p-3 rounded-xl shadow-sm border-l-4 ${cat.border} mb-2 hover:bg-gray-50 transition cursor-pointer`;
-        
         item.onclick = () => {
-            if (loggedIn || cat.id === 'video') {
-                window.location.href = cat.link;
-            } else {
-                alert("Veuillez vous connecter pour lire cet article ou télécharger ce livre.");
-                window.location.href = 'login.html';
-            }
+            if (loggedIn || cat.id === 'video') { window.location.href = cat.link; } 
+            else { alert("Connexion requise."); window.location.href = 'login.html'; }
         };
-
-        item.innerHTML = `
-            <div class="flex justify-between items-start">
-                <h4 class="font-bold text-brand-dark text-[9px] uppercase">${cat.label}</h4>
-                <span class="text-[8px] text-gray-400">${date}</span>
-            </div>
-            <p class="text-[11px] text-gray-700 font-medium line-clamp-2 mt-1">${data.title}</p>
-            ${(!loggedIn && cat.id !== 'video') ? '<span class="text-[7px] text-red-500 font-bold uppercase mt-1 block">Accès restreint</span>' : ''}
-        `;
+        item.innerHTML = `<div class="flex justify-between items-start"><h4 class="font-bold text-brand-dark text-[9px] uppercase">${cat.label}</h4><span class="text-[8px] text-gray-400">${date}</span></div><p class="text-[11px] text-gray-700 font-medium line-clamp-2 mt-1">${data.title}</p>${(!loggedIn && cat.id !== 'video') ? '<span class="text-[7px] text-red-500 font-bold uppercase mt-1 block">Accès restreint</span>' : ''}`;
         container.prepend(item);
     }
 
-    // GESTION CLOCHE (DRAGGABLE & CLICK)
     const bell = document.getElementById('notification-bell');
     const panel = document.getElementById('notif-panel');
     const bellDot = document.getElementById('bell-dot');
     let isDragging = false, hasMoved = false, startX, startY;
-
     if (bell && panel) {
         bell.addEventListener('mousedown', (e) => { isDragging = true; hasMoved = false; startX = e.clientX - bell.offsetLeft; startY = e.clientY - bell.offsetTop; });
         window.addEventListener('mousemove', (e) => { 
@@ -445,7 +417,6 @@
             panel.style.display = 'none';
         });
         window.addEventListener('mouseup', () => isDragging = false);
-
         bell.onclick = () => {
             if (hasMoved) return;
             const isVisible = panel.style.display === 'flex';
@@ -461,7 +432,6 @@
         document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
     }
 
-    // 6. MENU MOBILE
     document.getElementById('menu-button').onclick = () => { 
         document.getElementById('mobile-menu').classList.add('open'); 
         document.getElementById('mobile-menu-overlay').classList.remove('hidden'); 
@@ -471,30 +441,19 @@
         document.getElementById('mobile-menu-overlay').classList.add('hidden'); 
     };
 
-    // 7. SUPPRESSION DE COMPTE (MODIFIÉ : AUTH + FIRESTORE)
     window.handleDeleteAccount = async () => {
         const user = auth.currentUser;
         if (!user || user.isAnonymous) return;
-        if (!confirm("ATTENTION : Cette action supprimera votre compte et vos données de façon irréversible. Confirmer ?")) return;
-        
-        const password = prompt("Veuillez saisir votre mot de passe pour confirmer :");
+        if (!confirm("ATTENTION : Action irréversible. Confirmer ?")) return;
+        const password = prompt("Mot de passe :");
         if (password) {
             try {
                 const credential = EmailAuthProvider.credential(user.email, password);
                 await reauthenticateWithCredential(user, credential);
-                
-                // 1. Suppression du document dans Firestore
                 await deleteDoc(doc(db, "artifacts", user.uid));
-                
-                // 2. Suppression de l'utilisateur dans Firebase Auth
                 await deleteUser(user);
-                
-                alert("Compte et données supprimés définitivement.");
-                window.location.href = "index.html";
-            } catch (error) {
-                console.error(error);
-                alert("Erreur : Mot de passe incorrect ou problème de connexion.");
-            }
+                alert("Compte supprimé."); window.location.href = "index.html";
+            } catch (error) { alert("Erreur mot de passe."); }
         }
     };
 </script>
