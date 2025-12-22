@@ -121,155 +121,251 @@
     </footer>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, runTransaction, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    // 1. IMPORTATIONS
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, runTransaction, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const fb = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
-        const app = initializeApp(fb); const auth = getAuth(app); const db = getFirestore(app);
-        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
-        const APP_ID = "mindcompta-finance";
+    // 2. CONFIGURATION
+    const fb = { 
+        apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", 
+        authDomain: "mindcompta-a61ef.firebaseapp.com", 
+        projectId: "mindcompta-a61ef", 
+        storageBucket: "mindcompta-a61ef.firebasestorage.app", 
+        messagingSenderId: "578389020450", 
+        appId: "1:578389020450:web:edf9dd48e394cff7601f7b" 
+    };
+    const app = initializeApp(fb); 
+    const auth = getAuth(app); 
+    const db = getFirestore(app);
+    const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
+    const APP_ID = "mindcompta-finance";
 
-        setPersistence(auth, browserSessionPersistence);
+    setPersistence(auth, browserSessionPersistence);
 
-        function extractID(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
+    // Helper: Extraire ID Youtube
+    function extractID(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
 
-        const toggleMenu = () => {
-            document.getElementById('mobile-menu').classList.toggle('open');
-            document.getElementById('mobile-menu-overlay').classList.toggle('hidden');
-        };
-        document.getElementById('menu-button').onclick = toggleMenu;
-        document.getElementById('close-menu-button').onclick = toggleMenu;
-        document.getElementById('mobile-menu-overlay').onclick = toggleMenu;
+    // MENU MOBILE
+    const toggleMenu = () => {
+        document.getElementById('mobile-menu').classList.toggle('open');
+        document.getElementById('mobile-menu-overlay').classList.toggle('hidden');
+    };
+    document.getElementById('menu-button').onclick = toggleMenu;
+    document.getElementById('close-menu-button').onclick = toggleMenu;
+    document.getElementById('mobile-menu-overlay').onclick = toggleMenu;
 
-        onAuthStateChanged(auth, (user) => {
-            document.getElementById('loader')?.remove();
-            const dAuth = document.getElementById('auth-actions-desktop');
-            const mAuth = document.getElementById('auth-actions-mobile');
+    // --- 3. GESTION DE L'ÉTAT D'AUTHENTIFICATION ---
+    onAuthStateChanged(auth, (user) => {
+        document.getElementById('loader')?.remove();
+        const dAuth = document.getElementById('auth-actions-desktop');
+        const mAuth = document.getElementById('auth-actions-mobile');
+        const adminSection = document.getElementById('admin-section');
+        const adminDesktop = document.getElementById('admin-link-desktop');
+        const adminMobile = document.getElementById('admin-link-mobile');
 
-            if (user) {
-                const isAdmin = user.uid === ADMIN_UID;
-                dAuth.innerHTML = `<button onclick="window.handleLogout()" class="nav-link border border-red-400 text-red-400 font-bold">Déconnexion</button>`;
-                mAuth.innerHTML = `<button onclick="window.handleLogout()" class="btn-auth-mobile btn-logout">Déconnexion</button>`;
-                if (isAdmin) {
-                    document.getElementById('admin-section').classList.remove('hidden');
-                    document.getElementById('admin-link-desktop').classList.remove('hidden');
-                    document.getElementById('admin-link-mobile').classList.remove('hidden');
-                }
-                loadVideos(isAdmin, user.uid);
-                listenToAnnouncements();
-            } else {
-                dAuth.innerHTML = `<a href="login.html" class="nav-link bg-accent text-brand-dark font-bold">Connexion</a>`;
-                mAuth.innerHTML = `<a href="login.html" class="btn-auth-mobile btn-login">Connexion</a>`;
-                loadVideos(false, null);
+        // Toujours charger les notifications
+        loadGlobalNotifications();
+
+        if (user && !user.isAnonymous) {
+            // UTILISATEUR CONNECTÉ
+            const isAdmin = user.uid === ADMIN_UID;
+            dAuth.innerHTML = `<button id="logout-btn" class="nav-link border border-red-400 text-red-400 font-bold cursor-pointer">Déconnexion</button>`;
+            mAuth.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl w-full font-bold">Déconnexion</button>`;
+            
+            if (isAdmin) {
+                if(adminSection) adminSection.classList.remove('hidden');
+                if(adminDesktop) adminDesktop.classList.remove('hidden');
+                if(adminMobile) adminMobile.classList.remove('hidden');
             }
+
+            const handleLogout = () => signOut(auth).then(() => window.location.reload());
+            document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
+            document.getElementById('logout-btn-m')?.addEventListener('click', handleLogout);
+
+            loadVideos(isAdmin, user.uid);
+        } else {
+            // VISITEUR (ANONYME)
+            if (!user) signInAnonymously(auth);
+
+            dAuth.innerHTML = `<a href="login.html" class="nav-link bg-accent text-brand-dark font-bold">Connexion</a>`;
+            mAuth.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center w-full font-bold">Connexion</a>`;
+            
+            if(adminSection) adminSection.classList.add('hidden');
+            if(adminDesktop) adminDesktop.classList.add('hidden');
+            if(adminMobile) adminMobile.classList.add('hidden');
+
+            loadVideos(false, null);
+        }
+    });
+
+    // --- 4. CHARGEMENT DES VIDÉOS ---
+    function loadVideos(isAdmin, currentUid) {
+        onSnapshot(query(collection(db, "youtube_videos"), orderBy("createdAt", "desc")), (snap) => {
+            const list = document.getElementById('videos-list'); if(!list) return;
+            list.innerHTML = '';
+            snap.forEach((ds, index) => {
+                if (!currentUid && index > 0) return; // Restriction visiteur
+                
+                const v = ds.data(); const id = ds.id;
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col border border-gray-100";
+                card.innerHTML = `
+                    <div class="aspect-video"><iframe class="w-full h-full" src="https://www.youtube.com/embed/${v.youtubeId}" frameborder="0" allowfullscreen></iframe></div>
+                    <div class="p-6 flex-grow">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="font-black text-brand-dark leading-tight">${v.title}</h3>
+                            <button onclick="window.handleLike('${id}')" class="flex items-center gap-1.5 cursor-pointer">
+                                <svg id="like-icon-${id}" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                                <span id="like-count-${id}" class="text-sm font-bold text-gray-500">${v.likesCount || 0}</span>
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">${v.description || 'Pas de description.'}</p>
+                        ${isAdmin ? `<button onclick="window.delVideo('${id}')" class="text-red-500 text-[10px] font-bold uppercase hover:underline cursor-pointer">Supprimer</button>` : ''}
+                    </div>`;
+                list.appendChild(card);
+                
+                if (currentUid) {
+                    onSnapshot(doc(db, "youtube_videos", id, "likes", currentUid), (lSnap) => {
+                        const icon = document.getElementById(`like-icon-${id}`);
+                        if(icon) {
+                            if (lSnap.exists()) { icon.classList.replace('text-gray-400', 'text-red-500'); icon.setAttribute('fill', 'currentColor'); }
+                            else { icon.classList.replace('text-red-500', 'text-gray-400'); icon.setAttribute('fill', 'none'); }
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    // --- 5. NOTIFICATIONS AVEC VERROUILLAGE DES ARTICLES ---
+    function loadGlobalNotifications() {
+        const notifContent = document.getElementById('notif-content');
+        if (!notifContent) return;
+
+        const categories = [
+            { id: 'article', coll: "resources", label: "Article", link: "services.html", border: "border-brand-dark" },
+            { id: 'video', coll: "youtube_videos", label: "Vidéo", link: "youtube.html", border: "border-red-600" },
+            { id: 'book', coll: "library", label: "Livre", link: "services.html", border: "border-accent" }
+        ];
+
+        notifContent.innerHTML = '';
+
+        categories.forEach(cat => {
+            const q = query(collection(db, cat.coll), orderBy("createdAt", "desc"), limit(3));
+            onSnapshot(q, (snap) => {
+                const bellDot = document.getElementById('bell-dot');
+                if (!snap.empty && bellDot) bellDot.style.display = 'block';
+                
+                const oldNotifs = notifContent.querySelectorAll(`.notif-${cat.id}`);
+                oldNotifs.forEach(n => n.remove());
+
+                snap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const date = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'Récemment';
+                    const item = document.createElement('div');
+                    item.className = `notif-${cat.id} bg-white p-3 rounded-xl shadow-sm border-l-4 ${cat.border} mb-2 hover:bg-gray-50 transition cursor-pointer`;
+                    
+                    // --- VÉRIFICATION DU CLIC ---
+                    item.onclick = () => {
+                        const user = auth.currentUser;
+                        const isLogged = user && !user.isAnonymous;
+
+                        // Bloquer articles et livres si non connecté
+                        if ((cat.id === 'article' || cat.id === 'book') && !isLogged) {
+                            alert("Veuillez vous connecter pour lire cet article ou accéder à ce livre.");
+                            window.location.href = 'login.html';
+                        } else {
+                            window.location.href = cat.link;
+                        }
+                    };
+
+                    item.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-brand-dark text-[9px] uppercase">${cat.label}</h4>
+                            <span class="text-[8px] text-gray-400">${date}</span>
+                        </div>
+                        <p class="text-[11px] text-gray-700 font-medium line-clamp-2 mt-1">${data.title}</p>
+                    `;
+                    notifContent.prepend(item);
+                });
+            });
         });
 
-        window.handleLogout = () => signOut(auth).then(() => window.location.reload());
-
-        function loadVideos(isAdmin, currentUid) {
-            onSnapshot(query(collection(db, "youtube_videos"), orderBy("createdAt", "desc")), (snap) => {
-                const list = document.getElementById('videos-list'); list.innerHTML = '';
-                snap.forEach((ds, index) => {
-                    if (!currentUid && index > 0) return;
-                    const v = ds.data(); const id = ds.id;
-                    const card = document.createElement('div');
-                    card.className = "bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col border border-gray-100";
-                    card.innerHTML = `
-                        <div class="aspect-video"><iframe class="w-full h-full" src="https://www.youtube.com/embed/${v.youtubeId}" frameborder="0" allowfullscreen></iframe></div>
-                        <div class="p-6 flex-grow">
-                            <div class="flex justify-between items-start mb-4">
-                                <h3 class="font-black text-brand-dark leading-tight">${v.title}</h3>
-                                <button onclick="window.handleLike('${id}')" class="flex items-center gap-1.5">
-                                    <svg id="like-icon-${id}" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                                    <span id="like-count-${id}" class="text-sm font-bold text-gray-500">${v.likesCount || 0}</span>
-                                </button>
-                            </div>
-                            <p class="text-sm text-gray-600 mb-4">${v.description || 'Pas de description.'}</p>
-                            ${isAdmin ? `<button onclick="window.delVideo('${id}')" class="text-red-500 text-[10px] font-bold uppercase hover:underline">Supprimer</button>` : ''}
-                        </div>`;
-                    list.appendChild(card);
-                    if (currentUid) {
-                        onSnapshot(doc(db, "youtube_videos", id, "likes", currentUid), (lSnap) => {
-                            const icon = document.getElementById(`like-icon-${id}`);
-                            if(icon) {
-                                if (lSnap.exists()) { icon.classList.replace('text-gray-400', 'text-red-500'); icon.setAttribute('fill', 'currentColor'); }
-                                else { icon.classList.replace('text-red-500', 'text-gray-400'); icon.setAttribute('fill', 'none'); }
-                            }
-                        });
-                    }
-                });
+        // Annonces Admin
+        const qAnnounce = query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
+        onSnapshot(qAnnounce, (snap) => {
+            snap.forEach(docSnap => {
+                const d = docSnap.data();
+                const announceHtml = `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`;
+                notifContent.insertAdjacentHTML('afterbegin', announceHtml);
             });
-        }
+        });
+    }
 
-        const bell = document.getElementById('notification-bell');
-        const panel = document.getElementById('notif-panel');
-        const bellDot = document.getElementById('bell-dot');
-        let isDragging = false, hasMoved = false, startX, startY;
+    // --- 6. GESTION DE LA CLOCHE (DRAG & CLICK) ---
+    const bell = document.getElementById('notification-bell');
+    const panel = document.getElementById('notif-panel');
+    const bellDot = document.getElementById('bell-dot');
+    let isDragging = false, hasMoved = false, startX, startY;
 
-        if (bell && panel) {
-            bell.addEventListener('mousedown', (e) => { isDragging = true; hasMoved = false; startX = e.clientX - bell.offsetLeft; startY = e.clientY - bell.offsetTop; });
-            window.addEventListener('mousemove', (e) => { 
-                if (!isDragging) return; hasMoved = true;
-                bell.style.left = `${e.clientX - startX}px`; bell.style.top = `${e.clientY - startY}px`;
-                bell.style.right = 'auto'; bell.style.bottom = 'auto';
-                panel.style.display = 'none';
-            });
-            window.addEventListener('mouseup', () => isDragging = false);
+    if (bell && panel) {
+        bell.addEventListener('mousedown', (e) => { isDragging = true; hasMoved = false; startX = e.clientX - bell.offsetLeft; startY = e.clientY - bell.offsetTop; });
+        window.addEventListener('mousemove', (e) => { 
+            if (!isDragging) return; hasMoved = true;
+            bell.style.left = `${e.clientX - startX}px`; bell.style.top = `${e.clientY - startY}px`;
+            bell.style.right = 'auto'; bell.style.bottom = 'auto';
+            panel.style.display = 'none';
+        });
+        window.addEventListener('mouseup', () => isDragging = false);
 
-            bell.onclick = () => {
-                if (hasMoved) return;
-                if (panel.style.display === 'flex') { panel.style.display = 'none'; }
-                else {
-                    panel.style.display = 'flex';
-                    const rect = bell.getBoundingClientRect();
-                    panel.style.left = `${Math.max(10, rect.left - 250)}px`;
-                    panel.style.top = `${rect.top - panel.offsetHeight - 15}px`;
-                    if (rect.top < 400) panel.style.top = `${rect.bottom + 15}px`;
-                    if (bellDot) bellDot.style.display = 'none';
-                }
-            };
-        }
-        document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
-
-        function listenToAnnouncements() {
-            const q = query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
-            onSnapshot(q, (snap) => {
-                const c = document.getElementById('notif-content'); if (!c) return;
-                c.innerHTML = snap.empty ? '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>' : '';
-                snap.forEach(docSnap => { 
-                    const d = docSnap.data(); 
-                    c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`; 
-                });
-                if (!snap.empty && bellDot) bellDot.style.display = 'block';
-            });
-        }
-
-        window.handleLike = async (videoId) => {
-            const user = auth.currentUser; if (!user) return alert("Connectez-vous pour aimer !");
-            const likeRef = doc(db, "youtube_videos", videoId, "likes", user.uid);
-            const videoRef = doc(db, "youtube_videos", videoId);
-            await runTransaction(db, async (t) => {
-                const vSnap = await t.get(videoRef); const lSnap = await t.get(likeRef);
-                let count = vSnap.data().likesCount || 0;
-                if (lSnap.exists()) { t.delete(likeRef); t.update(videoRef, { likesCount: Math.max(0, count - 1) }); }
-                else { t.set(likeRef, { uid: user.uid }); t.update(videoRef, { likesCount: count + 1 }); }
-            });
+        bell.onclick = () => {
+            if (hasMoved) return;
+            const isVisible = panel.style.display === 'flex';
+            panel.style.display = isVisible ? 'none' : 'flex';
+            if(!isVisible) {
+                const r = bell.getBoundingClientRect();
+                panel.style.top = r.top > window.innerHeight/2 ? 'auto' : `${r.bottom+10}px`;
+                panel.style.bottom = r.top > window.innerHeight/2 ? `${window.innerHeight-r.top+10}px` : 'auto';
+                panel.style.right = '20px';
+                if(bellDot) bellDot.style.display = 'none';
+            }
         };
+        document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
+    }
 
-        window.delVideo = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "youtube_videos", id)); };
+    // --- 7. ACTIONS ADMIN & LIKES ---
+    window.handleLike = async (videoId) => {
+        const user = auth.currentUser;
+        if (!user || user.isAnonymous) return alert("Veuillez vous connecter pour aimer !");
+        
+        const likeRef = doc(db, "youtube_videos", videoId, "likes", user.uid);
+        const videoRef = doc(db, "youtube_videos", videoId);
+        await runTransaction(db, async (t) => {
+            const vSnap = await t.get(videoRef); const lSnap = await t.get(likeRef);
+            let count = vSnap.data().likesCount || 0;
+            if (lSnap.exists()) { t.delete(likeRef); t.update(videoRef, { likesCount: Math.max(0, count - 1) }); }
+            else { t.set(likeRef, { uid: user.uid }); t.update(videoRef, { likesCount: count + 1 }); }
+        });
+    };
 
-        document.getElementById('add-video-form').onsubmit = async (e) => {
+    window.delVideo = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "youtube_videos", id)); };
+
+    const addForm = document.getElementById('add-video-form');
+    if(addForm) {
+        addForm.onsubmit = async (e) => {
             e.preventDefault();
             const yId = extractID(document.getElementById('v-url').value);
             if(!yId) return alert("Lien invalide !");
             await addDoc(collection(db, "youtube_videos"), { title: document.getElementById('v-title').value, youtubeId: yId, description: document.getElementById('v-desc').value, likesCount: 0, createdAt: serverTimestamp() });
             e.target.reset();
         };
-    </script>
+    }
+</script>
+
 </body>
 </html>
