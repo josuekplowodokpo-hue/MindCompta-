@@ -166,22 +166,21 @@ async function syncUserToAdmin(user, extraData = {}) {
         status: "EN LIGNE",
         ...extraData
     };
+
+    if (extraData.firstName && extraData.lastName) {
+        data.displayName = `${extraData.firstName} ${extraData.lastName}`;
+    } else if (user.displayName) {
+        data.displayName = user.displayName;
+    }
+    
     await setDoc(userRef, data, { merge: true });
 }
 
-// --- GESTION DU MOT DE PASSE OUBLIÉ ---
 document.getElementById('forgot-password').onclick = async () => {
     const email = document.getElementById('auth-email').value;
-    if (!email) {
-        showMsg("Veuillez entrer votre email dans le champ ci-dessus.", false);
-        return;
-    }
-    try {
-        await sendPasswordResetEmail(auth, email);
-        showMsg("Email de réinitialisation envoyé !", true);
-    } catch (err) {
-        showMsg("Erreur : " + err.message, false);
-    }
+    if (!email) { showMsg("Entrez votre email d'abord.", false); return; }
+    try { await sendPasswordResetEmail(auth, email); showMsg("Lien envoyé ! Vérifiez vos emails.", true); }
+    catch (err) { showMsg(err.message, false); }
 };
 
 switchButton.onclick = (e) => {
@@ -206,27 +205,28 @@ document.getElementById('auth-form').onsubmit = async (e) => {
             const res = await signInWithEmailAndPassword(auth, email, password);
             if (!res.user.emailVerified && res.user.uid !== ADMIN_UID) {
                 await signOut(auth);
-                showMsg("Vérifiez votre email.", false);
+                showMsg("Vérifiez votre email avant de continuer.", false);
                 authButton.disabled = false; return;
             }
             await syncUserToAdmin(res.user);
-            window.location.href = 'index.html';
+            showMsg("Bon retour parmi nous !", true); // MESSAGE DE RETOUR
+            setTimeout(() => { window.location.href = 'index.html'; }, 1500);
         } else {
-            const fn = document.getElementById('auth-firstname').value;
-            const ln = document.getElementById('auth-lastname').value;
+            const fn = document.getElementById('auth-firstname').value.trim();
+            const ln = document.getElementById('auth-lastname').value.trim();
+            if(!fn || !ln) { showMsg("Nom et Prénom requis.", false); authButton.disabled = false; return; }
+
             const res = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(res.user, { displayName: `${fn} ${ln}` });
-            await sendEmailVerification(res.user);
             await syncUserToAdmin(res.user, { firstName: fn, lastName: ln, role: "Client", createdAt: serverTimestamp(), status: "INSCRIT" });
+            
+            await sendEmailVerification(res.user);
             await signOut(auth);
-            showMsg("Compte créé ! Vérifiez vos emails.", true);
+            showMsg("Bienvenue sur MindCompta ! Vérifiez vos emails pour valider votre compte.", true); // MESSAGE BIENVENUE
             authButton.disabled = false;
             switchButton.click();
         }
-    } catch (err) {
-        showMsg("Erreur : " + err.message, false);
-        authButton.disabled = false;
-    }
+    } catch (err) { showMsg(err.message, false); authButton.disabled = false; }
 };
 
 document.getElementById('google-btn').onclick = async () => {
@@ -238,17 +238,19 @@ document.getElementById('google-btn').onclick = async () => {
             document.getElementById('profile-modal').classList.remove('hidden');
         } else { 
             await syncUserToAdmin(res.user);
-            window.location.href = 'index.html'; 
+            showMsg("Bon retour parmi nous !", true);
+            setTimeout(() => { window.location.href = 'index.html'; }, 1000);
         }
     } catch (err) { showMsg(err.message, false); }
 };
 
 document.getElementById('save-profile-btn').onclick = async () => {
-    if(!pendingGoogleUser) return;
-    const fn = document.getElementById('modal-firstname').value;
-    const ln = document.getElementById('modal-lastname').value;
+    const fn = document.getElementById('modal-firstname').value.trim();
+    const ln = document.getElementById('modal-lastname').value.trim();
+    if(!fn || !ln) return;
     await syncUserToAdmin(pendingGoogleUser, { firstName: fn, lastName: ln, role: "Client", createdAt: serverTimestamp() });
-    window.location.href = 'index.html';
+    showMsg("Bienvenue sur MindCompta !", true);
+    setTimeout(() => { window.location.href = 'index.html'; }, 1000);
 };
 </script>
 </body>
