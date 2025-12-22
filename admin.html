@@ -132,7 +132,67 @@
             </div>
         </div>
     </div>
+<footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
+    <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
 
+            <div class="space-y-6">
+                <div>
+                    <h2 class="text-xl font-black uppercase tracking-tighter italic">MindCompta Finance</h2>
+                    <p class="text-xs text-gray-400 mt-2 leading-relaxed">Nous facilitons le quotidien des étudiant(e)s de la faculté des sciences économiques et de gestion en leur fournissant des articles qui expliquent les cours qu'ils (elles) reçoivent dans les amphithéâtres et des vidéos qui montent des exemples concrets et des explications très claires de plusieurs notions dont ils ont besoin pour valider leur unités d'enseignement en fin de semestre.</p>
+                </div>
+
+                <div class="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
+                    <div class="h-2 w-2 bg-accent rounded-full shadow-[0_0_5px_#F59E0B]"></div>
+                    <div class="flex flex-col">
+                        <span class="text-[8px] text-gray-500 uppercase font-bold tracking-widest">Utilisateur</span>
+                        <span id="footer-user-name" class="text-xs font-medium text-gray-200 italic">Visiteur</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">Nos Services</h3>
+                <ul class="space-y-4 text-sm text-gray-400 font-medium">
+                    <li><a href="services.html" class="hover:text-white transition">Comptabilité</a></li>
+                    <li><a href="services.html" class="hover:text-white transition">Conseil Fiscal</a></li>
+                    <li><a href="youtube.html" class="hover:text-white transition">Formations Vidéo</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">Support</h3>
+                <ul class="space-y-4 text-sm text-gray-400 font-medium">
+                    <li><a href="#" class="hover:text-white transition">Centre d'aide</a></li>
+                    <li><a href="#" class="hover:text-white transition">Contactez-nous</a></li>
+                    <li><a href="https://wa.me/22879592717?text=Bonjour%2C%20je%20souhaite%20obtenir%20des%20informations%20compl%C3%A9mentaires%20concernant%20MindCompta.%20Merci%20d%27avance" class="hover:text-white transition">FAQ</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">Mon Compte</h3>
+                <div class="space-y-4">
+                    <a href="login.html" class="block text-sm text-gray-400 hover:text-white transition font-medium">Espace Client</a>
+                    <div id="delete-account-zone" class="hidden pt-4">
+                        <button onclick="handleDeleteAccount()" class="text-[9px] text-red-400/80 hover:text-red-400 font-bold uppercase tracking-widest border border-red-500/30 px-3 py-2 rounded-lg transition hover:bg-red-500/5">
+                            Supprimer mon compte
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest">
+                &copy; 2025 MindCompta Finance. Tous droits réservés.
+            </p>
+            <div class="flex gap-6 text-[9px] text-gray-500 font-bold uppercase">
+                <a href="#" class="hover:text-white transition">Mentions Légales</a>
+                <a href="#" class="hover:text-white transition">Confidentialité</a>
+            </div>
+        </div>
+    </div>
+</footer>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
