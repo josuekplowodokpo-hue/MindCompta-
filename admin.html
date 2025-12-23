@@ -157,117 +157,121 @@
         </div>
     </main>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, limit, addDoc, updateDoc, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    // Ajout de setDoc dans les imports ci-dessous
+    import { getFirestore, collection, onSnapshot, query, orderBy, limit, addDoc, updateDoc, deleteDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    const firebaseConfig = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
-        const APP_ID = "mindcompta-finance";
+    const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
+    const APP_ID = "mindcompta-finance";
 
-        window.switchAdminTab = (tabName) => {
-            document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
-            document.querySelectorAll('.admin-menu-item').forEach(m => m.classList.remove('active', 'bg-brand-dark', 'text-white'));
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            document.getElementById(`menu-${tabName}`).classList.add('active', 'bg-brand-dark', 'text-white');
-        };
+    window.switchAdminTab = (tabName) => {
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
+        document.querySelectorAll('.admin-menu-item').forEach(m => m.classList.remove('active', 'bg-brand-dark', 'text-white'));
+        document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+        document.getElementById(`menu-${tabName}`).classList.add('active', 'bg-brand-dark', 'text-white');
+    };
 
-        // --- GESTION DU POP-UP ---
-        async function loadPopupAdminData() {
-            const popupRef = doc(db, "settings", "maintenance_popup");
-            const snap = await getDoc(popupRef);
-            if (snap.exists()) {
-                const data = snap.data();
-                document.getElementById('admin-popup-active').checked = data.isActive || false;
-                document.getElementById('admin-popup-title').value = data.title || "";
-                document.getElementById('admin-popup-message').value = data.message || "";
-                document.getElementById('admin-popup-btn').value = data.buttonText || "";
-            }
+    // --- GESTION DU POP-UP ---
+    async function loadPopupAdminData() {
+        const popupRef = doc(db, "settings", "maintenance_popup");
+        const snap = await getDoc(popupRef);
+        if (snap.exists()) {
+            const data = snap.data();
+            document.getElementById('admin-popup-active').checked = data.isActive || false;
+            document.getElementById('admin-popup-title').value = data.title || "";
+            document.getElementById('admin-popup-message').value = data.message || "";
+            document.getElementById('admin-popup-btn').value = data.buttonText || "";
         }
+    }
 
-        window.savePopupSettings = async () => {
-            const popupRef = doc(db, "settings", "maintenance_popup");
-            try {
-                await updateDoc(popupRef, {
-                    isActive: document.getElementById('admin-popup-active').checked,
-                    title: document.getElementById('admin-popup-title').value,
-                    message: document.getElementById('admin-popup-message').value,
-                    buttonText: document.getElementById('admin-popup-btn').value,
-                    updatedAt: new Date()
-                });
-                alert("Pop-up mis à jour avec succès !");
-            } catch (e) {
-                alert("Erreur : " + e.message);
-            }
-        };
-
-        // --- FONCTIONS EXISTANTES ---
-        function formatFSDate(ts) {
-            const d = ts?.seconds ? new Date(ts.seconds * 1000) : new Date(ts || Date.now());
-            return d.toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    // FONCTION CORRIGÉE : Utilise setDoc pour éviter l'erreur "No document to update"
+    window.savePopupSettings = async () => {
+        const popupRef = doc(db, "settings", "maintenance_popup");
+        try {
+            await setDoc(popupRef, {
+                isActive: document.getElementById('admin-popup-active').checked,
+                title: document.getElementById('admin-popup-title').value,
+                message: document.getElementById('admin-popup-message').value,
+                buttonText: document.getElementById('admin-popup-btn').value,
+                updatedAt: new Date()
+            }, { merge: true }); // Merge permet de ne pas écraser les autres champs si existants
+            
+            alert("Pop-up mis à jour et publié avec succès !");
+        } catch (e) {
+            console.error("Erreur Firebase:", e);
+            alert("Erreur : " + e.message);
         }
+    };
 
-        function fetchUsers() {
-            onSnapshot(collection(db, "artifacts"), (snap) => {
-                const list = document.getElementById('user-list');
-                const counter = document.getElementById('user-count');
-                list.innerHTML = ''; let count = 0;
-                snap.forEach(docSnap => {
-                    const u = docSnap.data(); if(!u.email) return; count++;
-                    list.innerHTML += `<tr class="border-b border-gray-50"><td class="px-6 py-4 font-bold text-gray-800">${u.displayName || 'Utilisateur'}</td><td class="px-6 py-4 text-xs text-gray-500">${u.email}</td><td class="px-6 py-4"><span class="px-3 py-1 text-[9px] font-black rounded-full ${u.status === 'EN LIGNE' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}">${u.status || 'Hors Ligne'}</span></td><td class="px-6 py-4 text-xs text-gray-400">${formatFSDate(u.lastLogin)}</td></tr>`;
-                });
-                counter.innerText = `${count} Membres`;
+    // --- FONCTIONS EXISTANTES ---
+    function formatFSDate(ts) {
+        const d = ts?.seconds ? new Date(ts.seconds * 1000) : new Date(ts || Date.now());
+        return d.toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function fetchUsers() {
+        onSnapshot(collection(db, "artifacts"), (snap) => {
+            const list = document.getElementById('user-list');
+            const counter = document.getElementById('user-count');
+            list.innerHTML = ''; let count = 0;
+            snap.forEach(docSnap => {
+                const u = docSnap.data(); if(!u.email) return; count++;
+                list.innerHTML += `<tr class="border-b border-gray-50"><td class="px-6 py-4 font-bold text-gray-800">${u.displayName || 'Utilisateur'}</td><td class="px-6 py-4 text-xs text-gray-500">${u.email}</td><td class="px-6 py-4"><span class="px-3 py-1 text-[9px] font-black rounded-full ${u.status === 'EN LIGNE' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}">${u.status || 'Hors Ligne'}</span></td><td class="px-6 py-4 text-xs text-gray-400">${formatFSDate(u.lastLogin)}</td></tr>`;
             });
-        }
-
-        function fetchActivity() {
-            const q = query(collection(db, "activity_logs"), orderBy("timestamp", "desc"), limit(40));
-            onSnapshot(q, (snap) => {
-                const list = document.getElementById('activity-list');
-                list.innerHTML = '';
-                snap.forEach(docSnap => {
-                    const log = docSnap.data();
-                    list.innerHTML += `<tr class="hover:bg-blue-50/50 transition"><td class="px-6 py-4 font-bold text-brand-dark">${log.userEmail?.split('@')[0] || 'Anonyme'}</td><td class="px-6 py-4"><span class="px-2 py-1 rounded-md text-[10px] bg-gray-200">${log.action}</span></td><td class="px-6 py-4 text-gray-500 italic truncate max-w-[150px]">"${log.target}"</td><td class="px-6 py-4 text-xs text-gray-400">${formatFSDate(log.timestamp)}</td></tr>`;
-                });
-            });
-        }
-
-        function fetchNotificationsForEdit() {
-            const q = query(collection(db, "artifacts", APP_ID, "public", "data", "site_notifications"), orderBy("timestamp", "desc"));
-            onSnapshot(q, (snap) => {
-                const list = document.getElementById('existing-notifs-list');
-                list.innerHTML = '';
-                snap.forEach(docSnap => {
-                    const data = docSnap.data(); const id = docSnap.id;
-                    list.innerHTML += `<div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-sm text-gray-700">${data.text || data.message}</p><span class="text-[9px] text-gray-400 uppercase font-bold">${formatFSDate(data.timestamp)}</span></div><div class="flex gap-2"><button onclick="deleteNotification('${id}')" class="p-2 bg-red-50 text-red-600 rounded-lg text-[10px] font-black uppercase">X</button></div></div>`;
-                });
-            });
-        }
-
-        window.deleteNotification = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "artifacts", APP_ID, "public", "data", "site_notifications", id)); };
-
-        document.getElementById('send-notif-btn').onclick = async () => {
-            const text = document.getElementById('notif-text').value.trim(); if(!text) return;
-            await addDoc(collection(db, "artifacts", APP_ID, "public", "data", "site_notifications"), { text, timestamp: new Date().toISOString(), adminUid: auth.currentUser.uid });
-            document.getElementById('notif-text').value = '';
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            const dAuth = document.getElementById('auth-actions-desktop');
-            if (user && user.uid === ADMIN_UID) {
-                document.getElementById('status-message').classList.add('hidden');
-                dAuth.innerHTML = `<button id="logout-btn" class="bg-red-500/10 text-red-500 py-2 px-6 text-[10px] font-black uppercase rounded-xl">Déconnexion</button>`;
-                document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = 'index.html');
-                fetchUsers(); fetchActivity(); fetchNotificationsForEdit(); loadPopupAdminData();
-            } else {
-                window.location.href = 'index.html';
-            }
+            counter.innerText = `${count} Membres`;
         });
-    </script>
+    }
+
+    function fetchActivity() {
+        const q = query(collection(db, "activity_logs"), orderBy("timestamp", "desc"), limit(40));
+        onSnapshot(q, (snap) => {
+            const list = document.getElementById('activity-list');
+            list.innerHTML = '';
+            snap.forEach(docSnap => {
+                const log = docSnap.data();
+                list.innerHTML += `<tr class="hover:bg-blue-50/50 transition"><td class="px-6 py-4 font-bold text-brand-dark">${log.userEmail?.split('@')[0] || 'Anonyme'}</td><td class="px-6 py-4"><span class="px-2 py-1 rounded-md text-[10px] bg-gray-200">${log.action}</span></td><td class="px-6 py-4 text-gray-500 italic truncate max-w-[150px]">"${log.target}"</td><td class="px-6 py-4 text-xs text-gray-400">${formatFSDate(log.timestamp)}</td></tr>`;
+            });
+        });
+    }
+
+    function fetchNotificationsForEdit() {
+        const q = query(collection(db, "artifacts", APP_ID, "public", "data", "site_notifications"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snap) => {
+            const list = document.getElementById('existing-notifs-list');
+            list.innerHTML = '';
+            snap.forEach(docSnap => {
+                const data = docSnap.data(); const id = docSnap.id;
+                list.innerHTML += `<div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-sm text-gray-700">${data.text || data.message}</p><span class="text-[9px] text-gray-400 uppercase font-bold">${formatFSDate(data.timestamp)}</span></div><div class="flex gap-2"><button onclick="deleteNotification('${id}')" class="p-2 bg-red-50 text-red-600 rounded-lg text-[10px] font-black uppercase">X</button></div></div>`;
+            });
+        });
+    }
+
+    window.deleteNotification = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "artifacts", APP_ID, "public", "data", "site_notifications", id)); };
+
+    document.getElementById('send-notif-btn').onclick = async () => {
+        const text = document.getElementById('notif-text').value.trim(); if(!text) return;
+        await addDoc(collection(db, "artifacts", APP_ID, "public", "data", "site_notifications"), { text, timestamp: new Date().toISOString(), adminUid: auth.currentUser.uid });
+        document.getElementById('notif-text').value = '';
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        const dAuth = document.getElementById('auth-actions-desktop');
+        if (user && user.uid === ADMIN_UID) {
+            document.getElementById('status-message').classList.add('hidden');
+            dAuth.innerHTML = `<button id="logout-btn" class="bg-red-500/10 text-red-500 py-2 px-6 text-[10px] font-black uppercase rounded-xl">Déconnexion</button>`;
+            document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = 'index.html');
+            fetchUsers(); fetchActivity(); fetchNotificationsForEdit(); loadPopupAdminData();
+        } else {
+            window.location.href = 'index.html';
+        }
+    });
+</script>
 </body>
 </html>
