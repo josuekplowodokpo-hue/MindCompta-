@@ -8,16 +8,16 @@
     <meta name="description" content="Nous facilitons le quotidien des étudiant(e)s de la faculté des sciences économiques et de gestion en leur fournissant des articles qui expliquent les cours et des vidéos concrètes.">
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://josuekplowodokpo-hue.github.io/">
+    <meta property="og:url" content="https://mindcompta.github.io/MindCompta-/">
     <meta property="og:title" content="MindCompta Finance - Réussite FASEG">
-    <meta property="og:description" content="Articles explicatifs et vidéos concrètes pour aider les étudiants en économie et gestion à valider leurs unités d'enseignement.">
-    <meta property="og:image" content="https://josuekplowodokpo-hue.github.io/logo.jpg">
+    <meta property="og:description" content="Nous facilitons le quotidien des étudiant(e)s de la faculté des sciences économiques et de gestion en leur fournissant des articles qui expliquent les cours qu'ils (elles) reçoivent dans les amphithéâtres et des vidéos qui montent des exemples concrets et des explications très claires.">
+    <meta property="og:image" content="https://mindcompta.github.io/MindCompta-/logo.jpg">
 
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://josuekplowodokpo-hue.github.io/">
+    <meta property="twitter:url" content="https://mindcompta.github.io/MindCompta-/">
     <meta property="twitter:title" content="MindCompta Finance - Expertise OHADA">
     <meta property="twitter:description" content="Articles et vidéos explicatifs pour les étudiants en sciences économiques et de gestion.">
-    <meta property="twitter:image" content="https://josuekplowodokpo-hue.github.io/logo.jpg">
+    <meta property="twitter:image" content="https://mindcompta.github.io/MindCompta-/logo.jpg">
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246" crossorigin="anonymous"></script>
     <meta name="google-adsense-account" content="ca-pub-7972578599056246">
@@ -25,60 +25,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        :root {
-            --brand-dark: #1E3A8A;
-            --accent: #F59E0B;
-            font-family: 'Inter', sans-serif;
-        }
+        :root { --brand-dark: #1E3A8A; --accent: #F59E0B; font-family: 'Inter', sans-serif; }
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
-
-        /* Notification Bell Styles */
-        #notification-bell {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            z-index: 100;
-            cursor: grab;
-            touch-action: none;
-            transition: transform 0.2s, left 0.3s ease-out, right 0.3s ease-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 56px;
-            height: 56px;
-        }
-        .bell-dot {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            height: 14px;
-            width: 14px;
-            background-color: #EF4444;
-            border: 2px solid white;
-            border-radius: 50%;
-            display: none;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
-        #notif-panel {
-            position: fixed;
-            width: 300px;
-            max-height: 400px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 101;
-            border: 1px solid #e5e7eb;
-        }
+        #notification-bell { position: fixed; bottom: 100px; right: 20px; z-index: 100; cursor: grab; touch-action: none; display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; }
+        .bell-dot { position: absolute; top: 2px; right: 2px; height: 14px; width: 14px; background-color: #EF4444; border: 2px solid white; border-radius: 50%; display: none; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        #notif-panel { position: fixed; width: 300px; max-height: 400px; background: white; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); display: none; flex-direction: column; overflow: hidden; z-index: 101; border: 1px solid #e5e7eb; }
         .nav-link { color: white; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; transition: all 0.2s; }
         .nav-link:hover { background-color: #345b85; }
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
