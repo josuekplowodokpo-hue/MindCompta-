@@ -163,7 +163,7 @@
                     </svg>
                 </div>
 
-              <div id="maintenance-popup" class="fixed inset-0 z-[9999] hidden flex items-center justify-center px-4 bg-brand-dark/80 backdrop-blur-md">
+      <div id="maintenance-popup" class="fixed inset-0 z-[9999] hidden flex items-center justify-center px-4 bg-brand-dark/80 backdrop-blur-md">
     <div class="relative max-w-2xl w-full bg-brand-dark rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
         <div class="absolute -top-24 -right-24 w-48 h-48 bg-accent/20 blur-[80px] rounded-full"></div>
         
@@ -171,39 +171,21 @@
             <button onclick="closePopup()" class="absolute top-6 right-6 text-gray-500 hover:text-white transition text-2xl">&times;</button>
             
             <div class="text-center space-y-6">
-                <p class="text-[10px] text-accent font-black uppercase tracking-[0.3em]">Fédération des Églises Adventistes du 7ème Jour</p>
-                
-                <div class="space-y-2">
-                    <h3 id="popup-title" class="text-white text-3xl md:text-4xl font-black uppercase tracking-tighter italic leading-none">
-                        L'Émission <br><span class="text-accent text-5xl not-italic">SENTINELLE</span>
+                <h3 id="popup-title" class="text-white text-3xl md:text-4xl font-black uppercase tracking-tighter italic leading-tight">
                     </h3>
-                    <p class="text-gray-400 font-bold uppercase tracking-widest text-xs">Sur Radio Ebenezer 105.9 FM</p>
-                </div>
 
-                <div id="popup-message" class="bg-white/5 p-6 rounded-2xl border border-white/10 text-left">
-                    <p class="text-gray-200 text-sm italic mb-4">"Le Seigneur agit puissamment : il brise les chaînes et guérit les cœurs blessés."</p>
-                    <div class="space-y-2">
-                        <div class="flex items-center gap-3 text-white">
-                            <span class="h-2 w-2 bg-accent rounded-full"></span>
-                            <span class="text-xs font-bold uppercase">Tous les Mardis et Jeudis</span>
-                        </div>
-                        <div class="flex items-center gap-3 text-white">
-                            <span class="h-2 w-2 bg-accent rounded-full"></span>
-                            <span class="text-xs font-bold uppercase text-accent">De 21h à 22h</span>
-                        </div>
+                <div id="popup-message-container" class="bg-white/5 p-6 rounded-2xl border border-white/10 text-left text-gray-200 text-sm md:text-base leading-relaxed">
                     </div>
-                </div>
 
                 <div class="pt-4">
-                    <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-4">Présentée par : Ps. KPLOWODOKPO Yaovi</p>
-                    <button onclick="closePopup()" id="popup-button" class="w-full bg-accent hover:bg-amber-500 text-brand-dark px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all">
-                        Prendre rendez-vous
-                    </button>
+                    <button id="popup-btn-action" onclick="closePopup()" class="w-full bg-accent hover:bg-amber-500 text-brand-dark px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all">
+                        </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
     <div class="max-w-6xl mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
@@ -298,8 +280,9 @@
 
     const isRealUser = () => auth.currentUser && !auth.currentUser.isAnonymous;
 
-    // --- LOGIQUE DU POP-UP ---
-    // On définit la fonction de fermeture globalement pour qu'elle soit vue par le HTML
+    // --- LOGIQUE DU POP-UP DYNAMIQUE ---
+    
+    // Fonction de fermeture
     window.closePopup = () => {
         const popup = document.getElementById('maintenance-popup');
         if(popup) {
@@ -307,6 +290,39 @@
             document.body.style.overflow = 'auto';
         }
     };
+
+    // Fonction d'écoute en temps réel (Firestore)
+    function listenToPopupSettings() {
+        const popupRef = doc(db, "settings", "maintenance_popup");
+        
+        onSnapshot(popupRef, (docSnap) => {
+            const popupEl = document.getElementById('maintenance-popup');
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                
+                if (data.isActive === true) {
+                    // Injection des contenus dynamiques
+                    const titleEl = document.getElementById('popup-title');
+                    const msgContainer = document.getElementById('popup-message-container');
+                    const btnEl = document.getElementById('popup-btn-action');
+
+                    if(titleEl) titleEl.innerHTML = data.title || "ANNONCE";
+                    if(msgContainer) msgContainer.innerHTML = data.message || "";
+                    if(btnEl) btnEl.innerText = data.buttonText || "COMPRIS";
+                    
+                    // Affichage seulement s'il n'est pas déjà visible
+                    if(popupEl && popupEl.classList.contains('hidden')) {
+                        popupEl.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    }
+                } else {
+                    // Si l'admin désactive, on cache immédiatement
+                    if(popupEl) popupEl.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        });
+    }
 
     // 3. GESTION DE L'ÉTAT D'AUTHENTIFICATION
     onAuthStateChanged(auth, (user) => {
@@ -317,12 +333,8 @@
         const deleteZone = document.getElementById('delete-account-zone');
         const footerUserName = document.getElementById('footer-user-name');
         
-        // --- DÉCLENCHEMENT DU POP-UP ---
-        const popup = document.getElementById('maintenance-popup');
-        if(popup && popup.classList.contains('hidden')) {
-            popup.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
+        // DÉCLENCHEMENT DE L'ÉCOUTE DU POP-UP
+        listenToPopupSettings();
 
         loadGlobalUpdates();
 
@@ -353,7 +365,8 @@
         }
     });
 
-    // --- LE RESTE DU SCRIPT RESTE INCHANGÉ ---
+
+    // --- LOGIQUE DES MISES À JOUR (RESTE INCHANGÉE) ---
     async function loadGlobalUpdates() {
         const grid = document.getElementById('recent-updates-grid');
         const notifContent = document.getElementById('notif-content');
