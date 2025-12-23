@@ -223,6 +223,7 @@
 
     setPersistence(auth, browserSessionPersistence);
 
+    // --- LOGIQUE MENU ---
     const toggleMenu = () => {
         document.getElementById('mobile-menu').classList.toggle('open');
         document.getElementById('mobile-menu-overlay').classList.toggle('hidden');
@@ -239,11 +240,15 @@
         if(activeBtn) { activeBtn.classList.add('active', 'text-brand-dark'); activeBtn.classList.remove('text-gray-400'); }
     };
 
+    // --- ÉTAT D'AUTHENTIFICATION & ACTIVITÉ ---
     onAuthStateChanged(auth, (user) => {
-        document.getElementById('loader').classList.add('hidden');
+        document.getElementById('loader')?.classList.add('hidden');
         const dAuth = document.getElementById('auth-actions-desktop');
         const mAuth = document.getElementById('auth-actions-mobile');
+        const footerUserName = document.getElementById('footer-user-name');
+
         if (user) {
+            if (footerUserName) footerUserName.innerText = user.displayName || user.email.split('@')[0];
             document.getElementById('documents-list').classList.remove('hidden');
             document.getElementById('library-list').classList.remove('hidden');
             const isAdmin = user.uid === ADMIN_UID;
@@ -254,6 +259,7 @@
             loadLibrary(isAdmin);
             listenToAnnouncements();
         } else {
+            if (footerUserName) footerUserName.innerText = "Visiteur";
             dAuth.innerHTML = `<a href="login.html" class="nav-link bg-accent text-brand-dark font-bold">Connexion</a>`;
             mAuth.innerHTML = `<a href="login.html" class="btn-auth-mobile btn-login">Se Connecter</a>`;
             document.getElementById('login-required').classList.remove('hidden');
@@ -262,129 +268,50 @@
 
     window.handleLogout = () => signOut(auth).then(() => window.location.reload());
 
-    window.prepareEdit = async (docId) => {        const snap = await getDoc(doc(db, "resources", docId));
-        if (snap.exists()) {
-            const data = snap.data();
-            document.getElementById('edit-doc-id').value = docId;
-            document.getElementById('doc-title').value = data.title;
-            document.getElementById('doc-image').value = data.imageUrl || '';
-            document.getElementById('doc-content').value = data.content;
-            document.getElementById('admin-form-title').innerText = "Modifier l'Article";
-            document.getElementById('submit-doc-btn').innerText = "Enregistrer les modifications";
-            window.scrollTo({ top: document.getElementById('admin-articles').offsetTop - 100, behavior: 'smooth' });
-        }
-    };
-
-    document.getElementById('add-doc-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('edit-doc-id').value;
-        const data = { title: document.getElementById('doc-title').value, content: document.getElementById('doc-content').value, imageUrl: document.getElementById('doc-image').value || null, updatedAt: serverTimestamp() };
-        if (id) { await updateDoc(doc(db, "resources", id), data); alert("Article mis à jour !"); }
-        else { await addDoc(collection(db, "resources"), { ...data, likesCount: 0, createdAt: serverTimestamp() }); }
-        e.target.reset(); document.getElementById('edit-doc-id').value = ""; document.getElementById('admin-form-title').innerText = "Publier un Article"; document.getElementById('submit-doc-btn').innerText = "Diffuser sur le flux";
-    };
-
-    function loadArticles(isAdmin, currentUid) {
-        onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snap) => {
-            const list = document.getElementById('documents-list'); list.innerHTML = '';
-            snap.forEach(async (docSnap) => {
-                const data = docSnap.data(); const docId = docSnap.id;
-                const art = document.createElement('article');
-                art.className = "post-card bg-white p-6 md:p-8 rounded-2xl shadow-sm mb-6";
-                art.innerHTML = `
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">MindCompta</span>
-                        <div class="flex gap-3">
-                            ${isAdmin ? `<button onclick="prepareEdit('${docId}')" class="text-brand-dark text-xs font-bold uppercase hover:underline">Modifier</button>` : ''}
-                            ${isAdmin ? `<button onclick="deletePublication('${docId}', 'resources')" class="text-red-500 text-xs font-bold uppercase">Supprimer</button>` : ''}
-                        </div>
-                    </div>
-                    ${data.imageUrl ? `<img src="${data.imageUrl}" class="w-full h-64 object-cover rounded-xl mb-4">` : ''}
-                    <h3 class="post-title text-2xl font-black text-brand-dark mb-4">${data.title}</h3>
-                    <div class="content-text text-gray-600 leading-relaxed content-collapsed">${data.content}</div>
-                    <button onclick="toggleReadMore(this)" class="text-brand-dark font-bold text-sm mt-2">Lire la suite</button>
-                    <div class="mt-6 pt-6 border-t flex gap-6">
-                         <button onclick="handleLike('${docId}')" class="flex items-center gap-1.5 transition">
-                            <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" id="like-icon-${docId}"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                            <span class="text-sm font-bold text-gray-500" id="like-count-${docId}">${data.likesCount || 0}</span>
-                         </button>
-                    </div>
-                    <div class="mt-8 bg-gray-50 p-4 rounded-xl">
-                        <div id="comments-container-${docId}" class="space-y-3 mb-4 max-h-60 overflow-y-auto"></div>
-                        <div class="flex gap-2">
-                            <input id="comment-input-${docId}" type="text" class="flex-grow p-2 text-sm border rounded-lg outline-none" placeholder="Commenter...">
-                            <button onclick="postComment('${docId}')" class="bg-brand-dark text-white px-4 py-2 rounded-lg text-xs font-bold uppercase">Poster</button>
-                        </div>
-                    </div>`;
-                list.appendChild(art);
-                onSnapshot(doc(db, "resources", docId, "likes", currentUid), (lSnap) => {
-                    const icon = document.getElementById(`like-icon-${docId}`); const count = document.getElementById(`like-count-${docId}`);
-                    if (lSnap.exists()) { icon.classList.replace('text-gray-400', 'text-red-500'); icon.setAttribute('fill', 'currentColor'); count?.classList.replace('text-gray-500', 'text-red-500'); }
-                    else { icon.classList.replace('text-red-500', 'text-gray-400'); icon.setAttribute('fill', 'none'); count?.classList.replace('text-red-500', 'text-gray-500'); }
-                });
-                loadComments(docId, isAdmin, currentUid);
-            });
-        });
-    }
-
-    function loadLibrary(isAdmin) {
-        onSnapshot(query(collection(db, "library"), orderBy("createdAt", "desc")), (snap) => {
-            const list = document.getElementById('library-list'); list.innerHTML = '';
-            snap.forEach(ds => {
-                const b = ds.data();
-                list.innerHTML += `<div class="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col border border-gray-100"><img src="${b.imageUrl}" class="w-full h-56 object-cover"><div class="p-5 flex-grow"><h4 class="font-black text-brand-dark mb-1">${b.title}</h4><p class="text-[10px] font-black text-accent uppercase mb-3">Auteur: ${b.author}</p><a href="${b.bookUrl}" target="_blank" class="block w-full text-center bg-brand-dark text-white text-xs font-bold py-3 rounded-lg uppercase">Télécharger</a></div>${isAdmin ? `<button onclick="deletePublication('${ds.id}', 'library')" class="text-red-500 text-[10px] font-bold py-2 border-t uppercase">Supprimer</button>` : ''}</div>`;
-            });
-        });
-    }
-
+    // --- SYSTÈME DE NOTIFICATION (Point rouge 24h) ---
     function listenToAnnouncements() {
-        const q = query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
-        onSnapshot(q, (snap) => {
-            const c = document.getElementById('notif-content'); if (!c) return;
+        const c = document.getElementById('notif-content'); 
+        const bellDot = document.getElementById('bell-dot');
+        if (!c) return;
+        const now = new Date();
+        const oneDayInMs = 24 * 60 * 60 * 1000;
+
+        onSnapshot(query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5)), (snap) => {
             c.innerHTML = snap.empty ? '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>' : '';
-            snap.forEach(docSnap => { const d = docSnap.data(); c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`; });
-            if (!snap.empty && document.getElementById('bell-dot')) document.getElementById('bell-dot').style.display = 'block';
+            snap.forEach(docSnap => { 
+                const d = docSnap.data(); 
+                c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`; 
+            });
+            if (!snap.empty && bellDot) bellDot.style.display = 'block';
+        });
+
+        ["resources", "library", "youtube_videos"].forEach(collName => {
+            onSnapshot(query(collection(db, collName), orderBy("createdAt", "desc"), limit(1)), (snap) => {
+                snap.forEach(doc => {
+                    const createdAt = doc.data().createdAt?.toDate ? doc.data().createdAt.toDate() : null;
+                    if (createdAt && (now - createdAt) < oneDayInMs) if (bellDot) bellDot.style.display = 'block';
+                });
+            });
         });
     }
 
-    window.toggleReadMore = (btn) => { const container = btn.parentElement.querySelector('.content-text'); const isCollapsed = container.classList.contains('content-collapsed'); container.classList.toggle('content-collapsed', !isCollapsed); container.classList.toggle('content-expanded', isCollapsed); btn.innerText = isCollapsed ? "Voir moins" : "Lire la suite"; };
-    window.handleLike = async (docId) => { const user = auth.currentUser; if (!user) return; const likeRef = doc(db, "resources", docId, "likes", user.uid); const docRef = doc(db, "resources", docId); await runTransaction(db, async (t) => { const snap = await t.get(docRef); const likeSnap = await t.get(likeRef); let count = snap.data().likesCount || 0; if (likeSnap.exists()) { t.delete(likeRef); t.update(docRef, { likesCount: Math.max(0, count - 1) }); } else { t.set(likeRef, { uid: user.uid }); t.update(docRef, { likesCount: count + 1 }); } }); };    window.postComment = async (docId) => { const input = document.getElementById(`comment-input-${docId}`); const text = input.value.trim(); if (!text || !auth.currentUser) return; await addDoc(collection(db, "resources", docId, "comments"), { userId: auth.currentUser.uid, userEmail: auth.currentUser.email, text: text, createdAt: serverTimestamp() }); input.value = ""; };
-    window.deletePublication = async (id, coll) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, coll, id)); };
-    document.getElementById('add-book-form').onsubmit = async (e) => { e.preventDefault(); await addDoc(collection(db, "library"), { title: document.getElementById('book-title').value, author: document.getElementById('book-author').value, imageUrl: document.getElementById('book-image').value, bookUrl: document.getElementById('book-url').value, description: document.getElementById('book-desc').value, createdAt: serverTimestamp() }); e.target.reset(); };
-    function loadComments(docId, isAdmin, currentUid) {
-        const container = document.getElementById(`comments-container-${docId}`);
-        onSnapshot(query(collection(db, "resources", docId, "comments"), orderBy("createdAt", "asc")), (snap) => {
-            if(!container) return; container.innerHTML = '';
-            snap.forEach(cSnap => { const c = cSnap.data(); container.innerHTML += `<div class="text-sm"><b>${c.userEmail.split('@')[0]}:</b> ${c.text}</div>`; });
-        });
+    // --- LOGIQUE CLOCHE FIXE ---
+    const bell = document.getElementById('notification-bell');
+    const panel = document.getElementById('notif-panel');
+    const bellDot = document.getElementById('bell-dot');
+
+    if (bell && panel) {
+        bell.onclick = () => {
+            const isVisible = (panel.style.display === 'flex');
+            panel.style.display = isVisible ? 'none' : 'flex';
+            if(!isVisible && bellDot) bellDot.style.display = 'none';
+        };
     }
+    const closeNotifBtn = document.getElementById('close-notif');
+    if(closeNotifBtn) closeNotifBtn.onclick = () => { if(panel) panel.style.display = 'none'; };
 
-const bell = document.getElementById('notification-bell');
-const panel = document.getElementById('notif-panel');
-const bellDot = document.getElementById('bell-dot');
-let isDragging = false, hasMoved = false, startX, startY;
-
-if (bell && panel) {
-    bell.addEventListener('mousedown', (e) => { isDragging = true; hasMoved = false; startX = e.clientX - bell.offsetLeft; startY = e.clientY - bell.offsetTop; bell.style.cursor = 'grabbing'; });
-    window.addEventListener('mousemove', (e) => { if (!isDragging) return; hasMoved = true; const newX = e.clientX - startX; const newY = e.clientY - startY; bell.style.left = `${newX}px`; bell.style.top = `${newY}px`; bell.style.right = 'auto'; bell.style.bottom = 'auto'; panel.style.display = 'none'; });
-    window.addEventListener('mouseup', () => { isDragging = false; bell.style.cursor = 'grab'; });
-    bell.onclick = (e) => {
-        if (hasMoved) return;
-        if (panel.style.display === 'flex') { panel.style.display = 'none'; } else {
-            panel.style.display = 'flex';
-            const rect = bell.getBoundingClientRect();
-            const panelWidth = 300;
-            let leftPos = rect.left - (panelWidth / 2) + (rect.width / 2);
-            if (leftPos < 10) leftPos = 10;
-            if (leftPos + panelWidth > window.innerWidth) leftPos = window.innerWidth - panelWidth - 10;
-            let topPos = rect.top - panel.offsetHeight - 15;
-            if (topPos < 10) { topPos = rect.bottom + 15; }
-            panel.style.left = `${leftPos}px`; panel.style.top = `${topPos}px`; panel.style.bottom = 'auto'; panel.style.right = 'auto';
-            if (bellDot) bellDot.style.display = 'none';
-        }
-    };
-}
-document.getElementById('close-notif').onclick = () => { if(panel) panel.style.display = 'none'; };
+    // --- LE RESTE DE VOS FONCTIONS (Articles, Library, Comments...) ---
+    // (Conservez ici vos fonctions loadArticles, prepareEdit, loadLibrary, etc., telles qu'elles sont dans votre fichier)
 </script>
 </body>
 </html>
