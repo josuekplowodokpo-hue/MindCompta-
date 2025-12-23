@@ -163,28 +163,41 @@
                     </svg>
                 </div>
 
-                <div class="space-y-3">
-                    <h3 class="text-white text-2xl md:text-3xl font-black uppercase tracking-tighter italic">
-                        Note Importante <span class="text-accent text-4xl font-normal not-italic">.</span>
+              <div id="maintenance-popup" class="fixed inset-0 z-[9999] hidden flex items-center justify-center px-4 bg-brand-dark/80 backdrop-blur-md">
+    <div class="relative max-w-2xl w-full bg-brand-dark rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-accent/20 blur-[80px] rounded-full"></div>
+        
+        <div class="p-8 md:p-12 relative">
+            <button onclick="closePopup()" class="absolute top-6 right-6 text-gray-500 hover:text-white transition text-2xl">&times;</button>
+            
+            <div class="text-center space-y-6">
+                <p class="text-[10px] text-accent font-black uppercase tracking-[0.3em]">Fédération des Églises Adventistes du 7ème Jour</p>
+                
+                <div class="space-y-2">
+                    <h3 id="popup-title" class="text-white text-3xl md:text-4xl font-black uppercase tracking-tighter italic leading-none">
+                        L'Émission <br><span class="text-accent text-5xl not-italic">SENTINELLE</span>
                     </h3>
-                    <p class="text-gray-400 text-sm md:text-base leading-relaxed">
-                        Suite à une maintenance ce <span class="text-white font-bold">Lundi 22 Décembre</span>, les comptes créés aujourd'hui ont pu être impactés par une perte d'accès.
-                    </p>
+                    <p class="text-gray-400 font-bold uppercase tracking-widest text-xs">Sur Radio Ebenezer 105.9 FM</p>
                 </div>
 
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                    <p class="text-xs text-gray-300">
-                        <span class="text-accent font-bold uppercase tracking-[0.2em] block mb-2">Pas d'inquiétude :</span>
-                        Il vous suffit de vous <span class="text-white font-bold underline decoration-accent">inscrire une nouvelle fois</span> pour retrouver un accès complet et sécurisé.
-                    </p>
+                <div id="popup-message" class="bg-white/5 p-6 rounded-2xl border border-white/10 text-left">
+                    <p class="text-gray-200 text-sm italic mb-4">"Le Seigneur agit puissamment : il brise les chaînes et guérit les cœurs blessés."</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3 text-white">
+                            <span class="h-2 w-2 bg-accent rounded-full"></span>
+                            <span class="text-xs font-bold uppercase">Tous les Mardis et Jeudis</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-white">
+                            <span class="h-2 w-2 bg-accent rounded-full"></span>
+                            <span class="text-xs font-bold uppercase text-accent">De 21h à 22h</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                    <a href="login.html" class="flex-1 bg-accent hover:bg-amber-500 text-brand-dark px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all text-center">
-                        Recréer mon compte
-                    </a>
-                    <button onclick="closePopup()" class="flex-1 bg-white/5 hover:bg-white/10 text-white px-6 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all border border-white/10">
-                        J'ai compris
+                <div class="pt-4">
+                    <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-4">Présentée par : Ps. KPLOWODOKPO Yaovi</p>
+                    <button onclick="closePopup()" id="popup-button" class="w-full bg-accent hover:bg-amber-500 text-brand-dark px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all">
+                        Prendre rendez-vous
                     </button>
                 </div>
             </div>
