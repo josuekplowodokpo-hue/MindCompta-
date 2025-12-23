@@ -3,11 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>MindCompta - Ressources & Bibliothèque</title>
+    <meta name="description" content="Accédez à notre bibliothèque de ressources : articles détaillés et documents essentiels pour maîtriser la gestion et l'économie en FASEG.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://josuekplowodokpo-hue.github.io/services.html">
+    <meta property="og:title" content="MindCompta - Bibliothèque de Ressources">
+    <meta property="og:description" content="Nous facilitons le quotidien des étudiant(e)s de la faculté des sciences économiques et de gestion en leur fournissant des articles qui expliquent les cours qu'ils (elles) reçoivent dans les amphithéâtres et des vidéos qui montent des exemples concrets et des explications très claires de plusieurs notions dont ils ont besoin pour valider leur unités d'enseignement en fin de semestre.">
+    <meta property="og:image" content="https://josuekplowodokpo-hue.github.io/logo.jpg">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://josuekplowodokpo-hue.github.io/services.html">
+    <meta property="twitter:title" content="MindCompta - Ressources & Bibliothèque">
+    <meta property="twitter:description" content="Explorations de cours, articles OHADA et supports pédagogiques pour les étudiants FASEG.">
+    <meta property="twitter:image" content="https://josuekplowodokpo-hue.github.io/logo.jpg">
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246" crossorigin="anonymous"></script>
+    <meta name="google-adsense-account" content="ca-pub-7972578599056246">
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7972578599056246"
-     crossorigin="anonymous"></script>
-<meta name="google-adsense-account" content="ca-pub-7972578599056246">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         :root { --brand-dark: #1E3A8A; --accent: #F59E0B; font-family: 'Inter', sans-serif; }
@@ -25,39 +40,20 @@
         #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 50; }
         #mobile-menu.open { transform: translateX(0); }
 
-        /* AUTH BUTTONS STYLE - EXTRAIT DE LA PAGE PARTENAIRE. */
+        /* AUTH BUTTONS STYLE */
         .btn-auth-mobile { padding: 1rem; border-radius: 1rem; font-weight: 800; text-transform: uppercase; text-align: center; font-size: 0.875rem; transition: all 0.2s; width: 100%; }
         .btn-logout { background-color: rgba(239, 68, 68, 0.1); color: #F87171; }
         .btn-login { background-color: var(--accent); color: var(--brand-dark); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
 
+        /* NOTIFICATIONS */
         #notification-bell { position: fixed; bottom: 100px; right: 20px; z-index: 100; cursor: grab; touch-action: none; display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; }
         .bell-dot { position: absolute; top: 2px; right: 2px; height: 14px; width: 14px; background-color: #EF4444; border: 2px solid white; border-radius: 50%; display: none; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         #notif-panel { position: fixed; width: 300px; max-height: 400px; background: white; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); display: none; flex-direction: column; overflow: hidden; z-index: 101; border: 1px solid #e5e7eb; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col font-inter">
-    <header class="w-full bg-brand-dark py-4 shadow-xl text-white sticky top-0 z-20">
-        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
-            <a href="index.html" class="flex items-center group">
-                <img src="logo.jpg" alt="MC" class="h-10 w-auto rounded-full mr-3 border-2 border-white group-hover:scale-105 transition">
-                <span class="text-xl font-bold tracking-wider">MindCompta Finance</span>
-            </a>
-            <nav class="hidden sm:flex items-center space-x-4">
-                <a href="index.html" class="nav-link ">Accueil</a>
-                <a href="services.html" class="nav-link bg-accent text-brand-dark font-bold">Services</a>
-                <a href="about.html" class="nav-link">À Propos</a>
-                <a href="youtube.html" class="nav-link">YouTube</a>
-                <div id="admin-link-desktop" class="hidden">
-                    <a href="admin.html" class="nav-link border border-accent text-accent font-bold">Tableau de Bord</a>
-                </div>
-                <div id="auth-actions-desktop"></div>
-            </nav>
-            <button id="menu-button" class="sm:hidden p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
-        </div>
-    </header>
 
-    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
     <nav id="mobile-menu" class="fixed top-0 right-0 w-72 h-full bg-brand-dark text-white p-8 shadow-2xl">
         <div class="flex justify-between items-center mb-10">
             <h2 class="text-xs font-black uppercase tracking-[0.2em] text-white">NAVIGATION</h2>
