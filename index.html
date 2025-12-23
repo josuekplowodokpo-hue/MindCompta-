@@ -213,11 +213,10 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { 
         getAuth, onAuthStateChanged, signInAnonymously, signOut, 
-        setPersistence, browserSessionPersistence, EmailAuthProvider, 
-        reauthenticateWithCredential, deleteUser 
+        setPersistence, browserSessionPersistence 
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { 
-        getFirestore, collection, onSnapshot, query, orderBy, limit, deleteDoc, doc 
+        getFirestore, collection, onSnapshot, query, orderBy, limit, doc 
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // 2. CONFIGURATION
@@ -229,220 +228,145 @@
         messagingSenderId: "578389020450", 
         appId: "1:578389020450:web:edf9dd48e394cff7601f7b" 
     };
-    
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
     const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
-    const APP_ID = "mindcompta-finance";
-
     setPersistence(auth, browserSessionPersistence);
 
-    const isRealUser = () => auth.currentUser && !auth.currentUser.isAnonymous;
-
-    // --- LOGIQUE DU POP-UP DYNAMIQUE ---
-    
-    // Fonction de fermeture
-    window.closePopup = () => {
-        const popup = document.getElementById('maintenance-popup');
-        if(popup) {
-            popup.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-    };
-
-    // Fonction d'écoute en temps réel (Firestore)
-    function listenToPopupSettings() {
-        const popupRef = doc(db, "settings", "maintenance_popup");
-        
-        onSnapshot(popupRef, (docSnap) => {
-            const popupEl = document.getElementById('maintenance-popup');
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                
-                if (data.isActive === true) {
-                    // Injection des contenus dynamiques
-                    const titleEl = document.getElementById('popup-title');
-                    const msgContainer = document.getElementById('popup-message-container');
-                    const btnEl = document.getElementById('popup-btn-action');
-
-                    if(titleEl) titleEl.innerHTML = data.title || "ANNONCE";
-                    if(msgContainer) msgContainer.innerHTML = data.message || "";
-                    if(btnEl) btnEl.innerText = data.buttonText || "COMPRIS";
-                    
-                    // Affichage seulement s'il n'est pas déjà visible
-                    if(popupEl && popupEl.classList.contains('hidden')) {
-                        popupEl.classList.remove('hidden');
-                        document.body.style.overflow = 'hidden';
-                    }
-                } else {
-                    // Si l'admin désactive, on cache immédiatement
-                    if(popupEl) popupEl.classList.add('hidden');
-                    document.body.style.overflow = 'auto';
-                }
-            }
-        });
-    }
-
-    // 3. GESTION DES ÉTATS D'AUTHENTIFICATION
+    // --- 3. GESTION DE L'ÉTAT D'ACTIVITÉ ---
     onAuthStateChanged(auth, (user) => {
-        const adminDesktop = document.getElementById('admin-link-desktop');
-        const adminMobile = document.getElementById('admin-link-mobile');
+        const adminLinks = [document.getElementById('admin-link-desktop'), document.getElementById('admin-link-mobile')];
         const authDesktop = document.getElementById('auth-actions-desktop');
         const authMobile = document.getElementById('auth-actions-mobile');
-        const deleteZone = document.getElementById('delete-account-zone');
         const footerUserName = document.getElementById('footer-user-name');
-        
-        // DÉCLENCHEMENT DE L'ÉCOUTE DU POP-UP
-        listenToPopupSettings();
 
+        // Lancer le chargement des contenus
         loadGlobalUpdates();
 
         if (user && !user.isAnonymous) {
+            // Utilisateur Connecté
             if (footerUserName) footerUserName.innerText = user.displayName || user.email.split('@')[0];
+            
             if (user.uid === ADMIN_UID) {
-                if(adminDesktop) adminDesktop.classList.remove('hidden');
-                if(adminMobile) adminMobile.classList.remove('hidden');
+                adminLinks.forEach(link => link?.classList.remove('hidden'));
             }
-            if(authDesktop) authDesktop.innerHTML = `<button id="logout-btn" class="text-xs font-bold text-red-400 cursor-pointer">Quitter</button>`;
-            if(authMobile) authMobile.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl w-full font-bold">Déconnexion</button>`;
-            if(deleteZone) deleteZone.classList.remove('hidden');
 
-            const handleLogout = (e) => {
-                e.preventDefault();
-                signOut(auth).then(() => { window.location.reload(); });
-            };
+            const logoutHtml = `<button id="logout-btn" class="text-xs font-bold text-red-400 cursor-pointer">Quitter</button>`;
+            if(authDesktop) authDesktop.innerHTML = logoutHtml;
+            if(authMobile) authMobile.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl w-full font-bold">Déconnexion</button>`;
+
+            const handleLogout = () => signOut(auth).then(() => window.location.reload());
             document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
             document.getElementById('logout-btn-m')?.addEventListener('click', handleLogout);
         } else {
+            // Mode Visiteur
             if (footerUserName) footerUserName.innerText = "Visiteur";
             if (!user) signInAnonymously(auth);
-            if(adminDesktop) adminDesktop.classList.add('hidden');
-            if(adminMobile) adminMobile.classList.add('hidden');
-            if(authDesktop) authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold">Connexion</a>`;
+            
+            adminLinks.forEach(link => link?.classList.add('hidden'));
+            
+            const loginHtml = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold">Connexion</a>`;
+            if(authDesktop) authDesktop.innerHTML = loginHtml;
             if(authMobile) authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center w-full font-bold">Se Connecter</a>`;
-            if(deleteZone) deleteZone.classList.add('hidden');
         }
     });
 
-
-    // --- LOGIQUE DES MISES À JOUR (RESTE INCHANGÉE) ---
+    // --- 4. GESTION DES NOTIFICATIONS & GRILLE (Filtre 24h) ---
     async function loadGlobalUpdates() {
         const grid = document.getElementById('recent-updates-grid');
         const notifContent = document.getElementById('notif-content');
         const bellDot = document.getElementById('bell-dot');
-        if (!grid && !notifContent) return;
+        const now = new Date();
+        const oneDayInMs = 24 * 60 * 60 * 1000;
+
         const categories = [
             { id: 'article', coll: "resources", label: "Article", link: "services.html", color: "bg-brand-dark", border: "border-brand-dark" },
             { id: 'video', coll: "youtube_videos", label: "Vidéo", link: "youtube.html", color: "bg-red-600", border: "border-red-600" },
             { id: 'book', coll: "library", label: "Livre", link: "services.html", color: "bg-accent", border: "border-accent" }
         ];
-        if (notifContent) notifContent.innerHTML = ''; 
+
+        if (notifContent) notifContent.innerHTML = '';
+
         categories.forEach(cat => {
             const q = query(collection(db, cat.coll), orderBy("createdAt", "desc"), limit(5));
+            
             onSnapshot(q, (snap) => {
                 if (snap.empty) return;
-                if (bellDot) bellDot.style.display = 'block';
+
+                // Nettoyer les anciennes cartes de cette catégorie dans la grille
                 if (grid) {
-                    const oldCards = grid.querySelectorAll(`.card-${cat.id}`);
-                    oldCards.forEach(c => c.remove());
-                    snap.forEach(doc => { renderGridCard(grid, doc.data(), cat); });
+                    grid.querySelectorAll(`.card-${cat.id}`).forEach(c => c.remove());
                 }
-                if (notifContent) {
-                    const oldNotifs = notifContent.querySelectorAll(`.notif-${cat.id}`);
-                    oldNotifs.forEach(n => n.remove());
-                    snap.forEach(doc => { renderNotifItem(notifContent, doc.data(), cat); });
-                }
-            });
-        });
-        const qAnnounce = query(collection(db, 'artifacts', APP_ID, 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
-        onSnapshot(qAnnounce, (snap) => {
-            if (snap.empty) return;
-            snap.forEach(doc => {
-                const d = doc.data();
-                const announceHtml = `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`;
-                if(notifContent) notifContent.insertAdjacentHTML('afterbegin', announceHtml);
+
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
+
+                    // 1. Affichage systématique dans la GRILLE (Top 5)
+                    if (grid) renderGridCard(grid, data, cat);
+
+                    // 2. Affichage dans les NOTIFICATIONS uniquement si < 24h
+                    if (createdAt && (now - createdAt) < oneDayInMs) {
+                        if (bellDot) bellDot.style.display = 'block';
+                        if (notifContent) renderNotifItem(notifContent, data, cat, createdAt);
+                    }
+                });
             });
         });
     }
 
     function renderGridCard(container, data, cat) {
-        const loggedIn = isRealUser();
+        const loggedIn = (auth.currentUser && !auth.currentUser.isAnonymous);
         const canAccess = (loggedIn || cat.id === 'video');
         const finalLink = canAccess ? cat.link : 'login.html';
-        const actionText = canAccess ? 'Consulter &rarr;' : 'Se connecter pour lire &rarr;';
+        
         const card = document.createElement('div');
         card.className = `card-${cat.id} group bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition duration-300`;
-        card.innerHTML = `<div class="h-48 bg-gray-200 relative overflow-hidden"><img src="${data.imageUrl || (data.youtubeId ? 'https://img.youtube.com/vi/'+data.youtubeId+'/mqdefault.jpg' : 'logo.jpg')}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" onerror="this.src='logo.jpg'"><div class="absolute top-4 left-4"><span class="${cat.color} text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">Nouveau ${cat.label}</span></div></div><div class="p-6"><h3 class="font-bold text-brand-dark mb-2 line-clamp-2">${data.title}</h3><a href="${finalLink}" class="text-brand-dark font-black text-[10px] uppercase border-b-2 border-accent pb-1 inline-block">${actionText}</a></div>`;
+        card.innerHTML = `
+            <div class="h-48 bg-gray-200 relative overflow-hidden">
+                <img src="${data.imageUrl || 'logo.jpg'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" onerror="this.src='logo.jpg'">
+                <div class="absolute top-4 left-4">
+                    <span class="${cat.color} text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">Nouveau ${cat.label}</span>
+                </div>
+            </div>
+            <div class="p-6">
+                <h3 class="font-bold text-brand-dark mb-2 line-clamp-2">${data.title}</h3>
+                <a href="${finalLink}" class="text-brand-dark font-black text-[10px] uppercase border-b-2 border-accent pb-1 inline-block">
+                    ${canAccess ? 'Consulter →' : 'Se connecter pour lire →'}
+                </a>
+            </div>`;
         container.appendChild(card);
     }
 
-    function renderNotifItem(container, data, cat) {
-        const loggedIn = isRealUser();
-        const date = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'Récemment';
+    function renderNotifItem(container, data, cat, date) {
         const item = document.createElement('div');
         item.className = `notif-${cat.id} bg-white p-3 rounded-xl shadow-sm border-l-4 ${cat.border} mb-2 hover:bg-gray-50 transition cursor-pointer`;
-        item.onclick = () => {
-            if (loggedIn || cat.id === 'video') { window.location.href = cat.link; } 
-            else { alert("Connexion requise."); window.location.href = 'login.html'; }
-        };
-        item.innerHTML = `<div class="flex justify-between items-start"><h4 class="font-bold text-brand-dark text-[9px] uppercase">${cat.label}</h4><span class="text-[8px] text-gray-400">${date}</span></div><p class="text-[11px] text-gray-700 font-medium line-clamp-2 mt-1">${data.title}</p>${(!loggedIn && cat.id !== 'video') ? '<span class="text-[7px] text-red-500 font-bold uppercase mt-1 block">Accès restreint</span>' : ''}`;
+        item.onclick = () => window.location.href = cat.link;
+        item.innerHTML = `
+            <div class="flex justify-between items-start">
+                <h4 class="font-bold text-brand-dark text-[9px] uppercase">${cat.label}</h4>
+                <span class="text-[8px] text-gray-400">${date.toLocaleDateString()}</span>
+            </div>
+            <p class="text-[11px] text-gray-700 font-medium line-clamp-2 mt-1">${data.title}</p>`;
         container.prepend(item);
     }
 
-    const bell = document.getElementById('notification-bell');
-    const panel = document.getElementById('notif-panel');
-    const bellDot = document.getElementById('bell-dot');
-    let isDragging = false, hasMoved = false, startX, startY;
-    if (bell && panel) {
-        bell.addEventListener('mousedown', (e) => { isDragging = true; hasMoved = false; startX = e.clientX - bell.offsetLeft; startY = e.clientY - bell.offsetTop; });
-        window.addEventListener('mousemove', (e) => { 
-            if (!isDragging) return; hasMoved = true;
-            bell.style.left = `${e.clientX - startX}px`; bell.style.top = `${e.clientY - startY}px`;
-            bell.style.right = 'auto'; bell.style.bottom = 'auto';
-            panel.style.display = 'none';
-        });
-        window.addEventListener('mouseup', () => isDragging = false);
-        bell.onclick = () => {
-            if (hasMoved) return;
-            const isVisible = panel.style.display === 'flex';
-            panel.style.display = isVisible ? 'none' : 'flex';
-            if(!isVisible) {
-                const r = bell.getBoundingClientRect();
-                panel.style.top = r.top > window.innerHeight/2 ? 'auto' : `${r.bottom+10}px`;
-                panel.style.bottom = r.top > window.innerHeight/2 ? `${window.innerHeight-r.top+10}px` : 'auto';
-                panel.style.right = '20px';
-                if(bellDot) bellDot.style.display = 'none';
-            }
+    // --- 5. LOGIQUE DU MENU MOBILE ---
+    document.getElementById('menu-button').onclick = () => {
+        document.getElementById('mobile-menu').classList.add('open');
+        document.getElementById('mobile-menu-overlay').classList.remove('hidden');
+    };
+    // Note: Assurez-vous d'avoir un bouton ou un ID pour fermer le menu
+    const closeBtn = document.getElementById('close-menu-button') || document.getElementById('mobile-menu-overlay');
+    if(closeBtn) {
+        closeBtn.onclick = () => {
+            document.getElementById('mobile-menu').classList.remove('open');
+            document.getElementById('mobile-menu-overlay').classList.add('hidden');
         };
-        document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
     }
-
-    document.getElementById('menu-button').onclick = () => { 
-        document.getElementById('mobile-menu').classList.add('open'); 
-        document.getElementById('mobile-menu-overlay').classList.remove('hidden'); 
-    };
-    document.getElementById('close-menu-button').onclick = () => { 
-        document.getElementById('mobile-menu').classList.remove('open'); 
-        document.getElementById('mobile-menu-overlay').classList.add('hidden'); 
-    };
-
-    window.handleDeleteAccount = async () => {
-        const user = auth.currentUser;
-        if (!user || user.isAnonymous) return;
-        if (!confirm("ATTENTION : Action irréversible. Confirmer ?")) return;
-        const password = prompt("Mot de passe :");
-        if (password) {
-            try {
-                const credential = EmailAuthProvider.credential(user.email, password);
-                await reauthenticateWithCredential(user, credential);
-                await deleteDoc(doc(db, "artifacts", user.uid));
-                await deleteUser(user);
-                alert("Compte supprimé."); window.location.href = "index.html";
-            } catch (error) { alert("Erreur mot de passe."); }
-        }
-    };
 </script>
 </body>
 </html>
