@@ -298,17 +298,15 @@
         const now = new Date();
         if (!c) return;
 
-        // Annonces système
         const qAnn = query(collection(db, 'artifacts', 'mindcompta-finance', 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
         onSnapshot(qAnn, (snap) => {
-            c.innerHTML = ''; 
+            c.innerHTML = snap.empty ? '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>' : ''; 
             snap.forEach(doc => {
                 const d = doc.data();
                 c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`;
             });
         });
 
-        // Filtre 24h pour le point rouge
         ["resources", "youtube_videos", "library"].forEach(coll => {
             onSnapshot(query(collection(db, coll), orderBy("createdAt", "desc"), limit(1)), (snap) => {
                 snap.forEach(doc => {
@@ -319,7 +317,7 @@
         });
     }
 
-    // --- 4. LOGIQUE MENU MOBILE (RÉPARÉE) ---
+    // --- 4. LOGIQUE MENU MOBILE ---
     const menuBtn = document.getElementById('menu-button');
     const closeBtn = document.getElementById('close-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
@@ -332,32 +330,19 @@
     if (closeBtn) closeBtn.onclick = toggleMenu;
     if (overlay) overlay.onclick = toggleMenu;
 
-    // --- 5. LOGIQUE CLOCHE (DÉPLACEMENT + CLIC) ---
+    // --- 5. LOGIQUE CLOCHE (FIXE ET SIMPLE) ---
     const bell = document.getElementById('notification-bell');
     const panel = document.getElementById('notif-panel');
     const bellDot = document.getElementById('bell-dot');
-    let isDragging = false, hasMoved = false, startX, startY;
 
     if (bell && panel) {
-        bell.onmousedown = (e) => { isDragging = true; hasMoved = false; startX = e.clientX - bell.offsetLeft; startY = e.clientY - bell.offsetTop; };
-        window.onmousemove = (e) => { 
-            if (!isDragging) return; hasMoved = true;
-            bell.style.left = `${e.clientX - startX}px`; bell.style.top = `${e.clientY - startY}px`;
-            bell.style.right = 'auto'; bell.style.bottom = 'auto';
-        };
-        window.onmouseup = () => { isDragging = false; };
         bell.onclick = () => {
-            if (hasMoved) return;
-            panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
-            if(panel.style.display === 'flex') {
-                const r = bell.getBoundingClientRect();
-                panel.style.top = r.top > window.innerHeight/2 ? 'auto' : `${r.bottom+10}px`;
-                panel.style.bottom = r.top > window.innerHeight/2 ? `${window.innerHeight-r.top+10}px` : 'auto';
-                if(bellDot) bellDot.style.display = 'none';
-            }
+            const isVisible = (panel.style.display === 'flex');
+            panel.style.display = isVisible ? 'none' : 'flex';
+            if (!isVisible && bellDot) bellDot.style.display = 'none';
         };
     }
-    document.getElementById('close-notif').onclick = () => panel.style.display = 'none';
+    document.getElementById('close-notif').onclick = () => { if(panel) panel.style.display = 'none'; };
 </script>
 </body>
 </html>
