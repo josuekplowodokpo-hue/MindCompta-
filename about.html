@@ -219,8 +219,12 @@
         const adminMobile = document.getElementById('admin-link-mobile');
         const authDesktop = document.getElementById('auth-actions-desktop');
         const authMobile = document.getElementById('auth-actions-mobile');
+        const footerUserName = document.getElementById('footer-user-name'); // Pour l'état d'activité
 
         if (user && !user.isAnonymous) {
+            // ÉTAT D'ACTIVITÉ : Affichage du nom
+            if (footerUserName) footerUserName.innerText = user.displayName || user.email.split('@')[0];
+
             if (user.uid === ADMIN_UID) {
                 if (adminDesktop) adminDesktop.classList.remove('hidden');
                 if (adminMobile) adminMobile.classList.remove('hidden');
@@ -231,12 +235,52 @@
             document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
             document.getElementById('logout-btn-m')?.addEventListener('click', handleLogout);
         } else {
+            // ÉTAT D'ACTIVITÉ : Visiteur
+            if (footerUserName) footerUserName.innerText = "Visiteur";
+
             if (authDesktop) authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold">Connexion</a>`;
             if (authMobile) authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center w-full">Se Connecter</a>`;
         }
         listenToAnnouncements();
+        listenToGlobalUpdates(); // Nouvelle fonction pour articles/vidéos
     });
 
+    // --- SYSTÈME DE NOTIFICATION MISE À JOUR (Articles, Vidéos, Livres) ---
+    function listenToGlobalUpdates() {
+        const notifContent = document.getElementById('notif-content');
+        const bellDot = document.getElementById('bell-dot');
+        const now = new Date();
+        const oneDayInMs = 24 * 60 * 60 * 1000;
+
+        const categories = [
+            { id: 'article', coll: "resources", label: "Article", link: "services.html", border: "border-brand-dark" },
+            { id: 'video', coll: "youtube_videos", label: "Vidéo", link: "youtube.html", border: "border-red-600" },
+            { id: 'book', coll: "library", label: "Livre", link: "services.html", border: "border-accent" }
+        ];
+
+        categories.forEach(cat => {
+            const q = query(collection(db, cat.coll), orderBy("createdAt", "desc"), limit(3));
+            onSnapshot(q, (snap) => {
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
+
+                    // Filtre : Uniquement les éléments de moins de 24h
+                    if (createdAt && (now - createdAt) < oneDayInMs) {
+                        if (bellDot) bellDot.style.display = 'block';
+                        const itemHtml = `
+                            <div onclick="window.location.href='${cat.link}'" class="bg-white p-3 rounded-xl shadow-sm border-l-4 ${cat.border} mb-2 cursor-pointer">
+                                <h4 class="font-bold text-brand-dark text-[9px] uppercase">${cat.label}</h4>
+                                <p class="text-[11px] text-gray-700 font-medium line-clamp-2">${data.title}</p>
+                            </div>`;
+                        if (notifContent) notifContent.insertAdjacentHTML('afterbegin', itemHtml);
+                    }
+                });
+            });
+        });
+    }
+
+    // --- LE RESTE DU CODE (MENU, DRAG BELL) RESTE INTACT ---
     const menuBtn = document.getElementById('menu-button');
     const closeBtn = document.getElementById('close-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
@@ -281,13 +325,12 @@
         onSnapshot(q, (snap) => {
             const c = document.getElementById('notif-content');
             if (!c) return;
-            if (snap.empty) { c.innerHTML = '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>'; return; }
-            c.innerHTML = '';
+            if (snap.empty && c.innerHTML === '') { c.innerHTML = '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>'; return; }
             snap.forEach(doc => {
                 const d = doc.data();
-                c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`;
+                c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`;
             });
-            if (bellDot) bellDot.style.display = 'block';
+            if (bellDot && !snap.empty) bellDot.style.display = 'block';
         });
     }
 </script>
