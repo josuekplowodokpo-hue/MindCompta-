@@ -209,17 +209,10 @@
     </div>
 </footer>
 <script type="module">
-    // 1. IMPORTATIONS
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { 
-        getAuth, onAuthStateChanged, signInAnonymously, signOut, 
-        setPersistence, browserSessionPersistence 
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { 
-        getFirestore, collection, onSnapshot, query, orderBy, limit, doc 
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // 2. CONFIGURATION
     const firebaseConfig = { 
         apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", 
         authDomain: "mindcompta-a61ef.firebaseapp.com", 
@@ -228,144 +221,124 @@
         messagingSenderId: "578389020450", 
         appId: "1:578389020450:web:edf9dd48e394cff7601f7b" 
     };
-
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
     const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
-    setPersistence(auth, browserSessionPersistence);
 
-    // --- 3. GESTION DE L'ÉTAT D'ACTIVITÉ ---
     onAuthStateChanged(auth, (user) => {
-        const adminLinks = [document.getElementById('admin-link-desktop'), document.getElementById('admin-link-mobile')];
+        if (!user) signInAnonymously(auth);
+        const adminDesktop = document.getElementById('admin-link-desktop');
+        const adminMobile = document.getElementById('admin-link-mobile');
         const authDesktop = document.getElementById('auth-actions-desktop');
         const authMobile = document.getElementById('auth-actions-mobile');
         const footerUserName = document.getElementById('footer-user-name');
 
-        // Lancer le chargement des contenus
-        loadGlobalUpdates();
-
         if (user && !user.isAnonymous) {
-            // Utilisateur Connecté
+            // --- ÉTAT D'ACTIVITÉ : NOM ---
             if (footerUserName) footerUserName.innerText = user.displayName || user.email.split('@')[0];
-            
+
             if (user.uid === ADMIN_UID) {
-                adminLinks.forEach(link => link?.classList.remove('hidden'));
+                if (adminDesktop) adminDesktop.classList.remove('hidden');
+                if (adminMobile) adminMobile.classList.remove('hidden');
             }
-
-            const logoutHtml = `<button id="logout-btn" class="text-xs font-bold text-red-400 cursor-pointer">Quitter</button>`;
-            if(authDesktop) authDesktop.innerHTML = logoutHtml;
-            if(authMobile) authMobile.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl w-full font-bold">Déconnexion</button>`;
-
+            if (authDesktop) authDesktop.innerHTML = `<button id="logout-btn" class="text-xs font-bold text-red-400">Quitter</button>`;
+            if (authMobile) authMobile.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl w-full">Déconnexion</button>`;
             const handleLogout = () => signOut(auth).then(() => window.location.reload());
             document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
             document.getElementById('logout-btn-m')?.addEventListener('click', handleLogout);
         } else {
-            // Mode Visiteur
+            // --- ÉTAT D'ACTIVITÉ : VISITEUR ---
             if (footerUserName) footerUserName.innerText = "Visiteur";
-            if (!user) signInAnonymously(auth);
-            
-            adminLinks.forEach(link => link?.classList.add('hidden'));
-            
-            const loginHtml = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold">Connexion</a>`;
-            if(authDesktop) authDesktop.innerHTML = loginHtml;
-            if(authMobile) authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center w-full font-bold">Se Connecter</a>`;
+
+            if (authDesktop) authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold">Connexion</a>`;
+            if (authMobile) authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center w-full">Se Connecter</a>`;
         }
+        listenToAnnouncements();
     });
 
-    // --- 4. GESTION DES NOTIFICATIONS & GRILLE (Filtre 24h) ---
-    async function loadGlobalUpdates() {
-        const grid = document.getElementById('recent-updates-grid');
-        const notifContent = document.getElementById('notif-content');
-        const bellDot = document.getElementById('bell-dot');
+    // --- LOGIQUE MENU (INCHANGÉE) ---
+    const menuBtn = document.getElementById('menu-button');
+    const closeBtn = document.getElementById('close-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const overlay = document.getElementById('mobile-menu-overlay');
+    const toggleMenu = () => {
+        if(mobileMenu) mobileMenu.classList.toggle('open');
+        if(overlay) overlay.classList.toggle('hidden');
+    };
+    if (menuBtn) menuBtn.onclick = toggleMenu;
+    if (closeBtn) closeBtn.onclick = toggleMenu;
+    if (overlay) overlay.onclick = toggleMenu;
+
+    // --- LOGIQUE CLOCHE (FIXÉE) ---
+    const bell = document.getElementById('notification-bell');
+    const panel = document.getElementById('notif-panel');
+    const bellDot = document.getElementById('bell-dot');
+    let isDragging = false, hasMoved = false, startX, startY;
+
+    if (bell && panel) {
+        bell.onmousedown = (e) => { isDragging = true; hasMoved = false; startX = e.clientX - bell.offsetLeft; startY = e.clientY - bell.offsetTop; };
+        window.onmousemove = (e) => { 
+            if (!isDragging) return; hasMoved = true;
+            bell.style.left = `${e.clientX - startX}px`; bell.style.top = `${e.clientY - startY}px`;
+            bell.style.right = 'auto'; bell.style.bottom = 'auto';
+        };
+        window.onmouseup = () => { isDragging = false; };
+        bell.onclick = () => {
+            if (hasMoved) return;
+            panel.style.display = (panel.style.display === 'flex' ? 'none' : 'flex');
+            if(panel.style.display === 'flex') {
+                const r = bell.getBoundingClientRect();
+                panel.style.top = r.top > window.innerHeight/2 ? 'auto' : `${r.bottom+10}px`;
+                panel.style.bottom = r.top > window.innerHeight/2 ? `${window.innerHeight-r.top+10}px` : 'auto';
+                panel.style.right = '20px';
+                if(bellDot) bellDot.style.display = 'none';
+            }
+        };
+    }
+    const closeNotif = document.getElementById('close-notif');
+    if(closeNotif) closeNotif.onclick = () => panel.style.display = 'none';
+
+    // --- SYSTÈME DE NOTIFICATIONS (ANNONCES + MISES À JOUR 24H) ---
+    function listenToAnnouncements() {
+        const c = document.getElementById('notif-content');
+        if (!c) return;
+
+        // 1. Écoute des annonces système (Existantes)
+        const qAnnounce = query(collection(db, 'artifacts', 'mindcompta-finance', 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
+        onSnapshot(qAnnounce, (snap) => {
+            c.innerHTML = ''; // Nettoyage au début
+            if (snap.empty) { c.innerHTML = '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>'; }
+            snap.forEach(doc => {
+                const d = doc.data();
+                c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`;
+            });
+            if (bellDot && !snap.empty) bellDot.style.display = 'block';
+        });
+
+        // 2. Écoute des mises à jour 24h (Articles, Vidéos, Livres)
         const now = new Date();
         const oneDayInMs = 24 * 60 * 60 * 1000;
-
         const categories = [
-            { id: 'article', coll: "resources", label: "Article", link: "services.html", color: "bg-brand-dark", border: "border-brand-dark" },
-            { id: 'video', coll: "youtube_videos", label: "Vidéo", link: "youtube.html", color: "bg-red-600", border: "border-red-600" },
-            { id: 'book', coll: "library", label: "Livre", link: "services.html", color: "bg-accent", border: "border-accent" }
+            { id: 'article', coll: "resources", label: "Article", link: "services.html", border: "border-brand-dark" },
+            { id: 'video', coll: "youtube_videos", label: "Vidéo", link: "youtube.html", border: "border-red-600" },
+            { id: 'book', coll: "library", label: "Livre", link: "services.html", border: "border-accent" }
         ];
 
-        if (notifContent) notifContent.innerHTML = '';
-
         categories.forEach(cat => {
-            const q = query(collection(db, cat.coll), orderBy("createdAt", "desc"), limit(5));
-            
+            const q = query(collection(db, cat.coll), orderBy("createdAt", "desc"), limit(3));
             onSnapshot(q, (snap) => {
-                if (snap.empty) return;
-
-                // Nettoyer les anciennes cartes de cette catégorie dans la grille
-                if (grid) {
-                    grid.querySelectorAll(`.card-${cat.id}`).forEach(c => c.remove());
-                }
-
                 snap.forEach(doc => {
                     const data = doc.data();
                     const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
-
-                    // 1. Affichage systématique dans la GRILLE (Top 5)
-                    if (grid) renderGridCard(grid, data, cat);
-
-                    // 2. Affichage dans les NOTIFICATIONS uniquement si < 24h
                     if (createdAt && (now - createdAt) < oneDayInMs) {
                         if (bellDot) bellDot.style.display = 'block';
-                        if (notifContent) renderNotifItem(notifContent, data, cat, createdAt);
+                        c.insertAdjacentHTML('afterbegin', `<div onclick="window.location.href='${cat.link}'" class="bg-white p-3 rounded-xl shadow-sm border-l-4 ${cat.border} mb-2 cursor-pointer"><h4 class="font-bold text-brand-dark text-[9px] uppercase">${cat.label}</h4><p class="text-[11px] text-gray-700 font-medium line-clamp-2">${data.title}</p></div>`);
                     }
                 });
             });
         });
-    }
-
-    function renderGridCard(container, data, cat) {
-        const loggedIn = (auth.currentUser && !auth.currentUser.isAnonymous);
-        const canAccess = (loggedIn || cat.id === 'video');
-        const finalLink = canAccess ? cat.link : 'login.html';
-        
-        const card = document.createElement('div');
-        card.className = `card-${cat.id} group bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition duration-300`;
-        card.innerHTML = `
-            <div class="h-48 bg-gray-200 relative overflow-hidden">
-                <img src="${data.imageUrl || 'logo.jpg'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" onerror="this.src='logo.jpg'">
-                <div class="absolute top-4 left-4">
-                    <span class="${cat.color} text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">Nouveau ${cat.label}</span>
-                </div>
-            </div>
-            <div class="p-6">
-                <h3 class="font-bold text-brand-dark mb-2 line-clamp-2">${data.title}</h3>
-                <a href="${finalLink}" class="text-brand-dark font-black text-[10px] uppercase border-b-2 border-accent pb-1 inline-block">
-                    ${canAccess ? 'Consulter →' : 'Se connecter pour lire →'}
-                </a>
-            </div>`;
-        container.appendChild(card);
-    }
-
-    function renderNotifItem(container, data, cat, date) {
-        const item = document.createElement('div');
-        item.className = `notif-${cat.id} bg-white p-3 rounded-xl shadow-sm border-l-4 ${cat.border} mb-2 hover:bg-gray-50 transition cursor-pointer`;
-        item.onclick = () => window.location.href = cat.link;
-        item.innerHTML = `
-            <div class="flex justify-between items-start">
-                <h4 class="font-bold text-brand-dark text-[9px] uppercase">${cat.label}</h4>
-                <span class="text-[8px] text-gray-400">${date.toLocaleDateString()}</span>
-            </div>
-            <p class="text-[11px] text-gray-700 font-medium line-clamp-2 mt-1">${data.title}</p>`;
-        container.prepend(item);
-    }
-
-    // --- 5. LOGIQUE DU MENU MOBILE ---
-    document.getElementById('menu-button').onclick = () => {
-        document.getElementById('mobile-menu').classList.add('open');
-        document.getElementById('mobile-menu-overlay').classList.remove('hidden');
-    };
-    // Note: Assurez-vous d'avoir un bouton ou un ID pour fermer le menu
-    const closeBtn = document.getElementById('close-menu-button') || document.getElementById('mobile-menu-overlay');
-    if(closeBtn) {
-        closeBtn.onclick = () => {
-            document.getElementById('mobile-menu').classList.remove('open');
-            document.getElementById('mobile-menu-overlay').classList.add('hidden');
-        };
     }
 </script>
 </body>
