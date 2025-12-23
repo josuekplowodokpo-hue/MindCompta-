@@ -131,46 +131,33 @@
     </div>
 </section>
 
-    <div id="notification-bell" class="bg-brand-dark rounded-full shadow-2xl border-2 border-white/20 select-none">
-        <span class="text-2xl">🔔</span>
-        <div id="bell-dot" class="bell-dot"></div>
-    </div>
+<div id="notification-bell" class="bg-brand-dark rounded-full shadow-2xl border-2 border-white/20 select-none">
+    <span class="text-2xl">🔔</span>
+    <div id="bell-dot" class="bell-dot"></div>
+</div>
 
-    <div id="notif-panel">
-        <div class="bg-brand-dark p-4 text-white flex justify-between items-center">
-            <h3 class="font-black text-[10px] uppercase tracking-widest">Notifications</h3>
-            <button id="close-notif" class="text-white/50 text-xl hover:text-white transition">&times;</button>
-        </div>
-        <div id="notif-content" class="p-4 space-y-4 overflow-y-auto bg-gray-50 flex-grow max-h-[300px]"></div>
+<div id="notif-panel">
+    <div class="bg-brand-dark p-4 text-white flex justify-between items-center">
+        <h3 class="font-black text-[10px] uppercase tracking-widest">Notifications</h3>
+        <button id="close-notif" class="text-white/50 text-xl hover:text-white transition">&times;</button>
     </div>
+    <div id="notif-content" class="p-4 space-y-4 overflow-y-auto bg-gray-50 flex-grow max-h-[300px]"></div>
+</div>
+
 <div id="maintenance-popup" class="fixed inset-0 z-[9999] hidden flex items-center justify-center px-4 bg-brand-dark/80 backdrop-blur-md">
-    
-    <div class="relative max-w-2xl w-full bg-brand-dark rounded-3xl border border-white/10 shadow-2xl overflow-hidden transform transition-all">
-        
+    <div class="relative max-w-2xl w-full bg-brand-dark rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
         <div class="absolute -top-24 -right-24 w-48 h-48 bg-accent/20 blur-[80px] rounded-full"></div>
 
         <div class="p-8 md:p-12 relative">
-            <button onclick="closePopup()" class="absolute top-6 right-6 text-gray-500 hover:text-white transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
+            <button onclick="closePopup()" class="absolute top-6 right-6 text-gray-500 hover:text-white transition text-2xl">&times;</button>
 
             <div class="text-center space-y-6">
-                <div class="mx-auto w-20 h-20 bg-accent/10 rounded-3xl flex items-center justify-center border border-accent/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-accent animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="mx-auto w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center border border-accent/20 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-accent animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
 
-      <div id="maintenance-popup" class="fixed inset-0 z-[9999] hidden flex items-center justify-center px-4 bg-brand-dark/80 backdrop-blur-md">
-    <div class="relative max-w-2xl w-full bg-brand-dark rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
-        <div class="absolute -top-24 -right-24 w-48 h-48 bg-accent/20 blur-[80px] rounded-full"></div>
-        
-        <div class="p-8 md:p-12 relative">
-            <button onclick="closePopup()" class="absolute top-6 right-6 text-gray-500 hover:text-white transition text-2xl">&times;</button>
-            
-            <div class="text-center space-y-6">
                 <h3 id="popup-title" class="text-white text-3xl md:text-4xl font-black uppercase tracking-tighter italic leading-tight">
                     </h3>
 
@@ -189,13 +176,13 @@
 <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
     <div class="max-w-6xl mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-            
             <div class="space-y-6">
                 <div>
                     <h2 class="text-xl font-black uppercase tracking-tighter italic">MindCompta Finance</h2>
-                    <p class="text-xs text-gray-400 mt-2 leading-relaxed">Nous facilitons le quotidien des étudiant(e)s de la faculté des sciences économiques et de gestion en leur fournissant des articles qui expliquent les cours qu'ils (elles) reçoivent dans les amphithéâtres et des vidéos qui montent des exemples concrets et des explications très claires de plusieurs notions dont ils ont besoin pour valider leur unités d'enseignement en fin de semestre.</p>
+                    <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+                        Nous facilitons le quotidien des étudiant(e)s de la faculté des sciences économiques et de gestion...
+                    </p>
                 </div>
-                
                 <div class="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
                     <div class="h-2 w-2 bg-accent rounded-full shadow-[0_0_5px_#F59E0B]"></div>
                     <div class="flex flex-col">
@@ -219,7 +206,7 @@
                 <ul class="space-y-4 text-sm text-gray-400 font-medium">
                     <li><a href="#" class="hover:text-white transition">Centre d'aide</a></li>
                     <li><a href="#" class="hover:text-white transition">Contactez-nous</a></li>
-                    <li><a href="https://wa.me/22879592717?text=Bonjour%2C%20je%20souhaite%20obtenir%20des%20informations%20compl%C3%A9mentaires%20concernant%20MindCompta.%20Merci%20d%27avance" class="hover:text-white transition">FAQ</a></li>
+                    <li><a href="https://wa.me/22879592717" class="hover:text-white transition">FAQ</a></li>
                 </ul>
             </div>
 
