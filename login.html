@@ -129,7 +129,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { 
     getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-    GoogleAuthProvider, signInWithPopup, setPersistence, browserSessionPersistence,
+    GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence,
     sendPasswordResetEmail, sendEmailVerification, signOut, updateProfile
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -156,6 +156,37 @@ const authButton = document.getElementById('auth-button');
 const switchButton = document.getElementById('switch-button');
 const authMessage = document.getElementById('auth-message');
 
+// --- 1. GESTION DE LA SESSION PAR INACTIVITÉ (30 MIN) ---
+const SESSION_TIMEOUT = 30 * 60 * 1000; 
+
+const updateActivity = () => localStorage.setItem('lastActive', Date.now());
+
+const checkInactivity = () => {
+    const lastActive = localStorage.getItem('lastActive');
+    if (lastActive && (Date.now() - lastActive > SESSION_TIMEOUT)) {
+        signOut(auth).then(() => {
+            localStorage.removeItem('lastActive');
+            window.location.href = 'login.html?reason=timeout';
+        });
+    }
+};
+
+// Écouter les interactions pour réinitialiser le chrono
+['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(ev => {
+    document.addEventListener(ev, updateActivity);
+});
+setInterval(checkInactivity, 60000); // Vérification chaque minute
+
+// --- 2. LOGIQUE DE REDIRECTION ---
+const redirectUser = () => {
+    const prevPage = document.referrer;
+    if (prevPage && !prevPage.includes('login.html') && prevPage !== "") {
+        window.location.href = prevPage;
+    } else {
+        window.location.href = 'index.html';
+    }
+};
+
 function showMsg(text, isSuccess) {
     authMessage.innerText = text;
     authMessage.className = `text-center p-3 rounded-lg text-sm border-l-4 mt-4 ${isSuccess ? 'bg-green-100 text-green-700 border-green-500' : 'bg-red-100 text-red-700 border-red-500'}`;
@@ -171,16 +202,15 @@ async function syncUserToAdmin(user, extraData = {}) {
         status: "EN LIGNE",
         ...extraData
     };
-
     if (extraData.firstName && extraData.lastName) {
         data.displayName = `${extraData.firstName} ${extraData.lastName}`;
     } else if (user.displayName) {
         data.displayName = user.displayName;
     }
-    
     await setDoc(userRef, data, { merge: true });
 }
 
+// --- 3. ACTIONS DU FORMULAIRE ---
 document.getElementById('forgot-password').onclick = async () => {
     const email = document.getElementById('auth-email').value;
     if (!email) { showMsg("Entrez votre email d'abord.", false); return; }
@@ -205,7 +235,7 @@ document.getElementById('auth-form').onsubmit = async (e) => {
     const password = document.getElementById('auth-password').value;
 
     try {
-        await setPersistence(auth, browserSessionPersistence);
+        await setPersistence(auth, browserLocalPersistence);
         if (isSignInMode) {
             const res = await signInWithEmailAndPassword(auth, email, password);
             if (!res.user.emailVerified && res.user.uid !== ADMIN_UID) {
@@ -213,9 +243,10 @@ document.getElementById('auth-form').onsubmit = async (e) => {
                 showMsg("Vérifiez votre email avant de continuer.", false);
                 authButton.disabled = false; return;
             }
+            updateActivity();
             await syncUserToAdmin(res.user);
-            showMsg("Bon retour parmi nous !", true); // MESSAGE DE RETOUR
-            setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+            showMsg("Bon retour parmi nous !", true);
+            setTimeout(redirectUser, 1500);
         } else {
             const fn = document.getElementById('auth-firstname').value.trim();
             const ln = document.getElementById('auth-lastname').value.trim();
@@ -224,10 +255,9 @@ document.getElementById('auth-form').onsubmit = async (e) => {
             const res = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(res.user, { displayName: `${fn} ${ln}` });
             await syncUserToAdmin(res.user, { firstName: fn, lastName: ln, role: "Client", createdAt: serverTimestamp(), status: "INSCRIT" });
-            
             await sendEmailVerification(res.user);
             await signOut(auth);
-            showMsg("Bienvenue sur MindCompta ! Vérifiez vos emails pour valider votre compte.", true); // MESSAGE BIENVENUE
+            showMsg("Inscription réussie ! Vérifiez vos emails.", true);
             authButton.disabled = false;
             switchButton.click();
         }
@@ -236,15 +266,17 @@ document.getElementById('auth-form').onsubmit = async (e) => {
 
 document.getElementById('google-btn').onclick = async () => {
     try {
+        await setPersistence(auth, browserLocalPersistence);
         const res = await signInWithPopup(auth, new GoogleAuthProvider());
         const userDoc = await getDoc(doc(db, "artifacts", res.user.uid));
         if (!userDoc.exists()) {
             pendingGoogleUser = res.user;
             document.getElementById('profile-modal').classList.remove('hidden');
         } else { 
+            updateActivity();
             await syncUserToAdmin(res.user);
-            showMsg("Bon retour parmi nous !", true);
-            setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+            showMsg("Connexion réussie !", true);
+            setTimeout(redirectUser, 1000);
         }
     } catch (err) { showMsg(err.message, false); }
 };
@@ -254,9 +286,18 @@ document.getElementById('save-profile-btn').onclick = async () => {
     const ln = document.getElementById('modal-lastname').value.trim();
     if(!fn || !ln) return;
     await syncUserToAdmin(pendingGoogleUser, { firstName: fn, lastName: ln, role: "Client", createdAt: serverTimestamp() });
-    showMsg("Bienvenue sur MindCompta !", true);
-    setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+    updateActivity();
+    showMsg("Profil validé !", true);
+    setTimeout(redirectUser, 1000);
 };
+
+// Message si déconnecté automatiquement
+window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('reason') === 'timeout') {
+        showMsg("Session expirée pour inactivité.", false);
+    }
+});
 </script>
 </body>
 </html>
