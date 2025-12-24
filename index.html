@@ -226,20 +226,19 @@
     const db = getFirestore(app);
     const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
 
-    // --- 1. AUTHENTIFICATION & ÉTAT D'ACTIVITÉ ---
     onAuthStateChanged(auth, (user) => {
         if (!user) signInAnonymously(auth);
-        const adminDesktop = document.getElementById('admin-link-desktop');
-        const adminMobile = document.getElementById('admin-link-mobile');
+        const footerUserName = document.getElementById('footer-user-name');
         const authDesktop = document.getElementById('auth-actions-desktop');
         const authMobile = document.getElementById('auth-actions-mobile');
-        const footerUserName = document.getElementById('footer-user-name');
+        const adminDesktop = document.getElementById('admin-link-desktop');
+        const adminMobile = document.getElementById('admin-link-mobile');
 
         if (user && !user.isAnonymous) {
             if (footerUserName) footerUserName.innerText = user.displayName || user.email.split('@')[0];
             if (user.uid === ADMIN_UID) {
-                if (adminDesktop) adminDesktop.classList.remove('hidden');
-                if (adminMobile) adminMobile.classList.remove('hidden');
+                adminDesktop?.classList.remove('hidden');
+                adminMobile?.classList.remove('hidden');
             }
             if (authDesktop) authDesktop.innerHTML = `<button id="logout-btn" class="text-xs font-bold text-red-400 cursor-pointer">Quitter</button>`;
             if (authMobile) authMobile.innerHTML = `<button id="logout-btn-m" class="p-4 bg-red-500/10 text-red-400 rounded-2xl w-full font-bold">Déconnexion</button>`;
@@ -252,12 +251,10 @@
             if (authDesktop) authDesktop.innerHTML = `<a href="login.html" class="bg-accent text-brand-dark px-4 py-2 rounded-full text-xs font-bold">Connexion</a>`;
             if (authMobile) authMobile.innerHTML = `<a href="login.html" class="p-4 bg-accent text-brand-dark rounded-2xl text-center w-full font-bold">Se Connecter</a>`;
         }
-        
         loadHomepageGrid();
         listenToAnnouncements();
     });
 
-    // --- 2. GRILLE D'ACCUEIL (LES 10 ARTICLES) ---
     function loadHomepageGrid() {
         const grid = document.getElementById('recent-updates-grid');
         if (!grid) return;
@@ -276,37 +273,26 @@
                     const canAccess = (loggedIn || cat.id === 'video');
                     const card = document.createElement('div');
                     card.className = `card-${cat.id} group bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition duration-300`;
-                    card.innerHTML = `
-                        <div class="h-48 bg-gray-200 relative overflow-hidden">
-                            <img src="${data.imageUrl || 'logo.jpg'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" onerror="this.src='logo.jpg'">
-                            <div class="absolute top-4 left-4"><span class="${cat.color} text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">Nouveau ${cat.label}</span></div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="font-bold text-brand-dark mb-2 line-clamp-2">${data.title}</h3>
-                            <a href="${canAccess ? cat.link : 'login.html'}" class="text-brand-dark font-black text-[10px] uppercase border-b-2 border-accent pb-1 inline-block">${canAccess ? 'Consulter →' : 'Se connecter pour lire →'}</a>
-                        </div>`;
+                    card.innerHTML = `<div class="h-48 bg-gray-200 relative overflow-hidden"><img src="${data.imageUrl || 'logo.jpg'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" onerror="this.src='logo.jpg'"><div class="absolute top-4 left-4"><span class="${cat.color} text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">Nouveau ${cat.label}</span></div></div><div class="p-6"><h3 class="font-bold text-brand-dark mb-2 line-clamp-2">${data.title}</h3><a href="${canAccess ? cat.link : 'login.html'}" class="text-brand-dark font-black text-[10px] uppercase border-b-2 border-accent pb-1 inline-block">${canAccess ? 'Consulter →' : 'Se connecter pour lire →'}</a></div>`;
                     grid.appendChild(card);
                 });
             });
         });
     }
 
-    // --- 3. NOTIFICATIONS (CLOCHE + FILTRE 24H) ---
     function listenToAnnouncements() {
         const c = document.getElementById('notif-content');
         const bellDot = document.getElementById('bell-dot');
-        const now = new Date();
         if (!c) return;
-
+        const now = new Date();
         onSnapshot(query(collection(db, 'artifacts', 'mindcompta-finance', 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5)), (snap) => {
-            c.innerHTML = snap.empty ? '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>' : ''; 
+            c.innerHTML = snap.empty ? '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>' : '';
             snap.forEach(doc => {
                 const d = doc.data();
                 c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`;
             });
             if (!snap.empty && bellDot) bellDot.style.display = 'block';
         });
-
         ["resources", "youtube_videos", "library"].forEach(coll => {
             onSnapshot(query(collection(db, coll), orderBy("createdAt", "desc"), limit(1)), (snap) => {
                 snap.forEach(doc => {
@@ -317,7 +303,6 @@
         });
     }
 
-    // --- 4. LOGIQUE MENU MOBILE ---
     const toggleMenu = () => {
         document.getElementById('mobile-menu')?.classList.toggle('open');
         document.getElementById('mobile-menu-overlay')?.classList.toggle('hidden');
@@ -326,32 +311,27 @@
     document.getElementById('close-menu-button').onclick = toggleMenu;
     document.getElementById('mobile-menu-overlay').onclick = toggleMenu;
 
-    // --- 5. LOGIQUE CLOCHE FIXE (CORRIGÉE POUR LE POSITIONNEMENT) ---
+    // --- FIX POSITION PANNEAU ---
     const bell = document.getElementById('notification-bell');
     const panel = document.getElementById('notif-panel');
     const bellDot = document.getElementById('bell-dot');
-
     if (bell && panel) {
         bell.onclick = () => {
             const isVisible = (panel.style.display === 'flex');
-            
             if (!isVisible) {
-                // On affiche le panneau
                 panel.style.display = 'flex';
-                
-                // FORCE LE PANEL À RESTER PRÈS DE LA CLOCHE (En bas à droite)
                 panel.style.position = 'fixed';
-                panel.style.bottom = '80px'; // Juste au-dessus de la cloche
-                panel.style.right = '20px';  // Aligné à droite
-                panel.style.left = 'auto';   // Annule le "Top-Left" par défaut
-                panel.style.top = 'auto';    // Annule le "Top-Left" par défaut
-                
+                panel.style.bottom = '90px'; 
+                panel.style.right = '20px';
+                panel.style.left = 'auto';
+                panel.style.top = 'auto';
                 if (bellDot) bellDot.style.display = 'none';
             } else {
                 panel.style.display = 'none';
             }
         };
     }
+    document.getElementById('close-notif').onclick = () => { if(panel) panel.style.display = 'none'; };
 </script>
 </body>
 </html>
