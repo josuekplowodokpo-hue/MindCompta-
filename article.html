@@ -8,13 +8,10 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1E3A8A">
     <link rel="icon" type="image/jpeg" href="logo.jpg">
-    <link rel="apple-touch-icon" href="logo.jpg">
 
     <meta property="og:type" content="article">
     <meta property="og:title" id="og-title" content="Article - MindCompta Finance">
-    <meta property="og:description" id="og-desc" content="Découvrez cet article sur MindCompta Finance.">
     <meta property="og:image" id="og-image" content="logo.jpg">
-    <meta property="og:url" id="og-url" content="">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -24,7 +21,6 @@
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
         
-        /* Squelette de chargement ultra-rapide */
         .skeleton { background: #eee; position: relative; overflow: hidden; border-radius: 12px; }
         .skeleton::after {
             content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
@@ -42,18 +38,16 @@
 <body class="bg-gray-50 min-h-screen flex flex-col font-inter">
 
     <main class="w-full max-w-4xl mx-auto p-4 md:p-8 flex-grow">
-        <a href="services.html" class="inline-flex items-center text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand-dark my-8 transition">
-            <span class="mr-2 text-lg">←</span> Revenir aux articles
-        </a>
-
-        <div id="loading-state" class="space-y-6">
+        <div id="loading-state" class="space-y-6 pt-20">
             <div class="skeleton h-12 w-3/4 mx-auto"></div>
             <div class="skeleton h-64 w-full rounded-[2.5rem]"></div>
-            <div class="skeleton h-4 w-full"></div>
-            <div class="skeleton h-4 w-5/6"></div>
         </div>
 
         <div id="article-view" class="hidden">
+            <a href="services.html" class="inline-flex items-center text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand-dark my-8 transition">
+                <span class="mr-2 text-lg">←</span> Revenir
+            </a>
+
             <div class="bg-white p-6 md:p-12 rounded-[2.5rem] shadow-sm mb-10">
                 <h1 id="art-title" class="text-3xl md:text-5xl font-black text-brand-dark mb-8 leading-tight"></h1>
                 <div id="art-image-container"></div>
@@ -61,75 +55,51 @@
 
                 <div class="flex items-center justify-between py-6 border-t border-b border-gray-100 my-8">
                     <button id="btn-share" class="bg-gray-100 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-brand-dark hover:bg-accent transition">
-                        Partager l'article
+                        Partager
                     </button>
-                    <div class="flex items-center gap-2">
-                        <svg id="like-icon" class="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                    <button id="btn-like" class="flex items-center gap-2 group p-2">
+                        <svg id="like-icon" class="h-8 w-8 text-gray-300 transition group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
                         <span id="like-count" class="font-bold text-gray-400">0</span>
-                    </div>
+                    </button>
                 </div>
 
                 <nav class="flex justify-between items-center py-4 border-t border-gray-50 mt-10">
-                    <button id="prev-btn" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand-dark disabled:opacity-20 transition">← Article Précédent</button>
-                    <button id="next-btn" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand-dark disabled:opacity-20 transition">Article Suivant →</button>
+                    <button id="prev-btn" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand-dark disabled:opacity-20">← Précédent</button>
+                    <button id="next-btn" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand-dark disabled:opacity-20">Suivant →</button>
                 </nav>
             </div>
-
-            <div class="mb-10">
-                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-center text-gray-400 mb-6 italic">Articles à découvrir</h3>
-                <div id="similar-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </div>
+            
+            <div id="similar-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10"></div>
         </div>
     </main>
 
     <footer class="bg-brand-dark text-white pt-16 pb-8 px-4 mt-auto">
         <div class="max-w-6xl mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-                <div class="space-y-6">
-                    <div>
-                        <h2 class="text-xl font-black uppercase tracking-tighter italic">MindCompta Finance</h2>
-                        <p class="text-xs text-gray-400 mt-2 leading-relaxed">
-                            Nous facilitons le quotidien des étudiant(e)s de la faculté des sciences économiques et de gestion en leur fournissant des articles qui expliquent les cours qu'ils (elles) reçoivent dans les amphithéâtres et des vidéos qui montent des exemples concrets et des explications très claires de plusieurs notions dont ils ont besoin pour valider leur unités d'enseignement en fin de semestre.
-                        </p>
-                    </div>
-                    <div class="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
-                        <div class="h-2 w-2 bg-accent rounded-full shadow-[0_0_5px_#F59E0B]"></div>
-                        <div class="flex flex-col">
-                            <span class="text-[8px] text-gray-500 uppercase font-bold tracking-widest">Utilisateur</span>
-                            <span id="footer-user-name" class="text-xs font-medium text-gray-200 italic">Visiteur</span>
-                        </div>
-                    </div>
+                <div>
+                    <h2 class="text-xl font-black uppercase italic">MindCompta Finance</h2>
+                    <p class="text-xs text-gray-400 mt-2 leading-relaxed">Nous facilitons le quotidien des étudiant(e)s de la faculté des sciences économiques et de gestion...</p>
                 </div>
                 <div>
-                    <h3 class="text-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">Nos Services</h3>
-                    <ul class="space-y-4 text-sm text-gray-400 font-medium">
-                        <li><a href="services.html" class="hover:text-white transition">Comptabilité</a></li>
-                        <li><a href="services.html" class="hover:text-white transition">Conseil Fiscal</a></li>
-                        <li><a href="youtube.html" class="hover:text-white transition">Formations Vidéo</a></li>
+                    <h3 class="text-accent text-[10px] font-black uppercase mb-6">Services</h3>
+                    <ul class="text-sm text-gray-400 space-y-4">
+                        <li><a href="services.html" class="hover:text-white">Articles</a></li>
+                        <li><a href="youtube.html" class="hover:text-white">Vidéos</a></li>
                     </ul>
-                </div>
-                <div>
-                    <h3 class="text-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">Support</h3>
-                    <ul class="space-y-4 text-sm text-gray-400 font-medium">
-                        <li><a href="https://wa.me/22879592717" class="hover:text-white transition">Contact WhatsApp</a></li>
-                        <li><a href="#" class="hover:text-white transition">FAQ</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">Mon Compte</h3>
-                    <a href="login.html" class="block text-sm text-gray-400 hover:text-white transition font-medium">Espace Client</a>
                 </div>
             </div>
-            <div class="border-t border-white/10 pt-8">
-                <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest">&copy; 2025 MindCompta Finance.</p>
+            <div class="border-t border-white/10 pt-8 text-[10px] text-gray-500 uppercase font-black text-center">
+                &copy; 2025 MindCompta Finance.
             </div>
         </div>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, getDocs, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, getDocs, collection, query, orderBy, limit, runTransaction, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const fb = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
         const app = initializeApp(fb); const auth = getAuth(app); const db = getFirestore(app);
@@ -137,20 +107,29 @@
         const urlParams = new URLSearchParams(window.location.search);
         const articleId = urlParams.get('id');
 
-        async function initPage() {
+        // --- 1. SÉCURITÉ : VÉRIFICATION CONNEXION ---
+        onAuthStateChanged(auth, (user) => {
+            if (!user || user.isAnonymous) {
+                // Redirige vers login si non connecté ou anonyme
+                window.location.href = "login.html";
+            } else {
+                initPage(user);
+            }
+        });
+
+        async function initPage(user) {
             try {
-                // Chargement parallèle
                 const [artSnap, allSnap] = await Promise.all([
                     getDoc(doc(db, "resources", articleId)),
                     getDocs(query(collection(db, "resources"), orderBy("createdAt", "desc")))
                 ]);
 
                 if (artSnap.exists()) {
-                    const data = artSnap.data();
-                    renderArticle(data);
+                    renderArticle(artSnap.data());
                     setupNavigation(allSnap.docs);
                     renderSimilar(allSnap.docs, articleId);
-                    
+                    setupLikeLogic(user);
+
                     document.getElementById('loading-state').classList.add('hidden');
                     document.getElementById('article-view').classList.remove('hidden');
                 }
@@ -160,9 +139,52 @@
         function renderArticle(data) {
             document.getElementById('art-title').innerText = data.title;
             document.getElementById('art-content').innerHTML = data.content;
-            if(data.imageUrl) document.getElementById('art-image-container').innerHTML = `<img src="${data.imageUrl}" id="main-art-img" class="w-full h-auto rounded-3xl mb-8 shadow-lg">`;
+            if(data.imageUrl) document.getElementById('art-image-container').innerHTML = `<img src="${data.imageUrl}" id="main-art-img" class="rounded-3xl mb-8">`;
             document.getElementById('og-title').content = data.title;
-            document.getElementById('og-image').content = data.imageUrl || 'logo.jpg';
+        }
+
+        // --- 2. LOGIQUE DU BOUTON LIKE ---
+        function setupLikeLogic(user) {
+            const likeIcon = document.getElementById('like-icon');
+            const likeCountSpan = document.getElementById('like-count');
+
+            // Écouter les changements en temps réel sur l'article
+            onSnapshot(doc(db, "resources", articleId), (doc) => {
+                likeCountSpan.innerText = doc.data().likesCount || 0;
+            });
+
+            // Vérifier si l'utilisateur a déjà liké
+            onSnapshot(doc(db, "resources", articleId, "likes", user.uid), (snap) => {
+                if (snap.exists()) {
+                    likeIcon.classList.replace('text-gray-300', 'text-red-500');
+                    likeIcon.setAttribute('fill', 'currentColor');
+                } else {
+                    likeIcon.classList.replace('text-red-500', 'text-gray-300');
+                    likeIcon.setAttribute('fill', 'none');
+                }
+            });
+
+            document.getElementById('btn-like').onclick = async () => {
+                const artRef = doc(db, "resources", articleId);
+                const userLikeRef = doc(db, "resources", articleId, "likes", user.uid);
+
+                try {
+                    await runTransaction(db, async (transaction) => {
+                        const artDoc = await transaction.get(artRef);
+                        const likeDoc = await transaction.get(userLikeRef);
+
+                        let newCount = artDoc.data().likesCount || 0;
+
+                        if (likeDoc.exists()) {
+                            transaction.delete(userLikeRef);
+                            transaction.update(artRef, { likesCount: Math.max(0, newCount - 1) });
+                        } else {
+                            transaction.set(userLikeRef, { uid: user.uid, date: Date.now() });
+                            transaction.update(artRef, { likesCount: newCount + 1 });
+                        }
+                    });
+                } catch (e) { console.error("Erreur Like:", e); }
+            };
         }
 
         function setupNavigation(docs) {
@@ -170,15 +192,11 @@
             const pBtn = document.getElementById('prev-btn');
             const nBtn = document.getElementById('next-btn');
 
-            // Précédent = plus vieux (index suivant dans la liste triée desc)
-            if (idx < docs.length - 1) {
-                pBtn.onclick = () => window.location.href = `article.html?id=${docs[idx + 1].id}`;
-            } else { pBtn.disabled = true; }
+            if (idx < docs.length - 1) pBtn.onclick = () => window.location.href = `article.html?id=${docs[idx + 1].id}`;
+            else pBtn.disabled = true;
 
-            // Suivant = plus récent (index précédent dans la liste triée desc)
-            if (idx > 0) {
-                nBtn.onclick = () => window.location.href = `article.html?id=${docs[idx - 1].id}`;
-            } else { nBtn.disabled = true; }
+            if (idx > 0) nBtn.onclick = () => window.location.href = `article.html?id=${docs[idx - 1].id}`;
+            else nBtn.disabled = true;
         }
 
         function renderSimilar(docs, currentId) {
@@ -192,21 +210,8 @@
             });
         }
 
-        onAuthStateChanged(auth, (u) => {
-            if(!u) signInAnonymously(auth);
-            if(u && !u.isAnonymous) document.getElementById('footer-user-name').innerText = u.displayName || u.email.split('@')[0];
-            initPage();
-        });
-
         document.getElementById('btn-share').onclick = async () => {
-            const url = window.location.href;
-            if(navigator.share) {
-                try {
-                    await navigator.share({ title: document.getElementById('art-title').innerText, url: url });
-                } catch (e) { console.log(e); }
-            } else {
-                navigator.clipboard.writeText(url); alert("Lien copié !");
-            }
+            if(navigator.share) await navigator.share({ title: document.getElementById('art-title').innerText, url: window.location.href });
         };
     </script>
 </body>
