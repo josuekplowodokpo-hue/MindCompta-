@@ -326,18 +326,32 @@
     document.getElementById('close-menu-button').onclick = toggleMenu;
     document.getElementById('mobile-menu-overlay').onclick = toggleMenu;
 
-    // --- 5. LOGIQUE CLOCHE FIXE ---
+    // --- 5. LOGIQUE CLOCHE FIXE (CORRIGÉE POUR LE POSITIONNEMENT) ---
     const bell = document.getElementById('notification-bell');
     const panel = document.getElementById('notif-panel');
     const bellDot = document.getElementById('bell-dot');
+
     if (bell && panel) {
         bell.onclick = () => {
             const isVisible = (panel.style.display === 'flex');
-            panel.style.display = isVisible ? 'none' : 'flex';
-            if (!isVisible && bellDot) bellDot.style.display = 'none';
+            
+            if (!isVisible) {
+                // On affiche le panneau
+                panel.style.display = 'flex';
+                
+                // FORCE LE PANEL À RESTER PRÈS DE LA CLOCHE (En bas à droite)
+                panel.style.position = 'fixed';
+                panel.style.bottom = '80px'; // Juste au-dessus de la cloche
+                panel.style.right = '20px';  // Aligné à droite
+                panel.style.left = 'auto';   // Annule le "Top-Left" par défaut
+                panel.style.top = 'auto';    // Annule le "Top-Left" par défaut
+                
+                if (bellDot) bellDot.style.display = 'none';
+            } else {
+                panel.style.display = 'none';
+            }
         };
     }
-    document.getElementById('close-notif').onclick = () => { if(panel) panel.style.display = 'none'; };
 </script>
 </body>
 </html>
