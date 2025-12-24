@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture - MindCompta Finance</title>
+    
+    <meta property="og:type" content="article">
+    <meta property="og:title" id="og-title" content="Article - MindCompta Finance">
+    <meta property="og:description" id="og-desc" content="Découvrez cet article sur MindCompta Finance.">
+    <meta property="og:image" id="og-image" content="logo.jpg">
+    <meta property="og:url" id="og-url" content="">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -29,11 +36,8 @@
 
         <div id="article-container" class="hidden bg-white p-6 md:p-12 rounded-[2.5rem] shadow-sm mb-10">
             <h1 id="art-title" class="text-3xl md:text-5xl font-black text-brand-dark mt-4 mb-8 leading-tight"></h1>
-            
             <div id="art-image-container"></div>
-
-            <div id="art-content" class="article-body text-gray-700 text-lg mb-10">
-                </div>
+            <div id="art-content" class="article-body text-gray-700 text-lg mb-10"></div>
 
             <div class="flex items-center justify-between py-6 border-t border-b border-gray-100 my-8">
                 <div class="flex gap-6">
@@ -43,7 +47,7 @@
                         </svg>
                         <span id="like-count" class="font-bold text-gray-400">0</span>
                     </button>
-                    <button onclick="shareArticle()" class="bg-gray-100 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-brand-dark hover:bg-accent transition">
+                    <button id="btn-share" class="bg-gray-100 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-brand-dark hover:bg-accent transition">
                         Partager
                     </button>
                 </div>
@@ -53,11 +57,6 @@
                 <button id="prev-btn" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand-dark disabled:opacity-20 transition">← Précédent</button>
                 <button id="next-btn" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand-dark disabled:opacity-20 transition">Suivant →</button>
             </nav>
-
-            <div class="mt-16 pt-10 border-t border-gray-100">
-                <h3 class="text-xs font-black uppercase tracking-widest text-brand-dark mb-6 italic text-center">Continuer la lecture</h3>
-                <div id="similar-articles" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </div>
         </div>
     </main>
 
@@ -102,6 +101,11 @@
                     <h3 class="text-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">Mon Compte</h3>
                     <div class="space-y-4">
                         <a href="login.html" class="block text-sm text-gray-400 hover:text-white transition font-medium">Espace Client</a>
+                        <div id="delete-account-zone" class="hidden pt-4">
+                            <button onclick="handleDeleteAccount()" class="text-[9px] text-red-400/80 hover:text-red-400 font-bold uppercase tracking-widest border border-red-500/30 px-3 py-2 rounded-lg transition hover:bg-red-500/5">
+                                Supprimer mon compte
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -110,6 +114,10 @@
                 <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest">
                     &copy; 2025 MindCompta Finance. Tous droits réservés.
                 </p>
+                <div class="flex gap-6 text-[9px] text-gray-500 font-bold uppercase">
+                    <a href="#" class="hover:text-white transition">Mentions Légales</a>
+                    <a href="#" class="hover:text-white transition">Confidentialité</a>
+                </div>
             </div>
         </div>
     </footer>
@@ -117,7 +125,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, collection, onSnapshot, query, orderBy, limit, runTransaction, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, query, orderBy, limit, runTransaction, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const fb = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
         const app = initializeApp(fb); const auth = getAuth(app); const db = getFirestore(app);
@@ -142,14 +150,29 @@
             onSnapshot(doc(db, "resources", articleId), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
-                    document.getElementById('art-title').innerText = data.title;
-                    document.getElementById('art-content').innerHTML = data.content;
+                    const title = data.title;
+                    const content = data.content;
+                    const imageUrl = data.imageUrl || "logo.jpg";
+                    const description = content.replace(/<[^>]*>/g, '').substring(0, 150) + "...";
+
+                    document.getElementById('art-title').innerText = title;
+                    document.getElementById('art-content').innerHTML = content;
                     document.getElementById('like-count').innerText = data.likesCount || 0;
+                    
                     if (data.imageUrl) {
-                        document.getElementById('art-image-container').innerHTML = `<img src="${data.imageUrl}" class="w-full h-auto rounded-3xl mb-8 shadow-lg">`;
+                        document.getElementById('art-image-container').innerHTML = `<img src="${data.imageUrl}" id="main-art-img" class="w-full h-auto rounded-3xl mb-8 shadow-lg">`;
                     }
+
+                    // Maj des Meta pour les réseaux sociaux
+                    document.getElementById('og-title').setAttribute('content', title);
+                    document.getElementById('og-desc').setAttribute('content', description);
+                    document.getElementById('og-image').setAttribute('content', imageUrl);
+                    document.getElementById('og-url').setAttribute('content', window.location.href);
+
                     document.getElementById('loader-article').classList.add('hidden');
                     document.getElementById('article-container').classList.remove('hidden');
+
+                    document.getElementById('btn-share').onclick = () => handleAdvancedShare(title, description, imageUrl);
                 }
             });
 
@@ -161,7 +184,26 @@
 
             document.getElementById('btn-like').onclick = window.handleLike;
             loadNavigation();
-            loadSimilarArticles();
+        }
+
+        async function handleAdvancedShare(title, text, imageUrl) {
+            const shareUrl = window.location.href;
+            if (navigator.share) {
+                try {
+                    const shareData = { title: title, text: text, url: shareUrl };
+                    const imgTag = document.getElementById('main-art-img');
+                    if (imgTag && navigator.canShare) {
+                        const response = await fetch(imgTag.src);
+                        const blob = await response.blob();
+                        const file = new File([blob], 'article.jpg', { type: blob.type });
+                        if (navigator.canShare({ files: [file] })) shareData.files = [file];
+                    }
+                    await navigator.share(shareData);
+                } catch (err) { console.log(err); }
+            } else {
+                navigator.clipboard.writeText(shareUrl);
+                alert("Lien copié !");
+            }
         }
 
         window.handleLike = async () => {
@@ -176,30 +218,12 @@
             });
         };
 
-        window.shareArticle = async () => {
-            if (navigator.share) await navigator.share({ title: document.getElementById('art-title').innerText, url: window.location.href });
-            else { navigator.clipboard.writeText(window.location.href); alert("Lien copié !"); }
-        };
-
         async function loadNavigation() {
             const snap = await getDocs(query(collection(db, "resources"), orderBy("createdAt", "desc")));
             const docs = snap.docs; const idx = docs.findIndex(d => d.id === articleId);
             const pBtn = document.getElementById('prev-btn'); const nBtn = document.getElementById('next-btn');
             if (idx > 0) pBtn.onclick = () => window.location.href = `article.html?id=${docs[idx - 1].id}`; else pBtn.disabled = true;
             if (idx < docs.length - 1) nBtn.onclick = () => window.location.href = `article.html?id=${docs[idx + 1].id}`; else nBtn.disabled = true;
-        }
-
-        async function loadSimilarArticles() {
-            const snap = await getDocs(query(collection(db, "resources"), limit(5)));
-            const container = document.getElementById('similar-articles');
-            container.innerHTML = '';
-            snap.forEach(ds => {
-                if(ds.id !== articleId) {
-                    container.innerHTML += `<a href="article.html?id=${ds.id}" class="block bg-gray-50 p-4 rounded-2xl border border-transparent hover:border-accent transition">
-                        <h4 class="font-bold text-brand-dark text-xs mb-1">${ds.data().title}</h4>
-                        <span class="text-[9px] text-accent font-black uppercase">Lire →</span></a>`;
-                }
-            });
         }
     </script>
 </body>
