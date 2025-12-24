@@ -226,7 +226,7 @@
     const db = getFirestore(app);
     const ADMIN_UID = "2BEpfRKWXIVGxyS7wJM8iSmvWY92";
 
-    // --- 1. ÉTAT D'ACTIVITÉ & AUTH ---
+    // --- 1. AUTHENTIFICATION & ÉTAT D'ACTIVITÉ ---
     onAuthStateChanged(auth, (user) => {
         if (!user) signInAnonymously(auth);
         const adminDesktop = document.getElementById('admin-link-desktop');
@@ -298,13 +298,13 @@
         const now = new Date();
         if (!c) return;
 
-        const qAnn = query(collection(db, 'artifacts', 'mindcompta-finance', 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5));
-        onSnapshot(qAnn, (snap) => {
+        onSnapshot(query(collection(db, 'artifacts', 'mindcompta-finance', 'public', 'data', 'site_notifications'), orderBy('timestamp', 'desc'), limit(5)), (snap) => {
             c.innerHTML = snap.empty ? '<div class="text-center py-8 text-gray-400 text-[10px]">RIEN POUR LE MOMENT</div>' : ''; 
             snap.forEach(doc => {
                 const d = doc.data();
                 c.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent mb-2"><h4 class="font-bold text-brand-dark text-[10px] uppercase">ANNONCE</h4><p class="text-xs text-gray-600 mt-1">${d.text || d.message}</p></div>`;
             });
+            if (!snap.empty && bellDot) bellDot.style.display = 'block';
         });
 
         ["resources", "youtube_videos", "library"].forEach(coll => {
@@ -318,23 +318,18 @@
     }
 
     // --- 4. LOGIQUE MENU MOBILE ---
-    const menuBtn = document.getElementById('menu-button');
-    const closeBtn = document.getElementById('close-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const overlay = document.getElementById('mobile-menu-overlay');
     const toggleMenu = () => {
-        if(mobileMenu) mobileMenu.classList.toggle('open');
-        if(overlay) overlay.classList.toggle('hidden');
+        document.getElementById('mobile-menu')?.classList.toggle('open');
+        document.getElementById('mobile-menu-overlay')?.classList.toggle('hidden');
     };
-    if (menuBtn) menuBtn.onclick = toggleMenu;
-    if (closeBtn) closeBtn.onclick = toggleMenu;
-    if (overlay) overlay.onclick = toggleMenu;
+    document.getElementById('menu-button').onclick = toggleMenu;
+    document.getElementById('close-menu-button').onclick = toggleMenu;
+    document.getElementById('mobile-menu-overlay').onclick = toggleMenu;
 
-    // --- 5. LOGIQUE CLOCHE (FIXE ET SIMPLE) ---
+    // --- 5. LOGIQUE CLOCHE FIXE ---
     const bell = document.getElementById('notification-bell');
     const panel = document.getElementById('notif-panel');
     const bellDot = document.getElementById('bell-dot');
-
     if (bell && panel) {
         bell.onclick = () => {
             const isVisible = (panel.style.display === 'flex');
