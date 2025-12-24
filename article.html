@@ -5,9 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture - MindCompta Finance</title>
     
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1E3A8A">
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="apple-touch-icon" href="logo.jpg">
+
     <meta property="og:type" content="article">
     <meta property="og:title" id="og-title" content="Article - MindCompta Finance">
-    <meta property="og:description" id="og-desc" content="Découvrez nos articles sur la comptabilité et la gestion.">
+    <meta property="og:description" id="og-desc" content="Découvrez cet article sur MindCompta Finance.">
     <meta property="og:image" id="og-image" content="logo.jpg">
     <meta property="og:url" id="og-url" content="">
 
@@ -18,8 +23,19 @@
         .bg-brand-dark { background-color: var(--brand-dark); }
         .text-brand-dark { color: var(--brand-dark); }
         .bg-accent { background-color: var(--accent); }
+        
+        /* Squelette de chargement ultra-rapide */
+        .skeleton { background: #eee; position: relative; overflow: hidden; border-radius: 12px; }
+        .skeleton::after {
+            content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+            transform: translateX(-100%);
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
+
         .article-body img { width: 100%; border-radius: 1.5rem; margin: 2rem 0; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .article-body h2, .article-body h3 { font-weight: 900; color: var(--brand-dark); text-transform: uppercase; margin-top: 2.5rem; border-left: 4px solid var(--accent); padding-left: 1rem; }
+        .article-body h2 { font-weight: 900; color: var(--brand-dark); text-transform: uppercase; margin-top: 2.5rem; border-left: 4px solid var(--accent); padding-left: 1rem; }
         .article-body p { margin-bottom: 1.5rem; color: #4b5563; line-height: 1.8; }
     </style>
 </head>
@@ -30,40 +46,38 @@
             <span class="mr-2 text-lg">←</span> Revenir aux articles
         </a>
 
-        <div id="loader-article" class="flex justify-center py-20">
-            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div>
+        <div id="loading-state" class="space-y-6">
+            <div class="skeleton h-12 w-3/4 mx-auto"></div>
+            <div class="skeleton h-64 w-full rounded-[2.5rem]"></div>
+            <div class="skeleton h-4 w-full"></div>
+            <div class="skeleton h-4 w-5/6"></div>
         </div>
 
-        <div id="article-container" class="hidden bg-white p-6 md:p-12 rounded-[2.5rem] shadow-sm mb-10">
-            <h1 id="art-title" class="text-3xl md:text-5xl font-black text-brand-dark mt-4 mb-8 leading-tight"></h1>
-            
-            <div id="art-image-container"></div>
+        <div id="article-view" class="hidden">
+            <div class="bg-white p-6 md:p-12 rounded-[2.5rem] shadow-sm mb-10">
+                <h1 id="art-title" class="text-3xl md:text-5xl font-black text-brand-dark mb-8 leading-tight"></h1>
+                <div id="art-image-container"></div>
+                <div id="art-content" class="article-body text-gray-700 text-lg"></div>
 
-            <div id="art-content" class="article-body text-gray-700 text-lg mb-10"></div>
-
-            <div class="flex items-center justify-between py-6 border-t border-b border-gray-100 my-8">
-                <div class="flex gap-6">
-                    <button id="btn-like" class="flex items-center gap-2 group">
-                        <svg id="like-icon" class="h-8 w-8 text-gray-300 transition group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                        <span id="like-count" class="font-bold text-gray-400">0</span>
-                    </button>
+                <div class="flex items-center justify-between py-6 border-t border-b border-gray-100 my-8">
                     <button id="btn-share" class="bg-gray-100 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-brand-dark hover:bg-accent transition">
                         Partager l'article
                     </button>
+                    <div class="flex items-center gap-2">
+                        <svg id="like-icon" class="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                        <span id="like-count" class="font-bold text-gray-400">0</span>
+                    </div>
                 </div>
+
+                <nav class="flex justify-between items-center py-4 border-t border-gray-50 mt-10">
+                    <button id="prev-btn" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand-dark disabled:opacity-20 transition">← Article Précédent</button>
+                    <button id="next-btn" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand-dark disabled:opacity-20 transition">Article Suivant →</button>
+                </nav>
             </div>
 
-            <nav class="flex justify-between items-center py-4">
-                <button id="prev-btn" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand-dark disabled:opacity-20 transition">← Précédent</button>
-                <button id="next-btn" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand-dark disabled:opacity-20 transition">Suivant →</button>
-            </nav>
-
-            <div class="mt-16 pt-10 border-t border-gray-100">
-                <h3 class="text-xs font-black uppercase tracking-widest text-brand-dark mb-6 italic text-center">Articles similaires</h3>
-                <div id="similar-articles" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    </div>
+            <div class="mb-10">
+                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-center text-gray-400 mb-6 italic">Articles à découvrir</h3>
+                <div id="similar-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
         </div>
     </main>
@@ -75,7 +89,7 @@
                     <div>
                         <h2 class="text-xl font-black uppercase tracking-tighter italic">MindCompta Finance</h2>
                         <p class="text-xs text-gray-400 mt-2 leading-relaxed">
-                            Nous facilitons le quotidien des étudiant(e)s de la faculté des sciences économiques et de gestion en leur fournissant des articles qui expliquent les cours qu'ils (elles) reçoivent dans les amphithéâtres et des vidéos...
+                            Nous facilitons le quotidien des étudiant(e)s de la faculté des sciences économiques et de gestion en leur fournissant des articles qui expliquent les cours qu'ils (elles) reçoivent dans les amphithéâtres et des vidéos qui montent des exemples concrets et des explications très claires de plusieurs notions dont ils ont besoin pour valider leur unités d'enseignement en fin de semestre.
                         </p>
                     </div>
                     <div class="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
@@ -86,7 +100,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div>
                     <h3 class="text-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">Nos Services</h3>
                     <ul class="space-y-4 text-sm text-gray-400 font-medium">
@@ -95,159 +108,106 @@
                         <li><a href="youtube.html" class="hover:text-white transition">Formations Vidéo</a></li>
                     </ul>
                 </div>
-
                 <div>
                     <h3 class="text-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">Support</h3>
                     <ul class="space-y-4 text-sm text-gray-400 font-medium">
-                        <li><a href="#" class="hover:text-white transition">Centre d'aide</a></li>
-                        <li><a href="https://wa.me/22879592717" class="hover:text-white transition">FAQ / WhatsApp</a></li>
+                        <li><a href="https://wa.me/22879592717" class="hover:text-white transition">Contact WhatsApp</a></li>
+                        <li><a href="#" class="hover:text-white transition">FAQ</a></li>
                     </ul>
                 </div>
-
                 <div>
                     <h3 class="text-accent text-[10px] font-black uppercase tracking-[0.2em] mb-6">Mon Compte</h3>
-                    <div class="space-y-4">
-                        <a href="login.html" class="block text-sm text-gray-400 hover:text-white transition font-medium">Espace Client</a>
-                    </div>
+                    <a href="login.html" class="block text-sm text-gray-400 hover:text-white transition font-medium">Espace Client</a>
                 </div>
             </div>
-
-            <div class="border-t border-white/10 pt-8 text-center">
-                <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest">
-                    &copy; 2025 MindCompta Finance. Tous droits réservés.
-                </p>
+            <div class="border-t border-white/10 pt-8">
+                <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest">&copy; 2025 MindCompta Finance.</p>
             </div>
         </div>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, collection, onSnapshot, query, orderBy, limit, runTransaction, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, getDocs, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const fb = { apiKey: "AIzaSyBvNz0MV5IqgJgnZqlBq1K66QFHBIVSGk0", authDomain: "mindcompta-a61ef.firebaseapp.com", projectId: "mindcompta-a61ef", storageBucket: "mindcompta-a61ef.firebasestorage.app", messagingSenderId: "578389020450", appId: "1:578389020450:web:edf9dd48e394cff7601f7b" };
         const app = initializeApp(fb); const auth = getAuth(app); const db = getFirestore(app);
 
         const urlParams = new URLSearchParams(window.location.search);
         const articleId = urlParams.get('id');
-        if (!articleId) window.location.href = "services.html";
 
-        // --- SÉCURITÉ INACTIVITÉ ---
-        const updateActivity = () => localStorage.setItem('lastActive', Date.now());
-        ['mousedown', 'scroll', 'touchstart'].forEach(e => document.addEventListener(e, updateActivity));
-        setInterval(() => {
-            const last = localStorage.getItem('lastActive');
-            if(last && (Date.now() - last > 30 * 60 * 1000)) {
-                signOut(auth).then(() => window.location.href = 'login.html?reason=timeout');
-            }
-        }, 60000);
+        async function initPage() {
+            try {
+                // Chargement parallèle
+                const [artSnap, allSnap] = await Promise.all([
+                    getDoc(doc(db, "resources", articleId)),
+                    getDocs(query(collection(db, "resources"), orderBy("createdAt", "desc")))
+                ]);
 
-        onAuthStateChanged(auth, (user) => {
-            if (!user) signInAnonymously(auth);
-            const footerUserName = document.getElementById('footer-user-name');
-            if (user && !user.isAnonymous) {
-                footerUserName.innerText = user.displayName || user.email.split('@')[0];
-            } else {
-                footerUserName.innerText = "Visiteur";
-            }
-            if (user) loadArticleDetail(user);
-        });
-
-        async function loadArticleDetail(user) {
-            onSnapshot(doc(db, "resources", articleId), (snap) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    const title = data.title;
-                    const content = data.content;
-                    const imgUrl = data.imageUrl || "logo.jpg";
-                    const desc = content.replace(/<[^>]*>/g, '').substring(0, 160) + "...";
-
-                    document.getElementById('art-title').innerText = title;
-                    document.getElementById('art-content').innerHTML = content;
-                    document.getElementById('like-count').innerText = data.likesCount || 0;
+                if (artSnap.exists()) {
+                    const data = artSnap.data();
+                    renderArticle(data);
+                    setupNavigation(allSnap.docs);
+                    renderSimilar(allSnap.docs, articleId);
                     
-                    if (data.imageUrl) {
-                        document.getElementById('art-image-container').innerHTML = `<img src="${data.imageUrl}" id="main-art-img" class="w-full h-auto rounded-3xl mb-8 shadow-lg">`;
-                    }
-
-                    // Meta Tags
-                    document.getElementById('og-title').setAttribute('content', title);
-                    document.getElementById('og-desc').setAttribute('content', desc);
-                    document.getElementById('og-image').setAttribute('content', imgUrl);
-
-                    document.getElementById('loader-article').classList.add('hidden');
-                    document.getElementById('article-container').classList.remove('hidden');
-
-                    // Bouton Partager
-                    document.getElementById('btn-share').onclick = () => handleShare(title, desc, imgUrl);
+                    document.getElementById('loading-state').classList.add('hidden');
+                    document.getElementById('article-view').classList.remove('hidden');
                 }
-            });
-
-            // Likes
-            onSnapshot(doc(db, "resources", articleId, "likes", user.uid), (lSnap) => {
-                const icon = document.getElementById('like-icon');
-                if (lSnap.exists()) { icon.classList.replace('text-gray-300', 'text-red-500'); icon.setAttribute('fill', 'currentColor'); }
-                else { icon.classList.replace('text-red-500', 'text-gray-300'); icon.setAttribute('fill', 'none'); }
-            });
-
-            document.getElementById('btn-like').onclick = window.handleLike;
-            loadNavigation();
-            loadSimilarArticles(articleId);
+            } catch (e) { console.error(e); }
         }
 
-        async function handleShare(title, text, imgUrl) {
+        function renderArticle(data) {
+            document.getElementById('art-title').innerText = data.title;
+            document.getElementById('art-content').innerHTML = data.content;
+            if(data.imageUrl) document.getElementById('art-image-container').innerHTML = `<img src="${data.imageUrl}" id="main-art-img" class="w-full h-auto rounded-3xl mb-8 shadow-lg">`;
+            document.getElementById('og-title').content = data.title;
+            document.getElementById('og-image').content = data.imageUrl || 'logo.jpg';
+        }
+
+        function setupNavigation(docs) {
+            const idx = docs.findIndex(d => d.id === articleId);
+            const pBtn = document.getElementById('prev-btn');
+            const nBtn = document.getElementById('next-btn');
+
+            // Précédent = plus vieux (index suivant dans la liste triée desc)
+            if (idx < docs.length - 1) {
+                pBtn.onclick = () => window.location.href = `article.html?id=${docs[idx + 1].id}`;
+            } else { pBtn.disabled = true; }
+
+            // Suivant = plus récent (index précédent dans la liste triée desc)
+            if (idx > 0) {
+                nBtn.onclick = () => window.location.href = `article.html?id=${docs[idx - 1].id}`;
+            } else { nBtn.disabled = true; }
+        }
+
+        function renderSimilar(docs, currentId) {
+            const grid = document.getElementById('similar-grid');
+            docs.filter(d => d.id !== currentId).slice(0, 4).forEach(ds => {
+                grid.innerHTML += `
+                    <a href="article.html?id=${ds.id}" class="block bg-white p-4 rounded-2xl border border-gray-100 hover:border-accent transition shadow-sm">
+                        <h4 class="font-bold text-brand-dark text-xs">${ds.data().title}</h4>
+                        <span class="text-[9px] text-accent font-black uppercase mt-2 block">Lire →</span>
+                    </a>`;
+            });
+        }
+
+        onAuthStateChanged(auth, (u) => {
+            if(!u) signInAnonymously(auth);
+            if(u && !u.isAnonymous) document.getElementById('footer-user-name').innerText = u.displayName || u.email.split('@')[0];
+            initPage();
+        });
+
+        document.getElementById('btn-share').onclick = async () => {
             const url = window.location.href;
-            if (navigator.share) {
+            if(navigator.share) {
                 try {
-                    const data = { title, text, url };
-                    const img = document.getElementById('main-art-img');
-                    if (img && navigator.canShare) {
-                        const res = await fetch(img.src);
-                        const blob = await res.blob();
-                        const file = new File([blob], 'photo.jpg', { type: blob.type });
-                        if (navigator.canShare({ files: [file] })) data.files = [file];
-                    }
-                    await navigator.share(data);
+                    await navigator.share({ title: document.getElementById('art-title').innerText, url: url });
                 } catch (e) { console.log(e); }
             } else {
                 navigator.clipboard.writeText(url); alert("Lien copié !");
             }
-        }
-
-        window.handleLike = async () => {
-            const user = auth.currentUser; if (!user) return;
-            const docRef = doc(db, "resources", articleId);
-            const likeRef = doc(db, "resources", articleId, "likes", user.uid);
-            await runTransaction(db, async (t) => {
-                const snap = await t.get(docRef); const lSnap = await t.get(likeRef);
-                let count = snap.data().likesCount || 0;
-                if (lSnap.exists()) { t.delete(likeRef); t.update(docRef, { likesCount: Math.max(0, count - 1) }); }
-                else { t.set(likeRef, { uid: user.uid }); t.update(docRef, { likesCount: count + 1 }); }
-            });
         };
-
-        async function loadNavigation() {
-            const snap = await getDocs(query(collection(db, "resources"), orderBy("createdAt", "desc")));
-            const docs = snap.docs; const idx = docs.findIndex(d => d.id === articleId);
-            const pBtn = document.getElementById('prev-btn'); const nBtn = document.getElementById('next-btn');
-            if (idx > 0) pBtn.onclick = () => window.location.href = `article.html?id=${docs[idx - 1].id}`; else pBtn.disabled = true;
-            if (idx < docs.length - 1) nBtn.onclick = () => window.location.href = `article.html?id=${docs[idx + 1].id}`; else nBtn.disabled = true;
-        }
-
-        async function loadSimilarArticles(currentId) {
-            const snap = await getDocs(query(collection(db, "resources"), limit(5)));
-            const container = document.getElementById('similar-articles');
-            container.innerHTML = "";
-            snap.forEach(ds => {
-                if(ds.id !== currentId) {
-                    container.innerHTML += `
-                        <a href="article.html?id=${ds.id}" class="block bg-gray-50 p-4 rounded-2xl border border-transparent hover:border-accent transition">
-                            <h4 class="font-bold text-brand-dark text-xs mb-1">${ds.data().title}</h4>
-                            <span class="text-[9px] text-accent font-black uppercase">Lire →</span>
-                        </a>`;
-                }
-            });
-        }
     </script>
 </body>
 </html>
