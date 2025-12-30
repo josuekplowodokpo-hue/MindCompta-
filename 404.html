@@ -2,25 +2,59 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>MindCompta Finance - Redirection</title>
+    <title>MindCompta Finance - Migration</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // FORCED REDIRECTION TO THE NEW HOMEPAGE
-        window.onload = function() {
-            const newHome = "https://mindcompta-a61ef.firebaseapp.com/";
-            
-            // We use replace to avoid the "back button" loop
-            setTimeout(() => {
-                window.location.replace(newHome);
+        let seconds = 10; // Délai de 10 secondes pour une lecture confortable
+        function startCountdown() {
+            const timerElement = document.getElementById('timer');
+            const interval = setInterval(() => {
+                seconds--;
+                timerElement.innerText = seconds;
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    window.location.replace("https://mindcompta-a61ef.firebaseapp.com" + window.location.pathname);
+                }
             }, 1000);
-        };
+        }
+        window.onload = startCountdown;
     </script>
 </head>
-<body class="bg-slate-50 flex items-center justify-center min-h-screen">
-    <div class="text-center p-10 bg-white rounded-[40px] shadow-xl border border-slate-100">
-        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-900 mx-auto mb-4"></div>
-        <h1 class="text-xl font-black text-[#1E3A8A] uppercase mb-2">MindCompta Finance</h1>
-        <p class="text-slate-500 text-sm">Redirection vers notre nouvelle plateforme...</p>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-6">
+    <div class="max-w-lg w-full bg-white rounded-[40px] p-12 shadow-2xl text-center">
+        
+        <div class="mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full border-4 border-amber-500">
+                <span id="timer" class="text-3xl font-black text-amber-600">10</span>
+            </div>
+            <p class="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-400 mt-2">secondes avant redirection</p>
+        </div>
+
+        <h1 class="text-3xl font-black text-[#1E3A8A] uppercase italic mb-6 tracking-tighter">
+            MindCompta Finance
+        </h1>
+
+        <div class="space-y-4 text-left bg-slate-50 p-8 rounded-3xl border border-slate-200 mb-8">
+            <h2 class="text-[#1E3A8A] font-bold text-lg uppercase">Annonce Importante :</h2>
+            <p class="text-slate-600 leading-relaxed">
+                Nous avons officiellement migré notre site internet de **GitHub** vers la technologie **Firebase**. 
+            </p>
+            <p class="text-slate-600 leading-relaxed">
+                Ce changement permet de vous offrir une plateforme plus rapide, plus sécurisée et mieux adaptée à vos cours de comptabilité et de finance.
+            </p>
+            <p class="text-slate-700 font-semibold italic">
+                Veuillez mettre à jour vos favoris !
+            </p>
+        </div>
+
+        <div class="flex flex-col items-center gap-4">
+            <a href="https://mindcompta-a61ef.firebaseapp.com" 
+               class="bg-[#F59E0B] text-[#1E3A8A] px-10 py-4 rounded-2xl font-black uppercase text-sm shadow-lg hover:bg-amber-500 transition-all">
+                Aller sur le nouveau site maintenant
+            </a>
+            <p class="text-slate-400 text-[10px] uppercase">L'ancienne adresse ne sera bientôt plus disponible</p>
+        </div>
+
     </div>
 </body>
 </html>
